@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 3.18)
+
+message(STATUS "CMake version: ${CMAKE_VERSION}")
+
+## Language setup ##
+
+set(CMAKE_DISABLE_SOURCE_CHANGES ON)
+set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+set(CMAKE_BUILD_TYPE_INIT Release)
+
+set(CMAKE_INSTALL_MESSAGE LAZY)
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+
+## Establish project ##
+
+project(anari_library_vtkm LANGUAGES C CXX)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+
+include(GNUInstallDirs)
+
+## Dependencies ##
+
+find_package(anari 0.8.0 REQUIRED)
+find_package(VTKm 2.1 REQUIRED)
+
+## Build Targets ##
+
+add_subdirectory(device)

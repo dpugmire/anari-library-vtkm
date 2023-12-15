@@ -1,0 +1,10 @@
+_*/
+*vscode*
+build/
+cmake-build-*
+docs/gen/*
+docs/out/*
+.vs
+out
+CMakeSettings.json
+.anari_deps
