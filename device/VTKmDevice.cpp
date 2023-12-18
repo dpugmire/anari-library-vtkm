@@ -3,11 +3,33 @@
 
 #include "VTKmDevice.h"
 
-#include "anari/anari_cpp.hpp"
+#include "array/Array1D.h"
+#include "array/Array2D.h"
+#include "array/Array3D.h"
+#include "array/ObjectArray.h"
+#include "frame/Frame.h"
+#include "scene/volume/spatial_field/SpatialField.h"
 
-#include <cstring>
+#include "VTKmDeviceQueries.h"
 
 namespace vtkm_device {
+
+///////////////////////////////////////////////////////////////////////////////
+// Helper functions ///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+template <typename HANDLE_T, typename OBJECT_T>
+inline HANDLE_T getHandleForAPI(OBJECT_T *object)
+{
+  return (HANDLE_T)object;
+}
+
+template <typename OBJECT_T, typename HANDLE_T, typename... Args>
+inline HANDLE_T createObjectForAPI(VTKmDeviceGlobalState *s, Args &&...args)
+{
+  return getHandleForAPI<HANDLE_T>(
+      new OBJECT_T(s, std::forward<Args>(args)...));
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // VTKmDevice definitions /////////////////////////////////////////////////////
@@ -15,10 +37,19 @@ namespace vtkm_device {
 
 // Data Arrays ////////////////////////////////////////////////////////////////
 
-void managed_deleter(const void *, const void *memory)
+void *VTKmDevice::mapArray(ANARIArray a)
 {
-  delete[] static_cast<char *>(const_cast<void *>(memory));
+  deviceState()->renderingSemaphore.arrayMapAcquire();
+  return helium::BaseDevice::mapArray(a);
 }
+
+void VTKmDevice::unmapArray(ANARIArray a)
+{
+  helium::BaseDevice::unmapArray(a);
+  deviceState()->renderingSemaphore.arrayMapRelease();
+}
+
+// API Objects ////////////////////////////////////////////////////////////////
 
 ANARIArray1D VTKmDevice::newArray1D(const void *appMemory,
     ANARIMemoryDeleter deleter,
@@ -26,19 +57,19 @@ ANARIArray1D VTKmDevice::newArray1D(const void *appMemory,
     ANARIDataType type,
     uint64_t numItems)
 {
-  ANARIArray1D handle = nextHandle<ANARIArray1D>();
-  if (auto obj = getObject(handle)) {
-    if (appMemory == nullptr) {
-      obj->userdata = nullptr;
-      obj->memory = new char[sizeOf(type) * numItems];
-      obj->deleter = managed_deleter;
-    } else {
-      obj->userdata = userData;
-      obj->memory = appMemory;
-      obj->deleter = deleter;
-    }
-  }
-  return handle;
+  initDevice();
+
+  Array1DMemoryDescriptor md;
+  md.appMemory = appMemory;
+  md.deleter = deleter;
+  md.deleterPtr = userData;
+  md.elementType = type;
+  md.numItems = numItems;
+
+  if (anari::isObject(type))
+    return createObjectForAPI<ObjectArray, ANARIArray1D>(deviceState(), md);
+  else
+    return createObjectForAPI<Array1D, ANARIArray1D>(deviceState(), md);
 }
 
 ANARIArray2D VTKmDevice::newArray2D(const void *appMemory,
@@ -48,19 +79,17 @@ ANARIArray2D VTKmDevice::newArray2D(const void *appMemory,
     uint64_t numItems1,
     uint64_t numItems2)
 {
-  ANARIArray2D handle = nextHandle<ANARIArray2D>();
-  if (auto obj = getObject(handle)) {
-    if (appMemory == nullptr) {
-      obj->userdata = nullptr;
-      obj->memory = new char[sizeOf(type) * numItems1 * numItems2];
-      obj->deleter = managed_deleter;
-    } else {
-      obj->userdata = userData;
-      obj->memory = appMemory;
-      obj->deleter = deleter;
-    }
-  }
-  return handle;
+  initDevice();
+
+  Array2DMemoryDescriptor md;
+  md.appMemory = appMemory;
+  md.deleter = deleter;
+  md.deleterPtr = userData;
+  md.elementType = type;
+  md.numItems1 = numItems1;
+  md.numItems2 = numItems2;
+
+  return createObjectForAPI<Array2D, ANARIArray2D>(deviceState(), md);
 }
 
 ANARIArray3D VTKmDevice::newArray3D(const void *appMemory,
@@ -71,112 +100,107 @@ ANARIArray3D VTKmDevice::newArray3D(const void *appMemory,
     uint64_t numItems2,
     uint64_t numItems3)
 {
-  ANARIArray3D handle = nextHandle<ANARIArray3D>();
-  if (auto obj = getObject(handle)) {
-    if (appMemory == nullptr) {
-      obj->userdata = nullptr;
-      obj->memory = new char[sizeOf(type) * numItems1 * numItems2 * numItems3];
-      obj->deleter = managed_deleter;
-    } else {
-      obj->userdata = userData;
-      obj->memory = appMemory;
-      obj->deleter = deleter;
-    }
-  }
-  return handle;
+  initDevice();
+
+  Array3DMemoryDescriptor md;
+  md.appMemory = appMemory;
+  md.deleter = deleter;
+  md.deleterPtr = userData;
+  md.elementType = type;
+  md.numItems1 = numItems1;
+  md.numItems2 = numItems2;
+  md.numItems3 = numItems3;
+
+  return createObjectForAPI<Array3D, ANARIArray3D>(deviceState(), md);
 }
 
-void *VTKmDevice::mapArray(ANARIArray a)
+ANARICamera VTKmDevice::newCamera(const char *subtype)
 {
-  if (auto obj = getObject(a)) {
-    return const_cast<void *>(obj->memory);
-  } else {
-    return nullptr;
-  }
+  initDevice();
+  return getHandleForAPI<ANARICamera>(
+      Camera::createInstance(subtype, deviceState()));
 }
 
-void VTKmDevice::unmapArray(ANARIArray) {}
-
-// Renderable Objects /////////////////////////////////////////////////////////
-
-ANARILight VTKmDevice::newLight(const char *)
+ANARIFrame VTKmDevice::newFrame()
 {
-  return nextHandle<ANARILight>();
+  initDevice();
+  return createObjectForAPI<Frame, ANARIFrame>(deviceState());
 }
 
-ANARICamera VTKmDevice::newCamera(const char *)
+ANARIGeometry VTKmDevice::newGeometry(const char *subtype)
 {
-  return nextHandle<ANARICamera>();
+  initDevice();
+  return getHandleForAPI<ANARIGeometry>(
+      Geometry::createInstance(subtype, deviceState()));
 }
 
-ANARIGeometry VTKmDevice::newGeometry(const char *)
+ANARIGroup VTKmDevice::newGroup()
 {
-  return nextHandle<ANARIGeometry>();
+  initDevice();
+  return createObjectForAPI<Group, ANARIGroup>(deviceState());
 }
 
-ANARISpatialField VTKmDevice::newSpatialField(const char *)
+ANARIInstance VTKmDevice::newInstance(const char * /*subtype*/)
 {
-  return nextHandle<ANARISpatialField>();
+  initDevice();
+  return createObjectForAPI<Instance, ANARIInstance>(deviceState());
+}
+
+ANARILight VTKmDevice::newLight(const char *subtype)
+{
+  initDevice();
+  return getHandleForAPI<ANARILight>(
+      Light::createInstance(subtype, deviceState()));
+}
+
+ANARIMaterial VTKmDevice::newMaterial(const char *subtype)
+{
+  initDevice();
+  return getHandleForAPI<ANARIMaterial>(
+      Material::createInstance(subtype, deviceState()));
+}
+
+ANARIRenderer VTKmDevice::newRenderer(const char *subtype)
+{
+  initDevice();
+  return getHandleForAPI<ANARIRenderer>(
+      Renderer::createInstance(subtype, deviceState()));
+}
+
+ANARISampler VTKmDevice::newSampler(const char *subtype)
+{
+  initDevice();
+  return getHandleForAPI<ANARISampler>(
+      Sampler::createInstance(subtype, deviceState()));
+}
+
+ANARISpatialField VTKmDevice::newSpatialField(const char *subtype)
+{
+  initDevice();
+  return getHandleForAPI<ANARISpatialField>(
+      SpatialField::createInstance(subtype, deviceState()));
 }
 
 ANARISurface VTKmDevice::newSurface()
 {
-  return nextHandle<ANARISurface>();
+  initDevice();
+  return createObjectForAPI<Surface, ANARISurface>(deviceState());
 }
 
-ANARIVolume VTKmDevice::newVolume(const char *)
+ANARIVolume VTKmDevice::newVolume(const char *subtype)
 {
-  return nextHandle<ANARIVolume>();
+  initDevice();
+  return getHandleForAPI<ANARIVolume>(
+      Volume::createInstance(subtype, deviceState()));
 }
-
-// Model Meta-Data ////////////////////////////////////////////////////////////
-
-ANARIMaterial VTKmDevice::newMaterial(const char *)
-{
-  return nextHandle<ANARIMaterial>();
-}
-
-ANARISampler VTKmDevice::newSampler(const char *)
-{
-  return nextHandle<ANARISampler>();
-}
-
-// Instancing /////////////////////////////////////////////////////////////////
-
-ANARIGroup VTKmDevice::newGroup()
-{
-  return nextHandle<ANARIGroup>();
-}
-
-ANARIInstance VTKmDevice::newInstance(const char *type)
-{
-  return nextHandle<ANARIInstance>();
-}
-
-// Top-level Worlds ///////////////////////////////////////////////////////////
 
 ANARIWorld VTKmDevice::newWorld()
 {
-  return nextHandle<ANARIWorld>();
+  initDevice();
+  return createObjectForAPI<World, ANARIWorld>(deviceState());
 }
 
-int VTKmDevice::getProperty(
-    ANARIObject, const char *, ANARIDataType, void *, uint64_t, ANARIWaitMask)
-{
-  return 0;
-}
-
-const char **query_object_types(ANARIDataType type);
-const void *query_object_info(ANARIDataType type,
-    const char *subtype,
-    const char *infoName,
-    ANARIDataType infoType);
-const void *query_param_info(ANARIDataType type,
-    const char *subtype,
-    const char *paramName,
-    ANARIDataType paramType,
-    const char *infoName,
-    ANARIDataType infoType);
+// Query functions ////////////////////////////////////////////////////////////
 
 const char **VTKmDevice::getObjectSubtypes(ANARIDataType objectType)
 {
@@ -209,168 +233,114 @@ const void *VTKmDevice::getParameterInfo(ANARIDataType objectType,
 
 // Object + Parameter Lifetime Management /////////////////////////////////////
 
-struct FrameData
-{
-  uint32_t width = 1;
-  uint32_t height = 1;
-};
-
-void frame_deleter(const void *userdata, const void *memory)
-{
-  delete[] static_cast<char *>(const_cast<void *>(memory));
-  delete static_cast<FrameData *>(const_cast<void *>(userdata));
-}
-
-void VTKmDevice::setParameter(
-    ANARIObject object, const char *name, ANARIDataType type, const void *mem)
-{
-  if (auto obj = getObject(object)) {
-    if (obj->type == ANARI_FRAME) {
-      FrameData *data =
-          static_cast<FrameData *>(const_cast<void *>(obj->userdata));
-      if (type == ANARI_UINT32_VEC2 && std::strncmp("size", name, 4) == 0) {
-        const uint32_t *size = static_cast<const uint32_t *>(mem);
-        data->width = size[0];
-        data->height = size[1];
-        delete[] static_cast<char *>(const_cast<void *>(obj->memory));
-        obj->memory = nullptr;
-      }
-    }
-  }
-}
-
-void VTKmDevice::unsetParameter(ANARIObject, const char *) {}
-
-void VTKmDevice::unsetAllParameters(ANARIObject) {}
-
-void *VTKmDevice::mapParameterArray1D(ANARIObject object,
+int VTKmDevice::getProperty(ANARIObject object,
     const char *name,
-    ANARIDataType dataType,
-    uint64_t numElements1,
-    uint64_t *elementStride)
+    ANARIDataType type,
+    void *mem,
+    uint64_t size,
+    uint32_t mask)
 {
-  if (auto obj = getObject(object)) {
-    if (elementStride) {
-      *elementStride = 0;
+  if (mask == ANARI_WAIT) {
+    auto lock = scopeLockObject();
+    deviceState()->waitOnCurrentFrame();
+  }
+
+  return helium::BaseDevice::getProperty(object, name, type, mem, size, mask);
+}
+
+// Other VTKmDevice definitions /////////////////////////////////////////////
+
+VTKmDevice::VTKmDevice(ANARIStatusCallback cb, const void *ptr)
+    : helium::BaseDevice(cb, ptr)
+{
+  m_state = std::make_unique<VTKmDeviceGlobalState>(this_device());
+  deviceCommitParameters();
+}
+
+VTKmDevice::VTKmDevice(ANARILibrary l) : helium::BaseDevice(l)
+{
+  m_state = std::make_unique<VTKmDeviceGlobalState>(this_device());
+  deviceCommitParameters();
+}
+
+VTKmDevice::~VTKmDevice()
+{
+  auto &state = *deviceState();
+
+  state.commitBufferClear();
+
+  reportMessage(ANARI_SEVERITY_DEBUG, "destroying VTKm device (%p)", this);
+
+  // NOTE: These object leak warnings are not required to be done by
+  //       implementations as the debug layer in the SDK is far more
+  //       comprehensive and designed for detecting bugs like this. However
+  //       these simple checks are very straightforward to implement and do not
+  //       really add substantial code complexity, so they are provided out of
+  //       convenience.
+
+  auto reportLeaks = [&](auto &count, const char *handleType) {
+    auto c = count.load();
+    if (c != 0) {
+      reportMessage(ANARI_SEVERITY_WARNING,
+          "detected %zu leaked %s objects",
+          c,
+          handleType);
     }
-    return obj->mapArray(name, sizeOf(dataType) * numElements1);
-  } else {
-    return nullptr;
+  };
+
+  reportLeaks(state.objectCounts.frames, "ANARIFrame");
+  reportLeaks(state.objectCounts.cameras, "ANARICamera");
+  reportLeaks(state.objectCounts.renderers, "ANARIRenderer");
+  reportLeaks(state.objectCounts.worlds, "ANARIWorld");
+  reportLeaks(state.objectCounts.instances, "ANARIInstance");
+  reportLeaks(state.objectCounts.groups, "ANARIGroup");
+  reportLeaks(state.objectCounts.surfaces, "ANARISurface");
+  reportLeaks(state.objectCounts.geometries, "ANARIGeometry");
+  reportLeaks(state.objectCounts.materials, "ANARIMaterial");
+  reportLeaks(state.objectCounts.samplers, "ANARISampler");
+  reportLeaks(state.objectCounts.volumes, "ANARIVolume");
+  reportLeaks(state.objectCounts.spatialFields, "ANARISpatialField");
+  reportLeaks(state.objectCounts.arrays, "ANARIArray");
+
+  if (state.objectCounts.unknown.load() != 0) {
+    reportMessage(ANARI_SEVERITY_WARNING,
+        "detected %zu leaked ANARIObject objects created by unknown subtypes",
+        state.objectCounts.unknown.load());
   }
 }
 
-void *VTKmDevice::mapParameterArray2D(ANARIObject object,
-    const char *name,
-    ANARIDataType dataType,
-    uint64_t numElements1,
-    uint64_t numElements2,
-    uint64_t *elementStride)
+void VTKmDevice::initDevice()
 {
-  if (auto obj = getObject(object)) {
-    if (elementStride) {
-      *elementStride = 0;
-    }
-    return obj->mapArray(name, sizeOf(dataType) * numElements1 * numElements2);
-  } else {
-    return nullptr;
+  if (m_initialized)
+    return;
+
+  reportMessage(ANARI_SEVERITY_DEBUG, "initializing VTKm device (%p)", this);
+
+  m_initialized = true;
+}
+
+void VTKmDevice::deviceCommitParameters()
+{
+  helium::BaseDevice::deviceCommitParameters();
+}
+
+int VTKmDevice::deviceGetProperty(
+    const char *name, ANARIDataType type, void *mem, uint64_t size)
+{
+  std::string_view prop = name;
+  if (prop == "extension" && type == ANARI_STRING_LIST) {
+    helium::writeToVoidP(mem, query_extensions());
+    return 1;
+  } else if (prop == "vtkm" && type == ANARI_BOOL) {
+    helium::writeToVoidP(mem, true);
+    return 1;
   }
+  return 0;
 }
 
-void *VTKmDevice::mapParameterArray3D(ANARIObject object,
-    const char *name,
-    ANARIDataType dataType,
-    uint64_t numElements1,
-    uint64_t numElements2,
-    uint64_t numElements3,
-    uint64_t *elementStride)
+VTKmDeviceGlobalState *VTKmDevice::deviceState() const
 {
-  if (auto obj = getObject(object)) {
-    if (elementStride) {
-      *elementStride = 0;
-    }
-    return obj->mapArray(
-        name, sizeOf(dataType) * numElements1 * numElements2 * numElements3);
-  } else {
-    return nullptr;
-  }
+  return (VTKmDeviceGlobalState *)helium::BaseDevice::m_state.get();
 }
-
-void VTKmDevice::unmapParameterArray(ANARIObject object, const char *name) {}
-
-void VTKmDevice::commitParameters(ANARIObject) {}
-
-void VTKmDevice::release(ANARIObject object)
-{
-  if (auto obj = getObject(object)) {
-    obj->release();
-  }
-}
-
-void VTKmDevice::retain(ANARIObject object)
-{
-  if (auto obj = getObject(object)) {
-    obj->retain();
-  }
-}
-
-// Frame Manipulation /////////////////////////////////////////////////////////
-
-ANARIFrame VTKmDevice::newFrame()
-{
-  ANARIFrame frame = nextHandle<ANARIFrame>();
-  if (auto obj = getObject(frame)) {
-    obj->userdata = new FrameData();
-    obj->deleter = frame_deleter;
-  }
-  return frame;
-}
-
-const void *VTKmDevice::frameBufferMap(ANARIFrame fb,
-    const char *,
-    uint32_t *width,
-    uint32_t *height,
-    ANARIDataType *pixelType)
-{
-  if (auto obj = getObject(fb)) {
-    if (obj->type == ANARI_FRAME) {
-      const FrameData *data = static_cast<const FrameData *>(obj->userdata);
-      if (obj->memory == nullptr) {
-        obj->memory = new char[data->width * data->height * 4 * sizeof(float)];
-      }
-      *width = data->width;
-      *height = data->height;
-      *pixelType = ANARI_FLOAT32;
-      return obj->memory;
-    }
-  }
-  return nullptr;
-}
-
-void VTKmDevice::frameBufferUnmap(ANARIFrame, const char *) {}
-
-// Frame Rendering ////////////////////////////////////////////////////////////
-
-ANARIRenderer VTKmDevice::newRenderer(const char *)
-{
-  return nextHandle<ANARIRenderer>();
-}
-
-void VTKmDevice::renderFrame(ANARIFrame) {}
-
-int VTKmDevice::frameReady(ANARIFrame, ANARIWaitMask)
-{
-  return 1;
-}
-
-void VTKmDevice::discardFrame(ANARIFrame) {}
-
-// Other VTKmDevice definitions ///////////////////////////////////////////////
-
-VTKmDevice::VTKmDevice(ANARILibrary library) : DeviceImpl(library)
-{
-  nextHandle<ANARIObject>(); // insert a handle at 0
-}
-
-const char **query_extensions();
 
 } // namespace vtkm_device
