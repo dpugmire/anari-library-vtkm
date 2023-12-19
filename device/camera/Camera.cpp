@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "Camera.h"
+// specific types
+#include "Orthographic.h"
+#include "Perspective.h"
 
 namespace vtkm_device {
 
@@ -17,7 +20,24 @@ Camera::~Camera()
 
 Camera *Camera::createInstance(std::string_view type, VTKmDeviceGlobalState *s)
 {
-  return (Camera *)new UnknownObject(ANARI_CAMERA, s);
+  if (type == "perspective")
+    return new Perspective(s);
+  else if (type == "orthographic")
+    return new Orthographic(s);
+  else
+    return (Camera *)new UnknownObject(ANARI_CAMERA, s);
+}
+
+void Camera::commit()
+{
+  this->Position = getParam<vtkm::Vec3f_32>("position", vtkm::Vec3f_32(0.f));
+  this->Dir = vtkm::Normal(
+      getParam<vtkm::Vec3f_32>("direction", vtkm::Vec3f_32(0.f, 0.f, 1.f)));
+  this->Up = vtkm::Normal(
+      getParam<vtkm::Vec3f_32>("up", vtkm::Vec3f_32(0.f, 1.f, 0.f)));
+  this->ImageRegion = vtkm::Vec4f_32(0.f, 0.f, 1.f, 1.f);
+  getParam("imageRegion", ANARI_FLOAT32_BOX2, &this->ImageRegion);
+  markUpdated();
 }
 
 } // namespace vtkm_device

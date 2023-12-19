@@ -11,13 +11,14 @@ struct Volume : public Object
 {
   Volume(VTKmDeviceGlobalState *d);
   virtual ~Volume();
-  static Volume *createInstance(std::string_view subtype, VTKmDeviceGlobalState *d);
+  static Volume *createInstance(
+      std::string_view subtype, VTKmDeviceGlobalState *d);
 
   void commit() override;
 
   uint32_t id() const;
 
-  private:
+ private:
   uint32_t m_id{~0u};
 };
 

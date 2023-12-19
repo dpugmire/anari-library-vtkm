@@ -21,6 +21,8 @@ add_library(${PROJECT_NAME} SHARED
   array/Array3D.cpp
   array/ObjectArray.cpp
   camera/Camera.cpp
+  camera/Orthographic.cpp
+  camera/Perspective.cpp
   frame/Frame.cpp
   renderer/Renderer.cpp
   scene/Group.cpp

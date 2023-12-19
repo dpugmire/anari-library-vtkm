@@ -5,6 +5,9 @@
 
 // helium
 #include "helium/helium_math.h"
+// vtk-m
+#include <vtkm/VectorAnalysis.h>
+#include <vtkm/interop/anari/VtkmANARITypes.h>
 
 namespace vtkm_device {
 

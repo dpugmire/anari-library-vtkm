@@ -15,6 +15,13 @@ struct Camera : public Object
   static Camera *createInstance(
       std::string_view type, VTKmDeviceGlobalState *state);
 
+  virtual void commit() override;
+
+ protected:
+  vtkm::Vec3f_32 Position;
+  vtkm::Vec3f_32 Dir;
+  vtkm::Vec3f_32 Up;
+  vtkm::Vec4f_32 ImageRegion;
 };
 
 } // namespace vtkm_device
