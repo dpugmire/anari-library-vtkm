@@ -32,7 +32,7 @@ void Group::commit()
   m_volumeData = getParamObject<ObjectArray>("volume");
 
   if (m_surfaceData) {
-    m_surfaceData->addCommitObserver(this);
+    m_surfaceData->addChangeObserver(this);
     std::transform(m_surfaceData->handlesBegin(),
         m_surfaceData->handlesEnd(),
         std::back_inserter(m_surfaces),
@@ -40,7 +40,7 @@ void Group::commit()
   }
 
   if (m_volumeData) {
-    m_volumeData->addCommitObserver(this);
+    m_volumeData->addChangeObserver(this);
     std::transform(m_volumeData->handlesBegin(),
         m_volumeData->handlesEnd(),
         std::back_inserter(m_volumes),
@@ -61,9 +61,9 @@ const std::vector<Volume *> &Group::volumes() const
 void Group::cleanup()
 {
   if (m_surfaceData)
-    m_surfaceData->removeCommitObserver(this);
+    m_surfaceData->removeChangeObserver(this);
   if (m_volumeData)
-    m_volumeData->removeCommitObserver(this);
+    m_volumeData->removeChangeObserver(this);
 
   m_surfaces.clear();
   m_volumes.clear();

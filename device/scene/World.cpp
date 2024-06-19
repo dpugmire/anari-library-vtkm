@@ -82,9 +82,9 @@ void World::commit()
     m_instances.push_back(m_zeroInstance.ptr);
 
   if (m_instanceData)
-    m_instanceData->addCommitObserver(this);
+    m_instanceData->addChangeObserver(this);
   if (m_zeroSurfaceData)
-    m_zeroSurfaceData->addCommitObserver(this);
+    m_zeroSurfaceData->addChangeObserver(this);
 }
 
 const std::vector<Instance *> &World::instances() const
@@ -95,9 +95,9 @@ const std::vector<Instance *> &World::instances() const
 void World::cleanup()
 {
   if (m_instanceData)
-    m_instanceData->removeCommitObserver(this);
+    m_instanceData->removeChangeObserver(this);
   if (m_zeroSurfaceData)
-    m_zeroSurfaceData->removeCommitObserver(this);
+    m_zeroSurfaceData->removeChangeObserver(this);
 }
 
 } // namespace vtkm_device
