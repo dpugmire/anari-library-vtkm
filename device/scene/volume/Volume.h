@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Object.h"
+#include "VTKmTypes.h"
 
 namespace vtkm_device {
 
@@ -18,8 +19,21 @@ struct Volume : public Object
 
   uint32_t id() const;
 
+  //DRP
+  void render(const VolumeRay &vray,
+              float3 &outputColor,
+              float &outputOpacity);
+  box3 bounds() const;
+  bool isValid() const override {return true;}
+  //DRP
+
  private:
   uint32_t m_id{~0u};
+
+  //DRP
+  // volume data...
+  float3 MinCorner, MaxCorner;
+  //DRP
 };
 
 // Inlined definitions ////////////////////////////////////////////////////////

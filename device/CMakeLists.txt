@@ -35,6 +35,7 @@ add_library(${PROJECT_NAME} SHARED
   scene/surface/material/sampler/Sampler.cpp
   scene/volume/Volume.cpp
   scene/volume/spatial_field/SpatialField.cpp
+#  scene/volume/TransferFunction1D.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

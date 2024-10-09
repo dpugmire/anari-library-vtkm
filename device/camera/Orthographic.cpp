@@ -23,4 +23,13 @@ void Orthographic::commit()
   this->Pos00 = this->Position - .5f * this->PosDU - .5f * this->PosDV;
 }
 
+Ray Orthographic::createRay(const float2 &screen) const
+{
+  Ray ray;
+  ray.dir = this->Dir;
+  //ray.org = this->Pos00 + screen.x * this->PosDU + screen.y * this->PosDV;
+  ray.org = this->Pos00 + screen[0] * this->PosDU + screen[1] * this->PosDV;
+  return ray;
+}
+
 } // namespace vtkm_device

@@ -12,6 +12,7 @@ struct Orthographic : public Camera
   Orthographic(VTKmDeviceGlobalState *s);
 
   void commit() override;
+  Ray createRay(const float2 &screen) const override;
 
  private:
    vtkm::Vec3f_32 PosDU;
@@ -20,4 +21,3 @@ struct Orthographic : public Camera
 };
 
 } // namespace vtkm_device
-

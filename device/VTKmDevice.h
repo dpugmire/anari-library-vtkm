@@ -5,6 +5,8 @@
 
 // helium
 #include "helium/BaseDevice.h"
+//#include "ChangeObserverPtr.h"
+#include "HelideMath.h"
 
 #include "Object.h"
 

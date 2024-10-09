@@ -3,7 +3,10 @@
 
 #pragma once
 
+#include "../VTKmTypes.h"
 #include "../Object.h"
+#include <vtkm/interop/anari/VtkmANARITypes.h>
+
 
 namespace vtkm_device {
 
@@ -17,10 +20,20 @@ struct Camera : public Object
 
   virtual void commit() override;
 
+  float4 imageRegion() const
+  {
+    return float4(this->ImageRegion[0],
+                  this->ImageRegion[1],
+                  this->ImageRegion[2],
+                  this->ImageRegion[3]);
+  }
+
+  virtual Ray createRay(const float2 &screen) const = 0;
+
  protected:
-  vtkm::Vec3f_32 Position;
-  vtkm::Vec3f_32 Dir;
-  vtkm::Vec3f_32 Up;
+  vtkm::Vec3f_32 Position = vtkm::Vec3f_32(0.f,0.f,0.f);
+  vtkm::Vec3f_32 Dir = vtkm::Vec3f_32(0.f,0.f,1.f);
+  vtkm::Vec3f_32 Up = vtkm::Vec3f_32(0.f,1.f,0.f);
   vtkm::Vec4f_32 ImageRegion;
 };
 

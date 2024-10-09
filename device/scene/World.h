@@ -21,6 +21,12 @@ struct World : public Object
 
   const std::vector<Instance *> &instances() const;
 
+  void intersectVolumes(VolumeRay &ray) const;
+
+  const Instance *instanceFromRay(const Ray &ray) const { return this->instances()[ray.instID]; }
+  const Instance *instanceFromRay(const VolumeRay &ray) const { return this->instances()[ray.instID]; }
+  const Surface *surfaceFromRay(const Ray &ray) const { return instanceFromRay(ray)->group()->surfaces()[ray.geomID]; }
+
  private:
   void cleanup();
 

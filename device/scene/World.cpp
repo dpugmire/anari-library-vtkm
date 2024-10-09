@@ -92,6 +92,19 @@ const std::vector<Instance *> &World::instances() const
   return m_instances;
 }
 
+void World::intersectVolumes(VolumeRay &ray) const
+{
+  const auto &insts = instances();
+  for (uint32_t i = 0; i < insts.size(); i++)
+  {
+    const auto *inst = insts[i];
+    inst->group()->intersectVolumes(ray);
+    if (ray.volume)
+      ray.instID = i;
+  }
+}
+
+
 void World::cleanup()
 {
   if (m_instanceData)

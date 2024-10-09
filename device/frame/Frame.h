@@ -11,6 +11,7 @@
 // std
 #include <future>
 #include <vector>
+#include "../VTKmTypes.h"
 
 namespace vtkm_device {
 

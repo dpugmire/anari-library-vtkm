@@ -12,6 +12,7 @@ struct Perspective : public Camera
   Perspective(VTKmDeviceGlobalState *s);
 
   void commit() override;
+  Ray createRay(const float2 &screen) const override;
 
  private:
    vtkm::Vec3f_32 DirDU;
@@ -20,4 +21,3 @@ struct Perspective : public Camera
 };
 
 } // namespace vtkm_device
-

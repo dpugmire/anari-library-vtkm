@@ -25,6 +25,9 @@ struct Group : public Object
   const std::vector<Surface *> &surfaces() const;
   const std::vector<Volume *> &volumes() const;
 
+    void intersectVolumes(VolumeRay &ray) const;
+
+
  private:
   void cleanup();
 

@@ -15,7 +15,7 @@ struct Surface : public Object
 
   void commit() override;
 
-  uint32_t id() const;
+  uint32_t id() const {return m_id;}
   const Geometry *geometry() const;
   const Material *material() const;
 

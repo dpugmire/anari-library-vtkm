@@ -8,6 +8,8 @@
 #include <random>
 #include <thread>
 
+#include <scene/World.h>
+
 namespace vtkm_device {
 
 // Helper functions ///////////////////////////////////////////////////////////
@@ -19,13 +21,13 @@ static uint32_t cvt_uint32(const float &f)
 
 static uint32_t cvt_uint32(const float4 &v)
 {
-  return (cvt_uint32(v.x) << 0) | (cvt_uint32(v.y) << 8)
-      | (cvt_uint32(v.z) << 16) | (cvt_uint32(v.w) << 24);
+  return (cvt_uint32(v[0]) << 0) | (cvt_uint32(v[1]) << 8)
+      | (cvt_uint32(v[2]) << 16) | (cvt_uint32(v[3]) << 24);
 }
 
 static uint32_t cvt_uint32_srgb(const float4 &v)
 {
-  return cvt_uint32(float4(toneMap(v.x), toneMap(v.y), toneMap(v.z), v.w));
+  return cvt_uint32(float4(toneMap(v[0]), toneMap(v[1]), toneMap(v[2]), v[3]));
 }
 
 template <typename R, typename TASK_T>
@@ -100,9 +102,11 @@ void Frame::commit()
   m_instIdType = getParam<anari::DataType>("channel.instanceId", ANARI_UNKNOWN);
 
   m_frameData.size = getParam<uint2>("size", uint2(10));
-  m_frameData.invSize = 1.f / float2(m_frameData.size);
+  //m_frameData.invSize = 1.f / float2(m_frameData.size);
+  m_frameData.invSize[0] = 1.f / (float)m_frameData.size[0];
+  m_frameData.invSize[1] = 1.f / (float)m_frameData.size[1];
 
-  const auto numPixels = m_frameData.size.x * m_frameData.size.y;
+  const auto numPixels = m_frameData.size[0] * m_frameData.size[1];
 
   m_perPixelBytes = 4 * (m_colorType == ANARI_FLOAT32_VEC4 ? 4 : 1);
   m_pixelBuffer.resize(numPixels * m_perPixelBytes);
@@ -151,9 +155,20 @@ void Frame::renderFrame()
           ANARI_SEVERITY_ERROR, "skipping render of incomplete frame object");
       std::fill(m_pixelBuffer.begin(), m_pixelBuffer.end(), 0);
     } else {
-      for (int y = 0; y < m_frameData.size.y; y++)
-        for (int x = 0; x < m_frameData.size.x; x++)
-          writeSample(x, y, {m_renderer->background(), 0.f});
+      //DRP worklet launch here.... ?
+      // use m_world, m_renderer
+      for (int y = 0; y < m_frameData.size[1]; y++)
+        for (int x = 0; x < m_frameData.size[0]; x++)
+        {
+          auto screen = screenFromPixel(float2(x,y));
+          auto imageRegion = m_camera->imageRegion();
+          screen[0] = linalg::lerp(imageRegion[0], imageRegion[2], screen[0]);
+          screen[1] = linalg::lerp(imageRegion[1], imageRegion[3], screen[1]);
+          Ray ray = m_camera->createRay(screen);
+          writeSample(x, y, m_renderer->renderSample(screen, ray, *m_world));
+
+          //writeSample(x, y, {m_renderer->background(), 0.f});
+        }
     }
 
     state->renderingSemaphore.frameEnd();
@@ -169,8 +184,8 @@ void *Frame::map(std::string_view channel,
 {
   wait();
 
-  *width = m_frameData.size.x;
-  *height = m_frameData.size.y;
+  *width = m_frameData.size[0];
+  *height = m_frameData.size[1];
 
   if (channel == "channel.color") {
     *pixelType = m_colorType;
@@ -237,7 +252,7 @@ float2 Frame::screenFromPixel(const float2 &p) const
 
 void Frame::writeSample(int x, int y, const PixelSample &s)
 {
-  const auto idx = y * m_frameData.size.x + x;
+  const auto idx = y * m_frameData.size[0] + x;
   auto *color = m_pixelBuffer.data() + (idx * m_perPixelBytes);
   switch (m_colorType) {
   case ANARI_UFIXED8_VEC4: {
