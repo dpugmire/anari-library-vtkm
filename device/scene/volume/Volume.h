@@ -5,6 +5,7 @@
 
 #include "Object.h"
 #include "VTKmTypes.h"
+#include <vtkm/cont/DataSet.h>
 
 namespace vtkm_device {
 
@@ -29,6 +30,8 @@ struct Volume : public Object
 
  private:
   uint32_t m_id{~0u};
+
+  vtkm::cont::DataSet DataSet;
 
   //DRP
   // volume data...

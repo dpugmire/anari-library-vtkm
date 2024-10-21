@@ -157,6 +157,7 @@ void Frame::renderFrame()
     } else {
       //DRP worklet launch here.... ?
       // use m_world, m_renderer
+      // call vtkm::rendering code here.
       for (int y = 0; y < m_frameData.size[1]; y++)
         for (int x = 0; x < m_frameData.size[0]; x++)
         {

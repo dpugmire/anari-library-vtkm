@@ -56,7 +56,7 @@ const std::vector<Surface *> &Group::surfaces() const
 
 const std::vector<Volume *> &Group::volumes() const
 {
-  std::cout<<__FILE__<<" "<<__LINE__<<std::endl;
+  std::cout<<__FILE__<<" "<<__LINE__<<" : "<<m_volumes.size()<<std::endl;
   return m_volumes;
 }
 
