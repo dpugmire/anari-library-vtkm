@@ -31,6 +31,7 @@ add_library(${PROJECT_NAME} SHARED
   scene/light/Light.cpp
   scene/surface/Surface.cpp
   scene/surface/geometry/Geometry.cpp
+  scene/surface/geometry/Triangle.cpp
   scene/surface/material/Material.cpp
   scene/surface/material/sampler/Sampler.cpp
   scene/volume/Volume.cpp
@@ -41,6 +42,7 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
 PRIVATE
   anari::helium
+  vtkm::cont
   vtkm::worklet
 )
 
