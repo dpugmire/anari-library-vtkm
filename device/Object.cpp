@@ -37,6 +37,14 @@ VTKmDeviceGlobalState *Object::deviceState() const
   return (VTKmDeviceGlobalState *)helium::BaseObject::m_state;
 }
 
+void Object::printParameters()
+{
+  for (auto&& paramItr = this->params_begin(); paramItr != this->params_end(); ++paramItr)
+  {
+    std::cout << paramItr->first << "\n";
+  }
+}
+
 // UnknownObject definitions //////////////////////////////////////////////////
 
 UnknownObject::UnknownObject(ANARIDataType type, VTKmDeviceGlobalState *s)
