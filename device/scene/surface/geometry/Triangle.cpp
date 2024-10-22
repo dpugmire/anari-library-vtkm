@@ -22,7 +22,6 @@ void Triangle::commit()
   // called again if the array contents change.
   this->m_index = getParamObject<Array1D>("primitive.index");
   this->m_vertexPosition = getParamObject<Array1D>("vertex.position");
-  this->m_index->dataAsVTKmArray().PrintSummary(std::cout, true);
 
   // Reset data
   this->m_data = vtkm::cont::DataSet{};
@@ -41,7 +40,11 @@ void Triangle::commit()
       connectionArray.GetComponentsArray());
   this->m_data.SetCellSet(cellSet);
 
-  this->m_data.AddCoordinateSystem({"coords", this->m_vertexPosition->dataAsVTKmArray()});
+  this->m_data.AddCoordinateSystem({ "coords", this->m_vertexPosition->dataAsVTKmArray() });
+
+  this->AddAttributeInformation();
+
+  // this->m_data.PrintSummary(std::cout);
 }
 
 } // namespace vtkm_device
