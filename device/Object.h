@@ -27,6 +27,8 @@ struct Object : public helium::BaseObject
   bool isValid() const override;
 
   VTKmDeviceGlobalState *deviceState() const;
+
+  void printParameters();
 };
 
 struct UnknownObject : public Object
