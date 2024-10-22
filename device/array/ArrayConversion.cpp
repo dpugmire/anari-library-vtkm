@@ -3,7 +3,11 @@
 
 #include "ArrayConversion.h"
 #include "anari/frontend/type_utility.h"
+// VTK-m
+#include <vtkm/cont/Invoker.h>
+#include <vtkm/worklet/WorkletMapField.h>
 // C++
+#include <limits>
 #include <type_traits>
 
 
@@ -68,6 +72,37 @@ struct ConstructArrayHandle<ANARI_UNKNOWN>
   }
 };
 
+
+struct ConvertColorValues : vtkm::worklet::WorkletMapField
+{
+  using ControlSignature = void(FieldIn, FieldOut);
+  template <typename InType, typename OutType>
+  VTKM_EXEC void operator()(const InType& inValue, OutType& outValue) const
+  {
+    using InComponentType = typename InType::ComponentType;
+    using OutComponentType = typename OutType::ComponentType;
+
+    constexpr OutComponentType scale = OutComponentType{ 1 } /
+        static_cast<OutComponentType>(std::numeric_limits<InComponentType>::max());
+    for (vtkm::IdComponent index = 0; index < inValue.GetNumberOfComponents(); ++index)
+    {
+      outValue[index] = static_cast<OutComponentType>(inValue[index]) * scale;
+    }
+  }
+};
+
+template <typename T>
+inline void FixColorsForType(vtkm::cont::UnknownArrayHandle& colorArray)
+{
+  using ArrayType = vtkm::cont::ArrayHandle<vtkm::Vec<T, 4>>;
+  if (colorArray.CanConvert<ArrayType>()) {
+    vtkm::cont::ArrayHandle<vtkm::Vec4f> retypedArray;
+    vtkm::cont::Invoker invoke;
+    invoke(ConvertColorValues{}, colorArray.AsArrayHandle<ArrayType>(), retypedArray);
+    colorArray = retypedArray;
+  }
+}
+
 } // anonymous namespace
 
 namespace vtkm_device {
@@ -79,6 +114,17 @@ vtkm::cont::UnknownArrayHandle ANARIArrayToVTKmArray(const helium::Array *anariA
 
   return anari::anariTypeInvoke<vtkm::cont::UnknownArrayHandle, ConstructArrayHandle>(
       anariArray->elementType(), memory, numValues);
+}
+
+vtkm::cont::UnknownArrayHandle ANARIColorsToVTKmColors(
+    const vtkm::cont::UnknownArrayHandle &anariColors)
+{
+  vtkm::cont::UnknownArrayHandle vtkmColors = anariColors;
+  FixColorsForType<vtkm::UInt8>(vtkmColors);
+  FixColorsForType<vtkm::UInt16>(vtkmColors);
+  FixColorsForType<vtkm::UInt32>(vtkmColors);
+  FixColorsForType<vtkm::UInt64>(vtkmColors);
+  return vtkmColors;
 }
 
 } // namespace vtkm_device

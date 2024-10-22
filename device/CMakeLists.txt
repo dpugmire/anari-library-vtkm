@@ -35,8 +35,10 @@ add_library(${PROJECT_NAME} SHARED
   scene/surface/geometry/Triangle.cpp
   scene/surface/material/Material.cpp
   scene/surface/material/sampler/Sampler.cpp
+  scene/volume/TransferFunction1D.cpp
   scene/volume/Volume.cpp
   scene/volume/spatial_field/SpatialField.cpp
+  scene/volume/spatial_field/StructuredRegularField.cpp
 #  scene/volume/TransferFunction1D.cpp
 )
 

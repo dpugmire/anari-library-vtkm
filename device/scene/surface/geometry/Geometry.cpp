@@ -4,43 +4,10 @@
 #include "Geometry.h"
 // subtypes
 #include "Triangle.h"
-// VTK-m
-#include <vtkm/cont/Invoker.h>
-#include <vtkm/worklet/WorkletMapField.h>
-// C++
-#include <limits>
+
+#include "array/ArrayConversion.h"
 
 namespace {
-
-struct ConvertColorValues : vtkm::worklet::WorkletMapField
-{
-  using ControlSignature = void(FieldIn, FieldOut);
-  template <typename InType, typename OutType>
-  VTKM_EXEC void operator()(const InType& inValue, OutType& outValue) const
-  {
-    using InComponentType = typename InType::ComponentType;
-    using OutComponentType = typename OutType::ComponentType;
-
-    constexpr OutComponentType scale = OutComponentType{ 1 } /
-        static_cast<OutComponentType>(std::numeric_limits<InComponentType>::max());
-    for (vtkm::IdComponent index = 0; index < inValue.GetNumberOfComponents(); ++index)
-    {
-      outValue[index] = static_cast<OutComponentType>(inValue[index]) * scale;
-    }
-  }
-};
-
-template <typename T>
-inline void FixColorsForType(vtkm::cont::UnknownArrayHandle& colorArray)
-{
-  using ArrayType = vtkm::cont::ArrayHandle<vtkm::Vec<T, 4>>;
-  if (colorArray.CanConvert<ArrayType>()) {
-    vtkm::cont::ArrayHandle<vtkm::Vec4f> retypedArray;
-    vtkm::cont::Invoker invoke;
-    invoke(ConvertColorValues{}, colorArray.AsArrayHandle<ArrayType>(), retypedArray);
-    colorArray = retypedArray;
-  }
-}
 
 } // anonymous namespace
 
@@ -80,11 +47,7 @@ void Geometry::AddAttributeInformation()
         this->getParamObject<Array1D>("vertex.color")->dataAsVTKmArray();
     // Colors can be either float or a fixed integer type. VTK-m only supports float colors.
     // If we get integer colors, convert them here.
-    FixColorsForType<vtkm::UInt8>(colorArray);
-    FixColorsForType<vtkm::UInt16>(colorArray);
-    FixColorsForType<vtkm::UInt32>(colorArray);
-    FixColorsForType<vtkm::UInt64>(colorArray);
-    this->m_dataSet.AddPointField("color", colorArray);
+    this->m_dataSet.AddPointField("color", ANARIColorsToVTKmColors(colorArray));
   }
 }
 

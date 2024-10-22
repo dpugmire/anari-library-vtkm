@@ -170,55 +170,45 @@ void Frame::renderFrame()
       std::fill(m_pixelBuffer.begin(), m_pixelBuffer.end(), 0);
     } else {
 
-      bool doVTKm = false;
-      if (this->m_world->instances().size() > 0)
+      auto instances = this->m_world->instances();
+      auto camera = this->m_camera->GetCamera();
+
+      std::cout<<"\n\nANARI camera:"<<std::endl;
+      camera.Print();
+
+      vtkm::rendering::Camera _camera;
+      _camera.SetLookAt(vtkm::Vec3f_32(0.5, 0.5, 0.5));
+      _camera.SetViewUp(vtkm::make_Vec(0.f, 1.f, 0.f));
+      _camera.SetClippingRange(1.f, 10.f);
+      _camera.SetFieldOfView(60.f);
+      _camera.SetPosition(vtkm::Vec3f_32(1.5, 1.5, 1.5));
+
+      std::cout<<"Correct camera:"<<std::endl;
+      _camera.Print();
+
+      /*
+            camera.SetPosition(_camera.GetPosition());
+            camera.SetLookAt(_camera.GetLookAt());
+            camera.SetViewUp(_camera.GetViewUp());
+            camera.SetFieldOfView(_camera.GetFieldOfView());
+            camera.SetClippingRange(_camera.GetClippingRange());
+            vtkm::Bounds vp = _camera.GetViewport();
+            camera.SetViewport(vp.X.Min, vp.X.Max, vp.Y.Min, vp.Y.Max);
+      */
+
+      // This should be a loop over volumes and surfaces.
+      if ((instances.size() > 0) &&
+          (instances[0]->group()->volumes().size() > 0))
       {
-        auto instances = this->m_world->instances();
-        if (instances[0]->group()->volumes().size() > 0)
-          doVTKm = true;
-      }
-      if (doVTKm)
-      {
-        auto instances = this->m_world->instances();
-        auto ds = instances[0]->group()->volumes()[0]->getDataSet();
-        auto camera = this->m_camera->GetCamera();
-
-        std::cout<<"\n\nANARI camera:"<<std::endl;
-        camera.Print();
-
-        vtkm::rendering::Camera _camera;
-        _camera.SetLookAt(vtkm::Vec3f_32(0.5, 0.5, 0.5));
-        _camera.SetViewUp(vtkm::make_Vec(0.f, 1.f, 0.f));
-        _camera.SetClippingRange(1.f, 10.f);
-        _camera.SetFieldOfView(60.f);
-        _camera.SetPosition(vtkm::Vec3f_32(1.5, 1.5, 1.5));
-
-        std::cout<<"Correct camera:"<<std::endl;
-        _camera.Print();
-
-  /*
-        camera.SetPosition(_camera.GetPosition());
-        camera.SetLookAt(_camera.GetLookAt());
-        camera.SetViewUp(_camera.GetViewUp());
-        camera.SetFieldOfView(_camera.GetFieldOfView());
-        camera.SetClippingRange(_camera.GetClippingRange());
-        vtkm::Bounds vp = _camera.GetViewport();
-        camera.SetViewport(vp.X.Min, vp.X.Max, vp.Y.Min, vp.Y.Max);
-  */
-
-
         vtkm::cont::ColorTable colorTable("inferno");
         // Background color:
         vtkm::rendering::Color bg(0.2f, 0.2f, 0.2f, 1.0f);
-        vtkm::rendering::Actor actor(ds.GetCellSet(),
-                                    ds.GetCoordinateSystem(),
-                                    ds.GetField("tangle"),
-                                    colorTable);
+        vtkm::rendering::Actor actor = *instances[0]->group()->volumes()[0]->actor();
         vtkm::rendering::Scene scene;
         scene.AddActor(actor);
 
         CanvasRayTracer canvas(m_frameData.size[0], m_frameData.size[1]);
-        vtkm::rendering::View3D view(scene, MapperVolume(), canvas, camera, bg);
+        vtkm::rendering::View3D view(scene, *instances[0]->group()->volumes()[0]->mapper(), canvas, camera, bg);
         view.SetWorldAnnotationsEnabled(false);
         view.SetRenderAnnotationsEnabled(false);
         view.Paint();
@@ -238,24 +228,6 @@ void Frame::renderFrame()
             this->writeSample(x,y, pixel);
 
             idx++;
-          }
-      }
-      else
-      {
-        //DRP worklet launch here.... ?
-        // use m_world, m_renderer
-        // call vtkm::rendering code here.
-        for (int y = 0; y < m_frameData.size[1]; y++)
-          for (int x = 0; x < m_frameData.size[0]; x++)
-          {
-            auto screen = screenFromPixel(float2(x,y));
-            auto imageRegion = m_camera->imageRegion();
-            screen[0] = linalg::lerp(imageRegion[0], imageRegion[2], screen[0]);
-            screen[1] = linalg::lerp(imageRegion[1], imageRegion[3], screen[1]);
-            Ray ray = m_camera->createRay(screen);
-            writeSample(x, y, m_renderer->renderSample(screen, ray, *m_world));
-
-            //writeSample(x, y, {m_renderer->background(), 0.f});
           }
       }
     }
