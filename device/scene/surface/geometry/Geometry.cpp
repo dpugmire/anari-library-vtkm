@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "Geometry.h"
+// subtypes
+#include "Triangle.h"
 
 namespace vtkm_device {
 
@@ -18,7 +20,12 @@ Geometry::~Geometry()
 Geometry *Geometry::createInstance(
     std::string_view subtype, VTKmDeviceGlobalState *s)
 {
-  return (Geometry *)new UnknownObject(ANARI_GEOMETRY, s);
+  std::cout << "Creating geometry of type " << subtype << "\n";
+  if (subtype == "triangle")
+    return new Triangle(s);
+  else
+    // This seems insanely dangerous.
+    return (Geometry *)new UnknownObject(ANARI_GEOMETRY, s);
 }
 
 } // namespace vtkm_device

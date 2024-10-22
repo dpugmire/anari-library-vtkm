@@ -5,6 +5,8 @@
 
 #include "Object.h"
 
+#include <vtkm/cont/DataSet.h>
+
 namespace vtkm_device {
 
 struct Geometry : public Object
@@ -13,6 +15,11 @@ struct Geometry : public Object
   ~Geometry() override;
   static Geometry *createInstance(
       std::string_view subtype, VTKmDeviceGlobalState *s);
+
+  const vtkm::cont::DataSet &getData() const { return this->m_data; }
+
+ protected:
+  vtkm::cont::DataSet m_data;
 };
 
 } // namespace vtkm_device
