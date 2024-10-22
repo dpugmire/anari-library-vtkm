@@ -9,7 +9,7 @@ Perspective::Perspective(VTKmDeviceGlobalState *s) : Camera(s) {}
 
 void Perspective::commit()
 {
-  Camera::commit();_
+  Camera::commit();
 
   // NOTE: demonstrate alternative 'raw' method for getting parameter values
   float fovy = 0.f;
