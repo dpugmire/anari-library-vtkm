@@ -92,7 +92,7 @@ void Volume::render(const VolumeRay &vray,
   {
     color = float3(1,0,0);
     opacity = 0.5;
-    std::cout<<"Hit!"<<std::endl;
+    //std::cout<<"Hit!"<<std::endl;
   }
 #if 0
 

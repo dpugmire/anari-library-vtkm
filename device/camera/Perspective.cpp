@@ -9,7 +9,7 @@ Perspective::Perspective(VTKmDeviceGlobalState *s) : Camera(s) {}
 
 void Perspective::commit()
 {
-  Camera::commit();
+  Camera::commit();_
 
   // NOTE: demonstrate alternative 'raw' method for getting parameter values
   float fovy = 0.f;
@@ -25,10 +25,10 @@ void Perspective::commit()
   this->DirDV = vtkm::Normal(vtkm::Cross(this->DirDU, this->Dir)) * imgPlaneSize[1];
   this->Dir00 = this->Dir - .5f * this->DirDU - .5f * this->DirDV;
 
-  std::cout<<"Dir: "<<this->Dir<<" Up: "<<this->Up<<std::endl;
-  std::cout<<"DirDU: "<<this->DirDU<<std::endl;
-  std::cout<<"DirDV: "<<this->DirDV<<std::endl;
-  std::cout<<"Dir00: "<<this->Dir00<<std::endl;
+  //std::cout<<"Dir: "<<this->Dir<<" Up: "<<this->Up<<std::endl;
+  //std::cout<<"DirDU: "<<this->DirDU<<std::endl;
+  //std::cout<<"DirDV: "<<this->DirDV<<std::endl;
+  //std::cout<<"Dir00: "<<this->Dir00<<std::endl;
 }
 
 Ray Perspective::createRay(const float2 &screen) const

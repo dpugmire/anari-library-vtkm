@@ -50,13 +50,13 @@ void Group::commit()
 
 const std::vector<Surface *> &Group::surfaces() const
 {
-  std::cout<<__FILE__<<" "<<__LINE__<<std::endl;
+  //std::cout<<__FILE__<<" "<<__LINE__<<std::endl;
   return m_surfaces;
 }
 
 const std::vector<Volume *> &Group::volumes() const
 {
-  std::cout<<__FILE__<<" "<<__LINE__<<" : "<<m_volumes.size()<<std::endl;
+  //std::cout<<__FILE__<<" "<<__LINE__<<" : "<<m_volumes.size()<<std::endl;
   return m_volumes;
 }
 

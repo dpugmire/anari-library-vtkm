@@ -40,10 +40,9 @@ void Camera::commit()
   this->ImageRegion = vtkm::Vec4f_32(0.f, 0.f, 1.f, 1.f);
   getParam("imageRegion", ANARI_FLOAT32_BOX2, &this->ImageRegion);
 
-  std::cout<<"Pos== "<<this->Position<<" pp= "<<pp<<std::endl;
-  std::cout<<"Dir== "<<this->Dir<<" dd== "<<dd<<std::endl;
-  std::cout<<"Up== "<<this->Up<<std::endl;
-
+  //std::cout<<"Pos== "<<this->Position<<" pp= "<<pp<<std::endl;
+  //std::cout<<"Dir== "<<this->Dir<<" dd== "<<dd<<std::endl;
+  //std::cout<<"Up== "<<this->Up<<std::endl;
 
   markUpdated();
 }
