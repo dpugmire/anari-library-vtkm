@@ -29,6 +29,14 @@ void Perspective::commit()
   //std::cout<<"DirDU: "<<this->DirDU<<std::endl;
   //std::cout<<"DirDV: "<<this->DirDV<<std::endl;
   //std::cout<<"Dir00: "<<this->Dir00<<std::endl;
+
+  this->camera.SetPosition(this->Position);
+  this->camera.SetLookAt(this->Dir);
+  this->camera.SetViewUp(this->Up);
+  this->camera.SetViewport(this->ImageRegion[0],
+                           this->ImageRegion[2],
+                           this->ImageRegion[1],
+                           this->ImageRegion[3]);
 }
 
 Ray Perspective::createRay(const float2 &screen) const

@@ -41,7 +41,7 @@ void Triangle::commit()
       connectionArray.GetComponentsArray());
   this->m_data.SetCellSet(cellSet);
 
-  this->m_data.AddCoordinateSystem("coords", this->m_vertexPosition->dataAsVTKmArray());
+  this->m_data.AddCoordinateSystem({"coords", this->m_vertexPosition->dataAsVTKmArray()});
 }
 
 } // namespace vtkm_device

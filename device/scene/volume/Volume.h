@@ -27,6 +27,7 @@ struct Volume : public Object
   box3 bounds() const;
   bool isValid() const override {return true;}
   //DRP
+  vtkm::cont::DataSet getDataSet() const { return this->DataSet; }
 
  private:
   uint32_t m_id{~0u};

@@ -5,6 +5,8 @@
 //#include "TransferFunction1D.h"
 #include <iostream>
 #include <vtkm/cont/DataSetBuilderUniform.h>
+#include <vtkm/source/Tangle.h>
+
 
 namespace vtkm_device {
 
@@ -18,9 +20,13 @@ Volume::Volume(VTKmDeviceGlobalState *s) : Object(ANARI_VOLUME, s)
   this->MaxCorner[1] = 1.f;
   this->MaxCorner[2] = 1.f;
 
-  vtkm::Vec3f origin(0,0,0), spacing(.1, .1, .1);
-  vtkm::cont::DataSetBuilderUniform dsb;
-  this->DataSet = dsb.Create({10,10,10}, origin, spacing);
+  //vtkm::Vec3f origin(0,0,0), spacing(.1, .1, .1);
+  //vtkm::cont::DataSetBuilderUniform dsb;
+  //this->DataSet = dsb.Create({10,10,10}, origin, spacing);
+
+  vtkm::source::Tangle tangle;
+  tangle.SetPointDimensions({ 50, 50, 50 });
+  this->DataSet = tangle.Execute();
 }
 
 Volume::~Volume()

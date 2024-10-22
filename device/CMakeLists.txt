@@ -44,6 +44,8 @@ PRIVATE
   anari::helium
   vtkm::cont
   vtkm::worklet
+  vtkm::source
+  vtkm::rendering
 )
 
 include(GenerateExportHeader)

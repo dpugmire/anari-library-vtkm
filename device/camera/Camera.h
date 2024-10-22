@@ -7,6 +7,7 @@
 #include "../Object.h"
 #include <vtkm/interop/anari/VtkmANARITypes.h>
 
+#include <vtkm/rendering/Camera.h>
 
 namespace vtkm_device {
 
@@ -30,11 +31,15 @@ struct Camera : public Object
 
   virtual Ray createRay(const float2 &screen) const = 0;
 
+  vtkm::rendering::Camera GetCamera() const { return this->camera; }
+
  protected:
   vtkm::Vec3f_32 Position = vtkm::Vec3f_32(0.f,0.f,0.f);
   vtkm::Vec3f_32 Dir = vtkm::Vec3f_32(0.f,0.f,1.f);
   vtkm::Vec3f_32 Up = vtkm::Vec3f_32(0.f,1.f,0.f);
   vtkm::Vec4f_32 ImageRegion;
+
+  vtkm::rendering::Camera camera;
 };
 
 } // namespace vtkm_device
