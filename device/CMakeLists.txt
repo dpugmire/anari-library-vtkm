@@ -19,6 +19,7 @@ add_library(${PROJECT_NAME} SHARED
   array/Array1D.cpp
   array/Array2D.cpp
   array/Array3D.cpp
+  array/ArrayConversion.cpp
   array/ObjectArray.cpp
   camera/Camera.cpp
   camera/Orthographic.cpp
