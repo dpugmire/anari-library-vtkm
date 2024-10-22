@@ -34,7 +34,8 @@ void Triangle::commit()
   vtkm::cont::ArrayCopyShallowIfPossible(this->m_index->dataAsVTKmArray(), connectionArray);
 
   vtkm::cont::CellSetSingleType<> cellSet;
-  cellSet.Fill(connectionArray.GetNumberOfValues() / 3,
+  cellSet.Fill(
+      static_cast<vtkm::Id>(this->m_vertexPosition->size()),
       vtkm::CELL_SHAPE_TRIANGLE,
       3,
       connectionArray.GetComponentsArray());
