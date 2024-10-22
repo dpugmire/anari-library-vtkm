@@ -16,10 +16,10 @@ struct Geometry : public Object
   static Geometry *createInstance(
       std::string_view subtype, VTKmDeviceGlobalState *s);
 
-  const vtkm::cont::DataSet &getData() const { return this->m_data; }
+  const vtkm::cont::DataSet &getDataSet() const { return this->m_dataSet; }
 
  protected:
-  vtkm::cont::DataSet m_data;
+  vtkm::cont::DataSet m_dataSet;
 
   /// @brief A convenience method to pull attribute information into m_data.
   ///

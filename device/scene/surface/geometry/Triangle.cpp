@@ -24,7 +24,7 @@ void Triangle::commit()
   this->m_vertexPosition = getParamObject<Array1D>("vertex.position");
 
   // Reset data
-  this->m_data = vtkm::cont::DataSet{};
+  this->m_dataSet = vtkm::cont::DataSet{};
 
   // Get the connection array.
   // Note that ANARI provides the connection array as a series of triples whereas
@@ -39,9 +39,9 @@ void Triangle::commit()
       vtkm::CELL_SHAPE_TRIANGLE,
       3,
       connectionArray.GetComponentsArray());
-  this->m_data.SetCellSet(cellSet);
+  this->m_dataSet.SetCellSet(cellSet);
 
-  this->m_data.AddCoordinateSystem({ "coords", this->m_vertexPosition->dataAsVTKmArray() });
+  this->m_dataSet.AddCoordinateSystem({ "coords", this->m_vertexPosition->dataAsVTKmArray() });
 
   this->AddAttributeInformation();
 

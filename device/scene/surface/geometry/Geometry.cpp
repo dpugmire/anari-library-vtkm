@@ -71,7 +71,7 @@ void Geometry::AddAttributeInformation()
   for (std::string&& attribName : { "attribute0", "attribute1", "attribute2", "attribute3" }) {
     std::string paramName = "vertex." + attribName;
     if (this->hasParam(paramName))
-      this->m_data.AddPointField(
+      this->m_dataSet.AddPointField(
           attribName, this->getParamObject<Array1D>(paramName)->dataAsVTKmArray());
   }
 
@@ -84,7 +84,7 @@ void Geometry::AddAttributeInformation()
     FixColorsForType<vtkm::UInt16>(colorArray);
     FixColorsForType<vtkm::UInt32>(colorArray);
     FixColorsForType<vtkm::UInt64>(colorArray);
-    this->m_data.AddPointField("color", colorArray);
+    this->m_dataSet.AddPointField("color", colorArray);
   }
 }
 
