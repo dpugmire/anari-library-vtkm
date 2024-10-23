@@ -12,9 +12,9 @@ void Perspective::commit()
   Camera::commit();
 
   this->camera.SetPosition(this->Position);
-  this->camera.SetLookAt(this->Position + this->Dir);
+  this->camera.SetLookAt(this->Position + (1000.f * this->Dir));
   this->camera.SetViewUp(this->Up);
-  this->camera.SetClippingRange(0.1f, 1e30f);
+  this->camera.SetClippingRange(10.f, 1e30f);
   this->camera.SetFieldOfView(
       anari::degrees(getParam("fovy", anari::radians(60.f))));
 #if 0
