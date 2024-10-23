@@ -13,6 +13,8 @@
 #include <vector>
 #include "../VTKmTypes.h"
 
+#include <vtkm/rendering/CanvasRayTracer.h>
+
 namespace vtkm_device {
 
 struct Frame : public helium::BaseFrame
@@ -75,6 +77,10 @@ struct Frame : public helium::BaseFrame
   helium::IntrusivePtr<Renderer> m_renderer;
   helium::IntrusivePtr<Camera> m_camera;
   helium::IntrusivePtr<World> m_world;
+
+  vtkm::rendering::CanvasRayTracer Canvas;
+  //vtkm::cont::ArrayHandle<vtkm::UInt8> m_bytesFrameBuffer;
+  vtkm::cont::ArrayHandle<vtkm::UInt32> m_intFrameBuffer;
 
   float m_duration{0.f};
 

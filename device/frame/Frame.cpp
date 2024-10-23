@@ -10,14 +10,16 @@
 
 #include <scene/World.h>
 
-
+#include <vtkm/cont/ArrayHandleBasic.h>
 #include <vtkm/rendering/Actor.h>
-#include <vtkm/rendering/CanvasRayTracer.h>
 #include <vtkm/rendering/MapperRayTracer.h>
 #include <vtkm/rendering/MapperVolume.h>
 #include <vtkm/rendering/MapperWireframer.h>
 #include <vtkm/rendering/Scene.h>
 #include <vtkm/rendering/View3D.h>
+
+#include <vtkm/cont/Invoker.h>
+#include <vtkm/worklet/WorkletMapField.h>
 
 using vtkm::rendering::CanvasRayTracer;
 using vtkm::rendering::MapperRayTracer;
@@ -26,23 +28,68 @@ using vtkm::rendering::MapperWireframer;
 
 namespace vtkm_device {
 
-// Helper functions ///////////////////////////////////////////////////////////
+constexpr float toneMap(vtkm::Float32 v)
+{
+  return std::pow(v, 1.f / 2.2f);
+}
 
-static uint32_t cvt_uint32(const float &f)
+static uint32_t cvt_uint32(const vtkm::Float32 &f)
 {
   return static_cast<uint32_t>(255.f * std::clamp(f, 0.f, 1.f));
 }
 
-static uint32_t cvt_uint32(const float4 &v)
+static uint32_t cvt_uint32(const vtkm::Vec4f_32 &v)
 {
   return (cvt_uint32(v[0]) << 0) | (cvt_uint32(v[1]) << 8)
       | (cvt_uint32(v[2]) << 16) | (cvt_uint32(v[3]) << 24);
 }
 
-static uint32_t cvt_uint32_srgb(const float4 &v)
+static uint32_t cvt_uint32_srgb(const vtkm::Vec4f_32 &v)
 {
-  return cvt_uint32(float4(toneMap(v[0]), toneMap(v[1]), toneMap(v[2]), v[3]));
+  return cvt_uint32(vtkm::Vec4f_32(toneMap(v[0]), toneMap(v[1]), toneMap(v[2]), v[3]));
 }
+
+class ConvertToRGBA : public vtkm::worklet::WorkletMapField
+{
+  public:
+
+  using ControlSignature = void(FieldIn inputArray, FieldOut outputArray);
+  using ExecutionSignature = void(InputIndex, _1, _2);
+  using InputDomain = _1;
+
+  template <typename InFieldType, typename OutFieldType>
+  VTKM_EXEC void operator()(const vtkm::Id& inIdx,
+                            const InFieldType& inField,
+                            OutFieldType& outField) const
+  {
+    outField = cvt_uint32(inField);
+  }
+};
+
+class ConvertToSRGBA : public vtkm::worklet::WorkletMapField
+{
+  public:
+
+  using ControlSignature = void(FieldIn inputArray, FieldOut outputArray);
+  using ExecutionSignature = void(InputIndex, _1, _2);
+  using InputDomain = _1;
+
+  template <typename InFieldType, typename OutFieldType>
+  VTKM_EXEC void operator()(const vtkm::Id& inIdx,
+                            const InFieldType& inField,
+                            OutFieldType& outField) const
+  {
+    outField = cvt_uint32_srgb(inField);
+  }
+
+  private :
+  vtkm::Float32 Exponent = 1.1f / 2.2f;
+};
+
+
+// Helper functions ///////////////////////////////////////////////////////////
+
+
 
 template <typename R, typename TASK_T>
 static std::future<R> async(TASK_T &&fcn)
@@ -119,6 +166,7 @@ void Frame::commit()
   //m_frameData.invSize = 1.f / float2(m_frameData.size);
   m_frameData.invSize[0] = 1.f / (float)m_frameData.size[0];
   m_frameData.invSize[1] = 1.f / (float)m_frameData.size[1];
+  this->Canvas = vtkm::rendering::CanvasRayTracer(this->m_frameData.size[0], this->m_frameData.size[1]);
 
   const auto numPixels = m_frameData.size[0] * m_frameData.size[1];
 
@@ -200,35 +248,37 @@ void Frame::renderFrame()
       if ((instances.size() > 0) &&
           (instances[0]->group()->volumes().size() > 0))
       {
+
+        auto instances = this->m_world->instances();
+        if (instances[0]->group()->volumes().size() > 0)
+          doVTKm = true;
+      }
+
+      //TODO:
+      // Need to be able to pass a color/depth buffer into the vtkm canvas.
+      if (doVTKm)
+      {
+        auto instances = this->m_world->instances();
+        auto ds = instances[0]->group()->volumes()[0]->getDataSet();
+        auto camera = this->m_camera->GetCamera();
+
         vtkm::cont::ColorTable colorTable("inferno");
-        // Background color:
-        vtkm::rendering::Color bg(0.2f, 0.2f, 0.2f, 1.0f);
-        vtkm::rendering::Actor actor = *instances[0]->group()->volumes()[0]->actor();
+        vtkm::rendering::Color bg(this->m_renderer->background());
+        vtkm::rendering::Actor actor(ds.GetCellSet(),
+                                    ds.GetCoordinateSystem(),
+                                    ds.GetField("tangle"),
+                                    colorTable);
         vtkm::rendering::Scene scene;
         scene.AddActor(actor);
 
-        CanvasRayTracer canvas(m_frameData.size[0], m_frameData.size[1]);
-        vtkm::rendering::View3D view(scene, *instances[0]->group()->volumes()[0]->mapper(), canvas, camera, bg);
+        vtkm::rendering::View3D view(scene, MapperVolume(), this->Canvas, camera, bg);
         view.SetWorldAnnotationsEnabled(false);
         view.SetRenderAnnotationsEnabled(false);
         view.Paint();
-        auto colorBuff = canvas.GetColorBuffer();
-        auto zBuff = canvas.GetDepthBuffer();
+        auto colorBuff = this->Canvas.GetColorBuffer();
+        auto zBuff = this->Canvas.GetDepthBuffer();
         auto colorPortal = colorBuff.ReadPortal();
         auto zPortal = zBuff.ReadPortal();
-        //view.SaveAs("volume.png");
-        int idx = 0;
-        for (int y = 0; y < m_frameData.size[1]; y++)
-          for (int x = 0; x < m_frameData.size[0]; x++)
-          {
-            auto color = colorPortal.Get(idx);
-            PixelSample pixel;
-            pixel.color = {color[0], color[1], color[2], color[3]};
-            pixel.depth = zPortal.Get(idx);
-            this->writeSample(x,y, pixel);
-
-            idx++;
-          }
       }
     }
 
@@ -245,25 +295,65 @@ void *Frame::map(std::string_view channel,
 {
   wait();
 
+  //types are in: anari enum
+  //report message method to convey info and faults.
+
   *width = m_frameData.size[0];
   *height = m_frameData.size[1];
 
-  if (channel == "channel.color") {
-    *pixelType = m_colorType;
-    return m_pixelBuffer.data();
-  } else if (channel == "channel.depth" && !m_depthBuffer.empty()) {
+  if (channel == "channel.color")
+  {
+    *pixelType = this->m_colorType;
+    if (this->m_colorType == ANARI_FLOAT32_VEC4)
+    {
+      //change this to GetReadPointer().
+      vtkm::cont::ArrayHandleBasic<vtkm::Vec4f> basicArray = this->Canvas.GetColorBuffer();
+      return basicArray.GetWritePointer();
+    }
+    else if (this->m_colorType == ANARI_UFIXED8_VEC4)
+    {
+      this->m_intFrameBuffer.Allocate(*width**height);
+      ConvertToRGBA worklet;
+      vtkm::cont::Invoker invoker;
+      invoker(worklet, this->Canvas.GetColorBuffer(), this->m_intFrameBuffer);
+      vtkm::cont::ArrayHandleBasic<vtkm::UInt32> basicArray = this->m_intFrameBuffer;
+      return basicArray.GetWritePointer();
+    }
+    else if (this->m_colorType == ANARI_UFIXED8_RGBA_SRGB)
+    {
+      this->m_intFrameBuffer.Allocate(*width**height);
+      ConvertToSRGBA worklet;
+      vtkm::cont::Invoker invoker;
+      invoker(worklet, this->Canvas.GetColorBuffer(), this->m_intFrameBuffer);
+
+      vtkm::cont::ArrayHandleBasic<vtkm::UInt32> basicArray = this->m_intFrameBuffer;
+      return basicArray.GetWritePointer();
+    }
+    return nullptr;
+  }
+  else if (channel == "channel.depth")
+  {
     *pixelType = ANARI_FLOAT32;
-    return m_depthBuffer.data();
-  } else if (channel == "channel.primitiveId" && !m_primIdBuffer.empty()) {
+    vtkm::cont::ArrayHandleBasic<vtkm::Float32> basicArray = this->Canvas.GetDepthBuffer();
+    return (void *) basicArray.GetWritePointer();
+  }
+  else if (channel == "channel.primitiveId" && !m_primIdBuffer.empty())
+  {
     *pixelType = ANARI_UINT32;
     return m_primIdBuffer.data();
-  } else if (channel == "channel.objectId" && !m_objIdBuffer.empty()) {
+  }
+  else if (channel == "channel.objectId" && !m_objIdBuffer.empty())
+   {
     *pixelType = ANARI_UINT32;
     return m_objIdBuffer.data();
-  } else if (channel == "channel.instanceId" && !m_instIdBuffer.empty()) {
+  }
+  else if (channel == "channel.instanceId" && !m_instIdBuffer.empty())
+  {
     *pixelType = ANARI_UINT32;
     return m_instIdBuffer.data();
-  } else {
+  }
+  else
+  {
     *width = 0;
     *height = 0;
     *pixelType = ANARI_UNKNOWN;
@@ -273,7 +363,8 @@ void *Frame::map(std::string_view channel,
 
 void Frame::unmap(std::string_view channel)
 {
-  // no-op
+  //if (channel == "channel.color" && this->m_bytesFrameBuffer.GetNumberOfValues() > 0)
+
 }
 
 int Frame::frameReady(ANARIWaitMask m)
@@ -288,7 +379,7 @@ int Frame::frameReady(ANARIWaitMask m)
 
 void Frame::discard()
 {
-  // no-op
+  this->m_intFrameBuffer.ReleaseResources();
 }
 
 bool Frame::ready() const
