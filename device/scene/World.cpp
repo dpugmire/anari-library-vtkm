@@ -27,6 +27,14 @@ World::~World()
 bool World::getProperty(
     const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
 {
+  if (name == "bounds" && type == ANARI_FLOAT32_BOX3) {
+    // TODO: actually calculate the bounds in the world
+    helium::box3 bounds;
+    bounds.lower = {0.f, 0.f, 0.f};
+    bounds.upper = {512.f, 512.f, 512.f};
+    std::memcpy(ptr, &bounds, sizeof(bounds));
+    return true;
+  }
   return Object::getProperty(name, type, ptr, flags);
 }
 

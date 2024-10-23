@@ -29,8 +29,6 @@ struct Camera : public Object
                   this->ImageRegion[3]);
   }
 
-  virtual Ray createRay(const float2 &screen) const = 0;
-
   vtkm::rendering::Camera GetCamera() const { return this->camera; }
 
  protected:

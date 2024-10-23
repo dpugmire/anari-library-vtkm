@@ -59,7 +59,6 @@ struct Frame : public helium::BaseFrame
   {
     int frameID{0};
     uint2 size;
-    float2 invSize;
   } m_frameData;
 
   anari::DataType m_colorType{ANARI_UNKNOWN};
