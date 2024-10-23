@@ -5,7 +5,10 @@
 
 #include "Object.h"
 #include "VTKmTypes.h"
+// VTK-m
 #include <vtkm/cont/DataSet.h>
+#include <vtkm/rendering/Actor.h>
+#include <vtkm/rendering/Mapper.h>
 
 namespace vtkm_device {
 
@@ -20,24 +23,24 @@ struct Volume : public Object
 
   uint32_t id() const;
 
-  //DRP
-  void render(const VolumeRay &vray,
-              float3 &outputColor,
-              float &outputOpacity);
-  box3 bounds() const;
-  bool isValid() const override {return true;}
-  //DRP
-  vtkm::cont::DataSet getDataSet() const { return this->DataSet; }
+  virtual box3 bounds() const = 0;
+  virtual vtkm::rendering::Actor *actor() const = 0;
+  virtual vtkm::rendering::Mapper *mapper() const = 0;
+
+  bool isValid() const override;
 
  private:
   uint32_t m_id{~0u};
+};
 
-  vtkm::cont::DataSet DataSet;
+struct UnknownVolume : public Volume
+{
+  UnknownVolume(VTKmDeviceGlobalState *d);
 
-  //DRP
-  // volume data...
-  float3 MinCorner, MaxCorner;
-  //DRP
+  box3 bounds() const override;
+  vtkm::rendering::Actor *actor() const override;
+  vtkm::rendering::Mapper *mapper() const override;
+  bool isValid() const override;
 };
 
 // Inlined definitions ////////////////////////////////////////////////////////

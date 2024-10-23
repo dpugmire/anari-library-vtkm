@@ -4,6 +4,8 @@
 #pragma once
 
 #include "Object.h"
+// VTK-m
+#include <vtkm/cont/DataSet.h>
 
 namespace vtkm_device {
 
@@ -13,6 +15,18 @@ struct SpatialField : public Object
   virtual ~SpatialField();
   static SpatialField *createInstance(
       std::string_view subtype, VTKmDeviceGlobalState *d);
+
+  vtkm::cont::DataSet getDataSet() const { return this->m_dataSet; }
+
+ protected:
+  vtkm::cont::DataSet m_dataSet;
+};
+
+struct UnknownSpatialField : public SpatialField
+{
+  UnknownSpatialField(VTKmDeviceGlobalState *d);
+
+  bool isValid() const override;
 };
 
 } // namespace vtkm_device

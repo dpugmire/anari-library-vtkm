@@ -19,6 +19,7 @@ struct Triangle : Geometry
  private:
   helium::ChangeObserverPtr<Array1D> m_index;
   helium::ChangeObserverPtr<Array1D> m_vertexPosition;
+  // TODO: Add other attributes to observe changes.
 };
 
 } // namespace vtkm_device

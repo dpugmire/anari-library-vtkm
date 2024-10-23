@@ -26,11 +26,6 @@ struct Renderer : public Object
       std::string_view subtype, VTKmDeviceGlobalState *d);
   void commit() override;
 
-  PixelSample renderSample(const float2 &screen, Ray ray, const World &w) const;
-  float4 shadeRay(const float2 &screen,
-                  const Ray &ray,
-                  const VolumeRay &vray,
-                  const World &w) const;
   float4 background() const;
 
  private:

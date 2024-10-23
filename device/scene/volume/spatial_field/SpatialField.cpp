@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "SpatialField.h"
+// Subtypes
+#include "StructuredRegularField.h"
 
 namespace vtkm_device {
 
@@ -19,7 +21,20 @@ SpatialField::~SpatialField()
 SpatialField *SpatialField::createInstance(
     std::string_view subtype, VTKmDeviceGlobalState *s)
 {
-  return (SpatialField *)new UnknownObject(ANARI_SPATIAL_FIELD, s);
+  if (subtype == "structuredRegular") {
+    return new StructuredRegularField(s);
+  } else {
+    return new UnknownSpatialField(s);
+  }
+}
+
+UnknownSpatialField::UnknownSpatialField(VTKmDeviceGlobalState *d) : SpatialField(d)
+{
+}
+
+bool UnknownSpatialField::isValid() const
+{
+  return false;
 }
 
 } // namespace vtkm_device

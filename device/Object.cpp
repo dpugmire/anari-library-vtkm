@@ -19,6 +19,7 @@ void Object::commit()
 bool Object::getProperty(
     const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
 {
+  (void)flags;  // ignored
   if (name == "valid" && type == ANARI_BOOL) {
     helium::writeToVoidP(ptr, isValid());
     return true;
