@@ -245,6 +245,7 @@ void Frame::renderFrame()
       */
 
       // This should be a loop over volumes and surfaces.
+      bool doVTKm = false;
       if ((instances.size() > 0) &&
           (instances[0]->group()->volumes().size() > 0))
       {
