@@ -101,43 +101,6 @@ static inline float MAXELEM(const float3& a)
   return std::max(a[0], std::max(a[1],a[2]));
 }
 
-//static inline float MAX(const float& a, const float& b)
-//{
-//  return a > b ? a : b;
-//}
-
-void Group::intersectVolumes(VolumeRay &ray) const
-{
-  Volume *originalVolume = ray.volume;
-  box1 t = ray.t;
-
-  for (auto *v : volumes())
-  {
-    if (!v->isValid())
-      continue;
-
-    const box3 bounds = v->bounds();
-    const float3 mins = (bounds.lower - ray.org) * (1.f / ray.dir);
-    const float3 maxs = (bounds.upper - ray.org) * (1.f / ray.dir);
-
-    const float3 nears = MIN(mins, maxs);
-    const float3 fars = MAX(mins, maxs);
-
-    const box1 lt(MAXELEM(nears), MINELEM(fars));
-
-    //Check for hit..
-    if (lt.lower < lt.upper && (!ray.volume || lt.lower < t.lower))
-    {
-      t.lower = CLAMP(lt.lower, t);
-      t.upper = CLAMP(lt.upper, t);
-      ray.volume = v;
-    }
-  }
-
-  if (ray.volume != originalVolume)
-    ray.t = t;
-}
-
 
 void Group::cleanup()
 {

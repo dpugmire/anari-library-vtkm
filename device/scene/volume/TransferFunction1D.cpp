@@ -114,14 +114,9 @@ const SpatialField *TransferFunction1D::spatialField() const
   return this->m_spatialField.ptr;
 }
 
-box3 TransferFunction1D::bounds() const
+vtkm::Bounds TransferFunction1D::bounds() const
 {
-  auto dsBounds = this->m_spatialField->getDataSet().GetCoordinateSystem().GetBounds();
-  float3 minC(dsBounds.X.Min, dsBounds.Y.Min, dsBounds.Z.Min);
-  float3 maxC(dsBounds.X.Max, dsBounds.Y.Max, dsBounds.Z.Max);
-  box3 bounds(minC, maxC);
-
-  return bounds;
+  return this->m_spatialField->getDataSet().GetCoordinateSystem().GetBounds();
 }
 
 vtkm::rendering::Actor *TransferFunction1D::actor() const

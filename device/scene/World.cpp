@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "World.h"
+#include "surface/Surface.h"
+#include "volume/Volume.h"
 
 namespace vtkm_device {
 
@@ -28,11 +30,9 @@ bool World::getProperty(
     const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
 {
   if (name == "bounds" && type == ANARI_FLOAT32_BOX3) {
-    // TODO: actually calculate the bounds in the world
-    helium::box3 bounds;
-    bounds.lower = {0.f, 0.f, 0.f};
-    bounds.upper = {512.f, 512.f, 512.f};
-    std::memcpy(ptr, &bounds, sizeof(bounds));
+    vtkm::Vec3f_32 anariBounds[] = {
+        vtkm::Vec3f_32(this->m_bounds.MinCorner()), vtkm::Vec3f_32(this->m_bounds.MaxCorner()) };
+    std::memcpy(ptr, &anariBounds, sizeof(anariBounds));
     return true;
   }
   return Object::getProperty(name, type, ptr, flags);
@@ -93,23 +93,21 @@ void World::commit()
     m_instanceData->addChangeObserver(this);
   if (m_zeroSurfaceData)
     m_zeroSurfaceData->addChangeObserver(this);
+
+  this->m_bounds = vtkm::Bounds{};
+  for (auto&& instance : this->instances()) {
+    for (auto&& surface : instance->group()->surfaces()) {
+      this->m_bounds.Include(surface->bounds());
+    }
+    for (auto&& volume : instance->group()->volumes()) {
+      this->m_bounds.Include(volume->bounds());
+    }
+  }
 }
 
 const std::vector<Instance *> &World::instances() const
 {
   return m_instances;
-}
-
-void World::intersectVolumes(VolumeRay &ray) const
-{
-  const auto &insts = instances();
-  for (uint32_t i = 0; i < insts.size(); i++)
-  {
-    const auto *inst = insts[i];
-    inst->group()->intersectVolumes(ray);
-    if (ray.volume)
-      ray.instID = i;
-  }
 }
 
 

@@ -6,6 +6,7 @@
 #include "Object.h"
 #include "VTKmTypes.h"
 // VTK-m
+#include <vtkm/Bounds.h>
 #include <vtkm/cont/DataSet.h>
 #include <vtkm/rendering/Actor.h>
 #include <vtkm/rendering/Mapper.h>
@@ -23,7 +24,7 @@ struct Volume : public Object
 
   uint32_t id() const;
 
-  virtual box3 bounds() const = 0;
+  virtual vtkm::Bounds bounds() const = 0;
   virtual vtkm::rendering::Actor *actor() const = 0;
   virtual vtkm::rendering::Mapper *mapper() const = 0;
 
@@ -37,7 +38,7 @@ struct UnknownVolume : public Volume
 {
   UnknownVolume(VTKmDeviceGlobalState *d);
 
-  box3 bounds() const override;
+  vtkm::Bounds bounds() const override;
   vtkm::rendering::Actor *actor() const override;
   vtkm::rendering::Mapper *mapper() const override;
   bool isValid() const override;
