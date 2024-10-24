@@ -4,6 +4,8 @@
 #pragma once
 
 #include "Instance.h"
+// VTK-m
+#include <vtkm/Bounds.h>
 
 namespace vtkm_device {
 
@@ -21,11 +23,11 @@ struct World : public Object
 
   const std::vector<Instance *> &instances() const;
 
-  void intersectVolumes(VolumeRay &ray) const;
-
   const Instance *instanceFromRay(const Ray &ray) const { return this->instances()[ray.instID]; }
   const Instance *instanceFromRay(const VolumeRay &ray) const { return this->instances()[ray.instID]; }
   const Surface *surfaceFromRay(const Ray &ray) const { return instanceFromRay(ray)->group()->surfaces()[ray.geomID]; }
+
+  const vtkm::Bounds &bounds() const { return this-> m_bounds; }
 
  private:
   void cleanup();
@@ -39,6 +41,8 @@ struct World : public Object
   bool m_addZeroInstance{false};
   helium::IntrusivePtr<Group> m_zeroGroup;
   helium::IntrusivePtr<Instance> m_zeroInstance;
+
+  vtkm::Bounds m_bounds;
 };
 
 } // namespace vtkm_device

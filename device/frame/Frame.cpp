@@ -212,9 +212,9 @@ void Frame::renderFrame()
       std::fill(m_pixelBuffer.begin(), m_pixelBuffer.end(), 0);
     } else {
       const auto &instances = this->m_world->instances();
-      auto camera = this->m_camera->GetCamera();
+      auto camera = this->m_camera->camera(this->m_world->bounds());
 
-#if 0
+#if 1
       std::cout << "\n\nANARI camera:" << std::endl;
       camera.Print();
 #endif
@@ -223,7 +223,6 @@ void Frame::renderFrame()
       bool doVTKm = false;
       if ((instances.size() > 0)
           && (instances[0]->group()->volumes().size() > 0)) {
-        auto instances = this->m_world->instances();
         if (instances[0]->group()->volumes().size() > 0)
           doVTKm = true;
       }

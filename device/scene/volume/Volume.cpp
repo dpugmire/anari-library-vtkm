@@ -39,9 +39,9 @@ UnknownVolume::UnknownVolume(VTKmDeviceGlobalState *d) : Volume(d)
 {
 }
 
-box3 UnknownVolume::bounds() const
+vtkm::Bounds UnknownVolume::bounds() const
 {
-  return box3{};
+  return vtkm::Bounds{};
 }
 
 vtkm::rendering::Actor *UnknownVolume::actor() const

@@ -11,18 +11,36 @@ void Perspective::commit()
 {
   Camera::commit();
 
-  this->camera.SetPosition(this->Position);
-  this->camera.SetLookAt(this->Position + (1000.f * this->Dir));
-  this->camera.SetViewUp(this->Up);
-  this->camera.SetClippingRange(10.f, 1e30f);
-  this->camera.SetFieldOfView(
-      anari::degrees(getParam("fovy", anari::radians(60.f))));
+  this->m_fovy = this->getParam("fovy", vtkm::Pi_3f());
+  this->m_aspect = this->getParam("aspect", vtkm::Float32(1));
+  this->m_near = this->getParam("near", vtkm::Float32(-1));
+  this->m_far = this->getParam("far", vtkm::Float32(-1));
+}
+
+vtkm::rendering::Camera Perspective::camera(const vtkm::Bounds &bounds) const
+{
+  vtkm::rendering::Camera camera;
+
+  vtkm::Vec3f_64 diagonal = { bounds.X.Length(), bounds.Y.Length(), bounds.Z.Length() };
+  vtkm::Float32 length = static_cast<vtkm::Float32>(vtkm::Magnitude(diagonal));
+
+  camera.SetPosition(this->m_position);
+  camera.SetLookAt(this->m_position + (length * this->m_direction));
+  camera.SetViewUp(this->m_up);
+  camera.SetFieldOfView(anari::degrees(this->m_fovy));
+  camera.SetClippingRange(
+      (this->m_near > 0) ? this->m_near : (0.001f * length),
+      (this->m_far > 0) ? this->m_far : (100.f * length));
 #if 0
-  this->camera.SetViewport(this->ImageRegion[0],
-                           this->ImageRegion[2],
-                           this->ImageRegion[1],
-                           this->ImageRegion[3]);
+  camera.SetViewport(this->m_imageRegion[0],
+                     this->m_imageRegion[2],
+                     this->m_imageRegion[1],
+                     this->m_imageRegion[3]);
 #endif
+
+  // TODO: The aspect parameter is ignored. This is handled elsewhere
+
+  return camera;
 }
 
 } // namespace vtkm_device

@@ -23,21 +23,28 @@ struct Camera : public Object
 
   float4 imageRegion() const
   {
-    return float4(this->ImageRegion[0],
-                  this->ImageRegion[1],
-                  this->ImageRegion[2],
-                  this->ImageRegion[3]);
+    return float4(this->m_imageRegion[0],
+                  this->m_imageRegion[1],
+                  this->m_imageRegion[2],
+                  this->m_imageRegion[3]);
   }
 
-  vtkm::rendering::Camera GetCamera() const { return this->camera; }
+  virtual vtkm::rendering::Camera camera(const vtkm::Bounds &bounds) const = 0;
 
  protected:
-  vtkm::Vec3f_32 Position = vtkm::Vec3f_32(0.f,0.f,0.f);
-  vtkm::Vec3f_32 Dir = vtkm::Vec3f_32(0.f,0.f,1.f);
-  vtkm::Vec3f_32 Up = vtkm::Vec3f_32(0.f,1.f,0.f);
-  vtkm::Vec4f_32 ImageRegion;
+  vtkm::Vec3f_32 m_position;
+  vtkm::Vec3f_32 m_direction;
+  vtkm::Vec3f_32 m_up;
+  vtkm::Vec4f_32 m_imageRegion;
+};
 
-  vtkm::rendering::Camera camera;
+struct UnknownCamera : public Camera
+{
+  UnknownCamera(VTKmDeviceGlobalState *s);
+
+  vtkm::rendering::Camera camera(const vtkm::Bounds &) const override;
+
+  bool isValid() const override;
 };
 
 } // namespace vtkm_device

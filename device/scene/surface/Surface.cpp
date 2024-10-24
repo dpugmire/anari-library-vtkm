@@ -42,6 +42,11 @@ const Material *Surface::material() const
   return m_material.ptr;
 }
 
+vtkm::Bounds Surface::bounds() const
+{
+  return this->geometry()->getDataSet().GetCoordinateSystem().GetBounds();
+}
+
 bool Surface::isValid() const
 {
   return m_geometry && m_material && m_geometry->isValid()

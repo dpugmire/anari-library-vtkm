@@ -3,6 +3,7 @@
 
 #include "StructuredRegularField.h"
 // VTK-m
+#include <vtkm/cont/ArrayCopy.h>
 #include <vtkm/cont/DataSetBuilderUniform.h>
 
 namespace vtkm_device {
@@ -27,7 +28,16 @@ void StructuredRegularField::commit()
       vtkm::Vec3f{ origin[0], origin[1], origin[2] },
       vtkm::Vec3f{ spacing[0], spacing[1], spacing[2] });
 
-  this->m_dataSet.AddPointField("data", this->m_dataArray->dataAsVTKmArray());
+  // VTK-m volume render only supports float fields in volume rendering. Convert
+  // if necessary.
+  vtkm::cont::UnknownArrayHandle vtkmArray = this->m_dataArray->dataAsVTKmArray();
+  if (!vtkmArray.IsValueType<vtkm::Float32>() && !vtkmArray.IsValueType<vtkm::Float64>())
+  {
+    vtkm::cont::ArrayHandle<vtkm::FloatDefault> castArray;
+    vtkm::cont::ArrayCopy(vtkmArray, castArray);
+    vtkmArray = castArray;
+  }
+  this->m_dataSet.AddPointField("data", vtkmArray);
 
   this->m_dataSet.PrintSummary(std::cout);
 }

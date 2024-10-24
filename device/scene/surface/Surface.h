@@ -5,6 +5,8 @@
 
 #include "geometry/Geometry.h"
 #include "material/Material.h"
+// VTK-m
+#include <vtkm/Bounds.h>
 
 namespace vtkm_device {
 
@@ -18,6 +20,8 @@ struct Surface : public Object
   uint32_t id() const {return m_id;}
   const Geometry *geometry() const;
   const Material *material() const;
+
+  vtkm::Bounds bounds() const;
 
   bool isValid() const override;
 

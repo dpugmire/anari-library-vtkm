@@ -23,7 +23,7 @@ struct TransferFunction1D : public Volume
   void commit() override;
 
   const SpatialField *spatialField() const;
-  box3 bounds() const override;
+  vtkm::Bounds bounds() const override;
   vtkm::rendering::Actor *actor() const override;
   vtkm::rendering::MapperVolume *mapper() const override;
 
