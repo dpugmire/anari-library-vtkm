@@ -210,39 +210,42 @@ void Frame::renderFrame()
       reportMessage(
           ANARI_SEVERITY_ERROR, "skipping render of incomplete frame object");
       std::fill(m_pixelBuffer.begin(), m_pixelBuffer.end(), 0);
-    } else {
+    }
+    else
+    {
       const auto &instances = this->m_world->instances();
       auto camera = this->m_camera->camera(this->m_world->bounds());
 
-#if 1
+#if 0
       std::cout << "\n\nANARI camera:" << std::endl;
       camera.Print();
 #endif
 
-      // This should be a loop over volumes and surfaces.
-      bool doVTKm = false;
-      if ((instances.size() > 0)
-          && (instances[0]->group()->volumes().size() > 0)) {
-        if (instances[0]->group()->volumes().size() > 0)
-          doVTKm = true;
-      }
+      for (const auto& instance : instances)
+      {
+        if (instance->group() == nullptr)
+          continue;
 
-      // TODO:
-      //  Need to be able to pass a color/depth buffer into the vtkm canvas.
-      if (doVTKm) {
-        vtkm::rendering::Actor actor =
-            *instances[0]->group()->volumes()[0]->actor();
-        vtkm::rendering::Scene scene;
-        scene.AddActor(actor);
+        for (const auto& volume : instance->group()->volumes())
+        {
+          const auto actor = volume->actor();
+          vtkm::rendering::Scene scene;
+          scene.AddActor(*actor);
 
-        vtkm::rendering::View3D view(scene,
-            MapperVolume(),
-            this->Canvas,
-            camera,
-            this->m_renderer->background());
-        view.SetWorldAnnotationsEnabled(false);
-        view.SetRenderAnnotationsEnabled(false);
-        view.Paint();
+          vtkm::rendering::View3D view(scene,
+              MapperVolume(),
+              this->Canvas,
+              camera,
+              this->m_renderer->background());
+          view.SetWorldAnnotationsEnabled(false);
+          view.SetRenderAnnotationsEnabled(false);
+          view.Paint();
+        }
+
+        for (const auto& surface : instance->group()->surfaces())
+        {
+          std::cout<<"Render Surface"<<std::endl;
+        }
       }
     }
 
