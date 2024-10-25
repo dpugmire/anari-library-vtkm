@@ -34,13 +34,23 @@ void FillColorTable(vtkm::cont::ColorTable& table, const vtkm::cont::UnknownArra
   std::transform(colorChannels.begin(), colorChannels.end(), colorPortals.begin(), [](auto array){
     return array.ReadPortal();
   });
-  vtkm::Float64 scale = 1.0/(numValues - 1);
-  for (vtkm::Id index = 0; index < numValues; ++index) {
+  if (numValues > 1) {
+    vtkm::Float64 scale = 1.0/(numValues - 1);
+    for (vtkm::Id index = 0; index < numValues; ++index) {
+      std::array<vtkm::Float32, 3> color;
+      std::transform(colorPortals.begin(), colorPortals.end(), color.begin(), [index](auto portal){
+        return static_cast<vtkm::Float32>(portal.Get(index));
+      });
+      table.AddPoint(index * scale, { color[0], color[1], color[2] });
+    }
+  } else {
+    // Special case: only one color given in array.
     std::array<vtkm::Float32, 3> color;
-    std::transform(colorPortals.begin(), colorPortals.end(), color.begin(), [index](auto portal){
-      return static_cast<vtkm::Float32>(portal.Get(index));
+    std::transform(colorPortals.begin(), colorPortals.end(), color.begin(), [](auto portal){
+      return static_cast<vtkm::Float32>(portal.Get(0));
     });
-    table.AddPoint(index * scale, { color[0], color[1], color[2] });
+    table.AddPoint(0, { color[0], color[1], color[2] });
+    table.AddPoint(1, { color[0], color[1], color[2] });
   }
 }
 
@@ -63,7 +73,6 @@ void TransferFunction1D::commit()
   // Reset and fill color table
   this->m_colorTable = vtkm::cont::ColorTable(vtkm::ColorSpace::Lab);
   Array1D* colorArray = this->getParamObject<Array1D>("color");
-  float4 color4;
   if (colorArray != nullptr) {
     // Convert to VTK-m colors
     vtkm::cont::UnknownArrayHandle vtkmColors =
@@ -79,25 +88,31 @@ void TransferFunction1D::commit()
     } else if (vtkmColors.IsBaseComponentType<vtkm::Float64>()) {
       FillColorTable<vtkm::Float64>(this->m_colorTable, vtkmColors);
     }
-  } else if (this->getParam("color", ANARI_FLOAT32_VEC4, &color4)) {
-    this->m_colorTable.AddPoint(0, { color4[0], color4[1], color4[2] });
-    this->m_colorTable.AddPoint(1, { color4[0], color4[1], color4[2] });
   } else {
-    float3 color3 = this->getParam("color", float3{ 1, 1, 1 });
-    this->m_colorTable.AddPoint(0, { color3[0], color3[1], color3[2] });
-    this->m_colorTable.AddPoint(1, { color3[0], color3[1], color3[2] });
+    float4 color = { 1, 1, 1, 1 };
+    this->getParam("color", ANARI_FLOAT32_VEC4, &color);
+    this->getParam("color", ANARI_FLOAT32_VEC3, &color);
+    this->m_colorTable.AddPoint(0, { color[0], color[1], color[2] });
+    this->m_colorTable.AddPoint(1, { color[0], color[1], color[2] });
   }
 
   Array1D* opacityArray = this->getParamObject<Array1D>("opacity");
   if (opacityArray != nullptr) {
-    vtkm::Float64 scale = 1.0/(opacityArray->size() - 1);
-    for (size_t index = 0; index < opacityArray->size(); ++index) {
-      float opacity = *opacityArray->valueAt<float>(index);
-      this->m_colorTable.AddPointAlpha(index * scale, opacity);
+    if (opacityArray->size() > 1) {
+      vtkm::Float64 scale = 1.0/(opacityArray->size() - 1);
+      for (size_t index = 0; index < opacityArray->size(); ++index) {
+        float opacity = *opacityArray->valueAt<float>(index);
+        this->m_colorTable.AddPointAlpha(index * scale, opacity);
+      }
+    } else {
+      float opacity = *opacityArray->valueAt<float>(0);
+      this->m_colorTable.AddPointAlpha(0, opacity);
+      this->m_colorTable.AddPointAlpha(1, opacity);
     }
   }
 
-  box1 range = this->getParam("valueRange", box1{ 0, 1 });
+  box1 range = { 0, 1 };
+  this->getParam("valueRange", ANARI_FLOAT32_BOX1, &range);
   this->m_colorTable.RescaleToRange({ range.lower, range.upper });
 
   vtkm::cont::DataSet dataSet = this->m_spatialField->getDataSet();
@@ -106,6 +121,7 @@ void TransferFunction1D::commit()
       dataSet.GetCoordinateSystem(),
       dataSet.GetField("data"),
       this->m_colorTable);
+  this->m_actor->SetScalarRange(this->m_colorTable.GetRange());
   this->m_mapper = std::make_shared<vtkm::rendering::MapperVolume>();
 }
 
