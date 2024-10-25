@@ -33,6 +33,10 @@ Geometry *Geometry::createInstance(
     return new UnknownGeometry(s);
 }
 
+//void Geometry::commit()
+//{
+//}
+
 void Geometry::AddAttributeInformation()
 {
   for (std::string&& attribName : { "attribute0", "attribute1", "attribute2", "attribute3" }) {

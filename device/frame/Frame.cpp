@@ -229,11 +229,12 @@ void Frame::renderFrame()
         for (const auto& volume : instance->group()->volumes())
         {
           const auto actor = volume->actor();
+          const auto mapper = volume->mapper();
           vtkm::rendering::Scene scene;
           scene.AddActor(*actor);
 
           vtkm::rendering::View3D view(scene,
-              MapperVolume(),
+              *mapper,
               this->Canvas,
               camera,
               this->m_renderer->background());
@@ -245,6 +246,20 @@ void Frame::renderFrame()
         for (const auto& surface : instance->group()->surfaces())
         {
           std::cout<<"Render Surface"<<std::endl;
+          const auto geom = surface->geometry();
+          const auto actor = geom->actor();
+          const auto mapper = geom->mapper();
+          vtkm::rendering::Scene scene;
+          scene.AddActor(*actor);
+
+          vtkm::rendering::View3D view(scene,
+              *mapper,
+              this->Canvas,
+              camera,
+              this->m_renderer->background());
+          view.SetWorldAnnotationsEnabled(false);
+          view.SetRenderAnnotationsEnabled(false);
+          view.Paint();
         }
       }
     }

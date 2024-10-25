@@ -6,6 +6,8 @@
 #include "Object.h"
 
 #include <vtkm/cont/DataSet.h>
+#include <vtkm/rendering/Actor.h>
+#include <vtkm/rendering/MapperRayTracer.h>
 
 namespace vtkm_device {
 
@@ -16,10 +18,14 @@ struct Geometry : public Object
   static Geometry *createInstance(
       std::string_view subtype, VTKmDeviceGlobalState *s);
 
+  //void commit() override;
+  virtual vtkm::rendering::Actor *actor() const {return nullptr; } // = 0;
   const vtkm::cont::DataSet &getDataSet() const { return this->m_dataSet; }
+  virtual const  vtkm::rendering::MapperRayTracer *mapper() const {return this->m_mapper.get();}
 
  protected:
   vtkm::cont::DataSet m_dataSet;
+  std::shared_ptr<vtkm::rendering::MapperRayTracer> m_mapper;
 
   /// @brief A convenience method to pull attribute information into m_data.
   ///
