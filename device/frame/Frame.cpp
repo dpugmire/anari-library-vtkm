@@ -222,14 +222,20 @@ void Frame::renderFrame()
 #endif
 
       for (const auto &instance : instances) {
-        if (instance->group() == nullptr)
+        if (!instance->isValid()) {
+          reportMessage(ANARI_SEVERITY_DEBUG, "skip rendering invalid group");
           continue;
+        }
 
-        for (const auto &volume : instance->group()->volumes()) {
-          if (!volume->isValid())
+        for (const auto &surface : instance->group()->surfaces()) {
+          if (!surface->isValid()) {
+            reportMessage(
+                ANARI_SEVERITY_DEBUG, "skip rendering invalid surface");
             continue;
-          const auto actor = volume->actor();
-          const auto mapper = volume->mapper();
+          }
+          const auto geom = surface->geometry();
+          const auto actor = geom->actor();
+          const auto mapper = geom->mapper();
           vtkm::rendering::Scene scene;
           scene.AddActor(*actor);
 
@@ -243,12 +249,14 @@ void Frame::renderFrame()
           view.Paint();
         }
 
-        for (const auto &surface : instance->group()->surfaces()) {
-          if (!surface->isValid())
+        for (const auto &volume : instance->group()->volumes()) {
+          if (!volume->isValid()) {
+            reportMessage(
+                ANARI_SEVERITY_DEBUG, "skip rendering invalid volume");
             continue;
-          const auto geom = surface->geometry();
-          const auto actor = geom->actor();
-          const auto mapper = geom->mapper();
+          }
+          const auto actor = volume->actor();
+          const auto mapper = volume->mapper();
           vtkm::rendering::Scene scene;
           scene.AddActor(*actor);
 
