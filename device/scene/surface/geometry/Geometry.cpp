@@ -7,8 +7,6 @@
 
 #include "array/ArrayConversion.h"
 
-namespace {} // anonymous namespace
-
 namespace vtkm_device {
 
 Geometry::Geometry(VTKmDeviceGlobalState *s) : Object(ANARI_GEOMETRY, s) {}
