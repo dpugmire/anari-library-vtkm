@@ -24,11 +24,6 @@ void Volume::commit()
   m_id = getParam<uint32_t>("id", ~0u);
 }
 
-bool Volume::isValid() const
-{
-  return true;
-}
-
 UnknownVolume::UnknownVolume(VTKmDeviceGlobalState *d) : Volume(d) {}
 
 vtkm::Bounds UnknownVolume::bounds() const

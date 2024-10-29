@@ -27,8 +27,10 @@ struct TransferFunction1D : public Volume
   vtkm::rendering::Actor *actor() const override;
   vtkm::rendering::MapperVolume *mapper() const override;
 
+  bool isValid() const override;
+
  private:
-  helium::IntrusivePtr<SpatialField> m_spatialField;
+  helium::ChangeObserverPtr<SpatialField> m_spatialField;
   vtkm::Range m_valueRange;
   helium::ChangeObserverPtr<Array1D> m_colorArray;
   helium::ChangeObserverPtr<Array1D> m_opacity;

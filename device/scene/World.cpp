@@ -7,7 +7,11 @@
 
 namespace vtkm_device {
 
-World::World(VTKmDeviceGlobalState *s) : Object(ANARI_WORLD, s)
+World::World(VTKmDeviceGlobalState *s)
+    : Object(ANARI_WORLD, s),
+      m_zeroSurfaceData(this),
+      m_zeroVolumeData(this),
+      m_instanceData(this)
 {
   m_zeroGroup = new Group(s);
   m_zeroInstance = new Instance(s);
@@ -18,10 +22,7 @@ World::World(VTKmDeviceGlobalState *s) : Object(ANARI_WORLD, s)
   m_zeroInstance->refDec(helium::RefType::PUBLIC);
 }
 
-World::~World()
-{
-  cleanup();
-}
+World::~World() = default;
 
 bool World::getProperty(
     const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
@@ -37,8 +38,6 @@ bool World::getProperty(
 
 void World::commit()
 {
-  cleanup();
-
   m_zeroSurfaceData = getParamObject<ObjectArray>("surface");
   m_zeroVolumeData = getParamObject<ObjectArray>("volume");
 
@@ -105,14 +104,6 @@ void World::commit()
 const std::vector<Instance *> &World::instances() const
 {
   return m_instances;
-}
-
-void World::cleanup()
-{
-  if (m_instanceData)
-    m_instanceData->removeChangeObserver(this);
-  if (m_zeroSurfaceData)
-    m_zeroSurfaceData->removeChangeObserver(this);
 }
 
 } // namespace vtkm_device

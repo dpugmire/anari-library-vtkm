@@ -221,6 +221,9 @@ void Frame::renderFrame()
       camera.Print();
 #endif
 
+      vtkm::rendering::Scene surface_scene;
+      vtkm::rendering::Scene volume_scene;
+
       for (const auto &instance : instances) {
         if (!instance->isValid()) {
           reportMessage(ANARI_SEVERITY_DEBUG, "skip rendering invalid group");
@@ -228,47 +231,44 @@ void Frame::renderFrame()
         }
 
         for (const auto &surface : instance->group()->surfaces()) {
-          if (!surface->isValid()) {
+          if (!surface || !surface->isValid()) {
             reportMessage(
                 ANARI_SEVERITY_DEBUG, "skip rendering invalid surface");
             continue;
           }
-          const auto geom = surface->geometry();
-          const auto actor = geom->actor();
-          const auto mapper = geom->mapper();
-          vtkm::rendering::Scene scene;
-          scene.AddActor(*actor);
-
-          vtkm::rendering::View3D view(scene,
-              *mapper,
-              this->Canvas,
-              camera,
-              this->m_renderer->background());
-          view.SetWorldAnnotationsEnabled(false);
-          view.SetRenderAnnotationsEnabled(false);
-          view.Paint();
+          surface_scene.AddActor(*surface->geometry()->actor());
         }
 
         for (const auto &volume : instance->group()->volumes()) {
-          if (!volume->isValid()) {
+          if (!volume || !volume->isValid()) {
             reportMessage(
                 ANARI_SEVERITY_DEBUG, "skip rendering invalid volume");
             continue;
           }
-          const auto actor = volume->actor();
-          const auto mapper = volume->mapper();
-          vtkm::rendering::Scene scene;
-          scene.AddActor(*actor);
-
-          vtkm::rendering::View3D view(scene,
-              *mapper,
-              this->Canvas,
-              camera,
-              this->m_renderer->background());
-          view.SetWorldAnnotationsEnabled(false);
-          view.SetRenderAnnotationsEnabled(false);
-          view.Paint();
+          volume_scene.AddActor(*volume->actor());
         }
+      }
+
+      if (surface_scene.GetNumberOfActors() != 0) {
+        vtkm::rendering::View3D surface_view(surface_scene,
+            vtkm::rendering::MapperRayTracer(),
+            this->Canvas,
+            camera,
+            this->m_renderer->background());
+        surface_view.SetWorldAnnotationsEnabled(false);
+        surface_view.SetRenderAnnotationsEnabled(false);
+        surface_view.Paint();
+      }
+
+      if (volume_scene.GetNumberOfActors() != 0) {
+        vtkm::rendering::View3D volume_view(volume_scene,
+            vtkm::rendering::MapperVolume(),
+            this->Canvas,
+            camera,
+            this->m_renderer->background());
+        volume_view.SetWorldAnnotationsEnabled(false);
+        volume_view.SetRenderAnnotationsEnabled(false);
+        volume_view.Paint();
       }
     }
 

@@ -28,8 +28,6 @@ struct Volume : public Object
   virtual vtkm::rendering::Actor *actor() const = 0;
   virtual vtkm::rendering::Mapper *mapper() const = 0;
 
-  bool isValid() const override;
-
  private:
   uint32_t m_id{~0u};
 };

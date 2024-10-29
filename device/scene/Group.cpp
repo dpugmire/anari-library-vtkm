@@ -7,12 +7,11 @@
 
 namespace vtkm_device {
 
-Group::Group(VTKmDeviceGlobalState *s) : Object(ANARI_GROUP, s) {}
+Group::Group(VTKmDeviceGlobalState *s)
+    : Object(ANARI_GROUP, s), m_surfaceData(this), m_volumeData(this)
+{}
 
-Group::~Group()
-{
-  cleanup();
-}
+Group::~Group() = default;
 
 bool Group::getProperty(
     const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
@@ -22,7 +21,8 @@ bool Group::getProperty(
 
 void Group::commit()
 {
-  cleanup();
+  m_surfaces.clear();
+  m_volumes.clear();
 
   m_surfaceData = getParamObject<ObjectArray>("surface");
   m_volumeData = getParamObject<ObjectArray>("volume");
@@ -46,13 +46,11 @@ void Group::commit()
 
 const std::vector<Surface *> &Group::surfaces() const
 {
-  // std::cout<<__FILE__<<" "<<__LINE__<<std::endl;
   return m_surfaces;
 }
 
 const std::vector<Volume *> &Group::volumes() const
 {
-  // std::cout<<__FILE__<<" "<<__LINE__<<" : "<<m_volumes.size()<<std::endl;
   return m_volumes;
 }
 
@@ -93,17 +91,6 @@ static inline float MINELEM(const float3 &a)
 static inline float MAXELEM(const float3 &a)
 {
   return std::max(a[0], std::max(a[1], a[2]));
-}
-
-void Group::cleanup()
-{
-  if (m_surfaceData)
-    m_surfaceData->removeChangeObserver(this);
-  if (m_volumeData)
-    m_volumeData->removeChangeObserver(this);
-
-  m_surfaces.clear();
-  m_volumes.clear();
 }
 
 } // namespace vtkm_device

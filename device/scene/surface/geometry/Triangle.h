@@ -5,9 +5,7 @@
 
 #include "Geometry.h"
 #include "array/Array1D.h"
-//helium
-#include <helium/utility/ChangeObserverPtr.h>
-
+// vtkm
 #include <vtkm/rendering/Actor.h>
 
 namespace vtkm_device {

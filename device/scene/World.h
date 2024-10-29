@@ -30,12 +30,10 @@ struct World : public Object
   const vtkm::Bounds &bounds() const { return this-> m_bounds; }
 
  private:
-  void cleanup();
+  helium::ChangeObserverPtr<ObjectArray> m_zeroSurfaceData;
+  helium::ChangeObserverPtr<ObjectArray> m_zeroVolumeData;
 
-  helium::IntrusivePtr<ObjectArray> m_zeroSurfaceData;
-  helium::IntrusivePtr<ObjectArray> m_zeroVolumeData;
-
-  helium::IntrusivePtr<ObjectArray> m_instanceData;
+  helium::ChangeObserverPtr<ObjectArray> m_instanceData;
   std::vector<Instance *> m_instances;
 
   bool m_addZeroInstance{false};
