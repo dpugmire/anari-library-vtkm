@@ -5,15 +5,9 @@
 
 namespace vtkm_device {
 
-Instance::Instance(VTKmDeviceGlobalState *s) : Object(ANARI_INSTANCE, s)
-{
-  s->objectCounts.instances++;
-}
+Instance::Instance(VTKmDeviceGlobalState *s) : Object(ANARI_INSTANCE, s) {}
 
-Instance::~Instance()
-{
-  deviceState()->objectCounts.instances--;
-}
+Instance::~Instance() = default;
 
 void Instance::commit()
 {

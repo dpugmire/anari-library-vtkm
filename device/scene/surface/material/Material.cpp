@@ -5,15 +5,9 @@
 
 namespace vtkm_device {
 
-Material::Material(VTKmDeviceGlobalState *s) : Object(ANARI_MATERIAL, s)
-{
-  s->objectCounts.materials++;
-}
+Material::Material(VTKmDeviceGlobalState *s) : Object(ANARI_MATERIAL, s) {}
 
-Material::~Material()
-{
-  deviceState()->objectCounts.materials--;
-}
+Material::~Material() = default;
 
 Material *Material::createInstance(
     std::string_view subtype, VTKmDeviceGlobalState *s)

@@ -5,17 +5,12 @@
 
 namespace vtkm_device {
 
-Sampler::Sampler(VTKmDeviceGlobalState *s) : Object(ANARI_SAMPLER, s)
-{
-  s->objectCounts.samplers++;
-}
+Sampler::Sampler(VTKmDeviceGlobalState *s) : Object(ANARI_SAMPLER, s) {}
 
-Sampler::~Sampler()
-{
-  deviceState()->objectCounts.samplers--;
-}
+Sampler::~Sampler() = default;
 
-Sampler *Sampler::createInstance(std::string_view subtype, VTKmDeviceGlobalState *s)
+Sampler *Sampler::createInstance(
+    std::string_view subtype, VTKmDeviceGlobalState *s)
 {
   return (Sampler *)new UnknownObject(ANARI_SAMPLER, s);
 }

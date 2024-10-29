@@ -5,15 +5,9 @@
 
 namespace vtkm_device {
 
-Surface::Surface(VTKmDeviceGlobalState *s) : Object(ANARI_SURFACE, s)
-{
-  s->objectCounts.surfaces++;
-}
+Surface::Surface(VTKmDeviceGlobalState *s) : Object(ANARI_SURFACE, s) {}
 
-Surface::~Surface()
-{
-  deviceState()->objectCounts.surfaces--;
-}
+Surface::~Surface() = default;
 
 void Surface::commit()
 {

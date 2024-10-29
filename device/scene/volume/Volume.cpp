@@ -4,25 +4,19 @@
 #include "Volume.h"
 #include "TransferFunction1D.h"
 
-
 namespace vtkm_device {
 
-Volume::Volume(VTKmDeviceGlobalState *s) : Object(ANARI_VOLUME, s)
-{
-  s->objectCounts.volumes++;
-}
+Volume::Volume(VTKmDeviceGlobalState *s) : Object(ANARI_VOLUME, s) {}
 
-Volume::~Volume()
-{
-  deviceState()->objectCounts.volumes--;
-}
+Volume::~Volume() = default;
 
-Volume *Volume::createInstance(std::string_view subtype, VTKmDeviceGlobalState *s)
+Volume *Volume::createInstance(
+    std::string_view subtype, VTKmDeviceGlobalState *s)
 {
- if (subtype =="transferFunction1D")
-   return new TransferFunction1D(s);
- else
-   return new UnknownVolume(s);
+  if (subtype == "transferFunction1D")
+    return new TransferFunction1D(s);
+  else
+    return new UnknownVolume(s);
 }
 
 void Volume::commit()
@@ -35,9 +29,7 @@ bool Volume::isValid() const
   return true;
 }
 
-UnknownVolume::UnknownVolume(VTKmDeviceGlobalState *d) : Volume(d)
-{
-}
+UnknownVolume::UnknownVolume(VTKmDeviceGlobalState *d) : Volume(d) {}
 
 vtkm::Bounds UnknownVolume::bounds() const
 {

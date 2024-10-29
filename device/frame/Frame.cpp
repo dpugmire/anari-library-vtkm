@@ -92,9 +92,7 @@ static std::future<R> async(TASK_T &&fcn)
 {
   auto task = std::packaged_task<R()>(std::forward<TASK_T>(fcn));
   auto future = task.get_future();
-
   std::thread([task = std::move(task)]() mutable { task(); }).detach();
-
   return future;
 }
 
@@ -107,10 +105,7 @@ static bool is_ready(const std::future<R> &f)
 
 // Frame definitions //////////////////////////////////////////////////////////
 
-Frame::Frame(VTKmDeviceGlobalState *s) : helium::BaseFrame(s)
-{
-  s->objectCounts.frames++;
-}
+Frame::Frame(VTKmDeviceGlobalState *s) : helium::BaseFrame(s) {}
 
 Frame::~Frame()
 {
@@ -210,9 +205,7 @@ void Frame::renderFrame()
       reportMessage(
           ANARI_SEVERITY_ERROR, "skipping render of incomplete frame object");
       std::fill(m_pixelBuffer.begin(), m_pixelBuffer.end(), 0);
-    }
-    else
-    {
+    } else {
       const auto &instances = this->m_world->instances();
       auto camera = this->m_camera->camera(this->m_world->bounds());
 
@@ -221,13 +214,11 @@ void Frame::renderFrame()
       camera.Print();
 #endif
 
-      for (const auto& instance : instances)
-      {
+      for (const auto &instance : instances) {
         if (instance->group() == nullptr)
           continue;
 
-        for (const auto& volume : instance->group()->volumes())
-        {
+        for (const auto &volume : instance->group()->volumes()) {
           const auto actor = volume->actor();
           const auto mapper = volume->mapper();
           vtkm::rendering::Scene scene;
@@ -243,9 +234,8 @@ void Frame::renderFrame()
           view.Paint();
         }
 
-        for (const auto& surface : instance->group()->surfaces())
-        {
-          std::cout<<"Render Surface"<<std::endl;
+        for (const auto &surface : instance->group()->surfaces()) {
+          std::cout << "Render Surface" << std::endl;
           const auto geom = surface->geometry();
           const auto actor = geom->actor();
           const auto mapper = geom->mapper();
@@ -277,9 +267,6 @@ void *Frame::map(std::string_view channel,
 {
   wait();
 
-  // types are in: anari enum
-  // report message method to convey info and faults.
-
   *width = m_frameData.size[0];
   *height = m_frameData.size[1];
 
@@ -308,7 +295,6 @@ void *Frame::map(std::string_view channel,
           this->m_intFrameBuffer;
       return basicArray.GetWritePointer();
     }
-    return nullptr;
   } else if (channel == "channel.depth") {
     *pixelType = ANARI_FLOAT32;
     vtkm::cont::ArrayHandleBasic<vtkm::Float32> basicArray =
@@ -323,18 +309,17 @@ void *Frame::map(std::string_view channel,
   } else if (channel == "channel.instanceId" && !m_instIdBuffer.empty()) {
     *pixelType = ANARI_UINT32;
     return m_instIdBuffer.data();
-  } else {
-    *width = 0;
-    *height = 0;
-    *pixelType = ANARI_UNKNOWN;
-    return nullptr;
   }
+
+  *width = 0;
+  *height = 0;
+  *pixelType = ANARI_UNKNOWN;
+  return nullptr;
 }
 
-void Frame::unmap(std::string_view channel)
+void Frame::unmap(std::string_view /*channel*/)
 {
-  // if (channel == "channel.color" &&
-  // this->m_bytesFrameBuffer.GetNumberOfValues() > 0)
+  // no-op
 }
 
 int Frame::frameReady(ANARIWaitMask m)

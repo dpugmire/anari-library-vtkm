@@ -9,8 +9,6 @@ namespace vtkm_device {
 
 World::World(VTKmDeviceGlobalState *s) : Object(ANARI_WORLD, s)
 {
-  s->objectCounts.worlds++;
-
   m_zeroGroup = new Group(s);
   m_zeroInstance = new Instance(s);
   m_zeroInstance->setParamDirect("group", m_zeroGroup.ptr);
@@ -23,15 +21,14 @@ World::World(VTKmDeviceGlobalState *s) : Object(ANARI_WORLD, s)
 World::~World()
 {
   cleanup();
-  deviceState()->objectCounts.worlds--;
 }
 
 bool World::getProperty(
     const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
 {
   if (name == "bounds" && type == ANARI_FLOAT32_BOX3) {
-    vtkm::Vec3f_32 anariBounds[] = {
-        vtkm::Vec3f_32(this->m_bounds.MinCorner()), vtkm::Vec3f_32(this->m_bounds.MaxCorner()) };
+    vtkm::Vec3f_32 anariBounds[] = {vtkm::Vec3f_32(this->m_bounds.MinCorner()),
+        vtkm::Vec3f_32(this->m_bounds.MaxCorner())};
     std::memcpy(ptr, &anariBounds, sizeof(anariBounds));
     return true;
   }
@@ -95,11 +92,11 @@ void World::commit()
     m_zeroSurfaceData->addChangeObserver(this);
 
   this->m_bounds = vtkm::Bounds{};
-  for (auto&& instance : this->instances()) {
-    for (auto&& surface : instance->group()->surfaces()) {
+  for (auto &&instance : this->instances()) {
+    for (auto &&surface : instance->group()->surfaces()) {
       this->m_bounds.Include(surface->bounds());
     }
-    for (auto&& volume : instance->group()->volumes()) {
+    for (auto &&volume : instance->group()->volumes()) {
       this->m_bounds.Include(volume->bounds());
     }
   }
@@ -109,7 +106,6 @@ const std::vector<Instance *> &World::instances() const
 {
   return m_instances;
 }
-
 
 void World::cleanup()
 {
