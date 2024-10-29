@@ -12,7 +12,11 @@ Material::~Material() = default;
 Material *Material::createInstance(
     std::string_view subtype, VTKmDeviceGlobalState *s)
 {
+#if 0
   return (Material *)new UnknownObject(ANARI_MATERIAL, s);
+#else
+  return new Material(s);
+#endif
 }
 
 } // namespace vtkm_device

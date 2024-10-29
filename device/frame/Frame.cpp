@@ -201,11 +201,18 @@ void Frame::renderFrame()
     state->renderingSemaphore.frameStart();
     state->commitBufferFlush();
 
+    if (m_lastCommitOccured < state->commitBufferLastFlush()) {
+      m_lastCommitOccured = state->commitBufferLastFlush();
+      reportMessage(ANARI_SEVERITY_DEBUG, "object changes committed");
+    }
+
     if (!m_renderer) {
       reportMessage(
           ANARI_SEVERITY_ERROR, "skipping render of incomplete frame object");
       std::fill(m_pixelBuffer.begin(), m_pixelBuffer.end(), 0);
     } else {
+      reportMessage(ANARI_SEVERITY_DEBUG, "rendering frame");
+
       const auto &instances = this->m_world->instances();
       auto camera = this->m_camera->camera(this->m_world->bounds());
 
@@ -219,6 +226,8 @@ void Frame::renderFrame()
           continue;
 
         for (const auto &volume : instance->group()->volumes()) {
+          if (!volume->isValid())
+            continue;
           const auto actor = volume->actor();
           const auto mapper = volume->mapper();
           vtkm::rendering::Scene scene;
@@ -235,6 +244,8 @@ void Frame::renderFrame()
         }
 
         for (const auto &surface : instance->group()->surfaces()) {
+          if (!surface->isValid())
+            continue;
           const auto geom = surface->geometry();
           const auto actor = geom->actor();
           const auto mapper = geom->mapper();

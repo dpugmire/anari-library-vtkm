@@ -5,7 +5,6 @@
 
 #include "Geometry.h"
 #include "array/Array1D.h"
-#include "array/Array3D.h"
 //helium
 #include <helium/utility/ChangeObserverPtr.h>
 
@@ -21,6 +20,8 @@ struct Triangle : Geometry
   virtual vtkm::rendering::Actor *actor() const override {return this->m_actor.get();}
   virtual vtkm::rendering::MapperRayTracer *mapper() const override {return this->m_mapper.get();}
 
+  bool isValid() const override;
+
  private:
   helium::ChangeObserverPtr<Array1D> m_index;
   helium::ChangeObserverPtr<Array1D> m_vertexPosition;
@@ -30,7 +31,7 @@ struct Triangle : Geometry
   std::shared_ptr<vtkm::rendering::MapperRayTracer> m_mapper;
 
   vtkm::cont::ColorTable m_colorTable;
-  helium::ChangeObserverPtr<Array3D> m_dataArray;
+  helium::ChangeObserverPtr<Array1D> m_vertexColor;
 };
 
 } // namespace vtkm_device
