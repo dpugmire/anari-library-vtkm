@@ -235,7 +235,6 @@ void Frame::renderFrame()
         }
 
         for (const auto &surface : instance->group()->surfaces()) {
-          std::cout << "Render Surface" << std::endl;
           const auto geom = surface->geometry();
           const auto actor = geom->actor();
           const auto mapper = geom->mapper();

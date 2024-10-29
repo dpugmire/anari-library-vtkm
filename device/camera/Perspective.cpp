@@ -29,8 +29,8 @@ vtkm::rendering::Camera Perspective::camera(const vtkm::Bounds &bounds) const
   camera.SetViewUp(this->m_up);
   camera.SetFieldOfView(anari::degrees(this->m_fovy));
   camera.SetClippingRange(
-      (this->m_near > 0) ? this->m_near : (0.001f * length),
-      (this->m_far > 0) ? this->m_far : (100.f * length));
+      (this->m_near > 0) ? this->m_near : (0.01f * length),
+      (this->m_far > 0) ? this->m_far : (1000.f * length));
 #if 0
   camera.SetViewport(this->m_imageRegion[0],
                      this->m_imageRegion[2],
