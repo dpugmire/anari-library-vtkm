@@ -7,10 +7,12 @@
 
 namespace vtkm_device {
 
-World::World(VTKmDeviceGlobalState *s) : Object(ANARI_WORLD, s)
+World::World(VTKmDeviceGlobalState *s)
+    : Object(ANARI_WORLD, s),
+      m_zeroSurfaceData(this),
+      m_zeroVolumeData(this),
+      m_instanceData(this)
 {
-  s->objectCounts.worlds++;
-
   m_zeroGroup = new Group(s);
   m_zeroInstance = new Instance(s);
   m_zeroInstance->setParamDirect("group", m_zeroGroup.ptr);
@@ -20,18 +22,14 @@ World::World(VTKmDeviceGlobalState *s) : Object(ANARI_WORLD, s)
   m_zeroInstance->refDec(helium::RefType::PUBLIC);
 }
 
-World::~World()
-{
-  cleanup();
-  deviceState()->objectCounts.worlds--;
-}
+World::~World() = default;
 
 bool World::getProperty(
     const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
 {
   if (name == "bounds" && type == ANARI_FLOAT32_BOX3) {
-    vtkm::Vec3f_32 anariBounds[] = {
-        vtkm::Vec3f_32(this->m_bounds.MinCorner()), vtkm::Vec3f_32(this->m_bounds.MaxCorner()) };
+    vtkm::Vec3f_32 anariBounds[] = {vtkm::Vec3f_32(this->m_bounds.MinCorner()),
+        vtkm::Vec3f_32(this->m_bounds.MaxCorner())};
     std::memcpy(ptr, &anariBounds, sizeof(anariBounds));
     return true;
   }
@@ -40,8 +38,6 @@ bool World::getProperty(
 
 void World::commit()
 {
-  cleanup();
-
   m_zeroSurfaceData = getParamObject<ObjectArray>("surface");
   m_zeroVolumeData = getParamObject<ObjectArray>("volume");
 
@@ -95,11 +91,11 @@ void World::commit()
     m_zeroSurfaceData->addChangeObserver(this);
 
   this->m_bounds = vtkm::Bounds{};
-  for (auto&& instance : this->instances()) {
-    for (auto&& surface : instance->group()->surfaces()) {
+  for (auto &&instance : this->instances()) {
+    for (auto &&surface : instance->group()->surfaces()) {
       this->m_bounds.Include(surface->bounds());
     }
-    for (auto&& volume : instance->group()->volumes()) {
+    for (auto &&volume : instance->group()->volumes()) {
       this->m_bounds.Include(volume->bounds());
     }
   }
@@ -108,15 +104,6 @@ void World::commit()
 const std::vector<Instance *> &World::instances() const
 {
   return m_instances;
-}
-
-
-void World::cleanup()
-{
-  if (m_instanceData)
-    m_instanceData->removeChangeObserver(this);
-  if (m_zeroSurfaceData)
-    m_zeroSurfaceData->removeChangeObserver(this);
 }
 
 } // namespace vtkm_device

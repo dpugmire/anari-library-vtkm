@@ -7,21 +7,11 @@
 
 #include "array/ArrayConversion.h"
 
-namespace {
-
-} // anonymous namespace
-
 namespace vtkm_device {
 
-Geometry::Geometry(VTKmDeviceGlobalState *s) : Object(ANARI_GEOMETRY, s)
-{
-  s->objectCounts.geometries++;
-}
+Geometry::Geometry(VTKmDeviceGlobalState *s) : Object(ANARI_GEOMETRY, s) {}
 
-Geometry::~Geometry()
-{
-  deviceState()->objectCounts.geometries--;
-}
+Geometry::~Geometry() = default;
 
 Geometry *Geometry::createInstance(
     std::string_view subtype, VTKmDeviceGlobalState *s)
@@ -33,32 +23,31 @@ Geometry *Geometry::createInstance(
     return new UnknownGeometry(s);
 }
 
-//void Geometry::commit()
-//{
-//}
+void Geometry::commit()
+{
+  // no-op
+}
 
 void Geometry::AddAttributeInformation()
 {
-  for (std::string&& attribName : { "attribute0", "attribute1", "attribute2", "attribute3" }) {
+  for (std::string &&attribName :
+      {"attribute0", "attribute1", "attribute2", "attribute3"}) {
     std::string paramName = "vertex." + attribName;
     if (this->hasParam(paramName))
-      this->m_dataSet.AddPointField(
-          attribName, this->getParamObject<Array1D>(paramName)->dataAsVTKmArray());
+      this->m_dataSet.AddPointField(attribName,
+          this->getParamObject<Array1D>(paramName)->dataAsVTKmArray());
   }
 
   if (this->hasParam("vertex.color")) {
     vtkm::cont::UnknownArrayHandle colorArray =
         this->getParamObject<Array1D>("vertex.color")->dataAsVTKmArray();
-    // Colors can be either float or a fixed integer type. VTK-m only supports float colors.
-    // If we get integer colors, convert them here.
+    // Colors can be either float or a fixed integer type. VTK-m only supports
+    // float colors. If we get integer colors, convert them here.
     this->m_dataSet.AddPointField("color", ANARIColorsToVTKmColors(colorArray));
   }
 }
 
-UnknownGeometry::UnknownGeometry(VTKmDeviceGlobalState *s)
-    : Geometry(s)
-{
-}
+UnknownGeometry::UnknownGeometry(VTKmDeviceGlobalState *s) : Geometry(s) {}
 
 bool UnknownGeometry::isValid() const
 {

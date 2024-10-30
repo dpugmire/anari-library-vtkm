@@ -6,7 +6,8 @@
 #include "VTKmDeviceGlobalState.h"
 #include "vtkm_device_math.h"
 // helium
-#include "helium/BaseObject.h"
+#include <helium/BaseObject.h>
+#include <helium/utility/ChangeObserverPtr.h>
 // std
 #include <string_view>
 

@@ -18,7 +18,7 @@ struct Geometry : public Object
   static Geometry *createInstance(
       std::string_view subtype, VTKmDeviceGlobalState *s);
 
-  //void commit() override;
+  void commit() override;
   virtual vtkm::rendering::Actor *actor() const {return nullptr; } // = 0;
   const vtkm::cont::DataSet &getDataSet() const { return this->m_dataSet; }
   virtual const  vtkm::rendering::MapperRayTracer *mapper() const {return this->m_mapper.get();}

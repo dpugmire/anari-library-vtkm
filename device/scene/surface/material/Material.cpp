@@ -5,20 +5,18 @@
 
 namespace vtkm_device {
 
-Material::Material(VTKmDeviceGlobalState *s) : Object(ANARI_MATERIAL, s)
-{
-  s->objectCounts.materials++;
-}
+Material::Material(VTKmDeviceGlobalState *s) : Object(ANARI_MATERIAL, s) {}
 
-Material::~Material()
-{
-  deviceState()->objectCounts.materials--;
-}
+Material::~Material() = default;
 
 Material *Material::createInstance(
     std::string_view subtype, VTKmDeviceGlobalState *s)
 {
+#if 0
   return (Material *)new UnknownObject(ANARI_MATERIAL, s);
+#else
+  return new Material(s);
+#endif
 }
 
 } // namespace vtkm_device

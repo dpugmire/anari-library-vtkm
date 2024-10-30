@@ -9,14 +9,9 @@ namespace vtkm_device {
 
 SpatialField::SpatialField(VTKmDeviceGlobalState *s)
     : Object(ANARI_SPATIAL_FIELD, s)
-{
-  s->objectCounts.spatialFields++;
-}
+{}
 
-SpatialField::~SpatialField()
-{
-  deviceState()->objectCounts.spatialFields--;
-}
+SpatialField::~SpatialField() = default;
 
 SpatialField *SpatialField::createInstance(
     std::string_view subtype, VTKmDeviceGlobalState *s)
@@ -28,9 +23,9 @@ SpatialField *SpatialField::createInstance(
   }
 }
 
-UnknownSpatialField::UnknownSpatialField(VTKmDeviceGlobalState *d) : SpatialField(d)
-{
-}
+UnknownSpatialField::UnknownSpatialField(VTKmDeviceGlobalState *d)
+    : SpatialField(d)
+{}
 
 bool UnknownSpatialField::isValid() const
 {
