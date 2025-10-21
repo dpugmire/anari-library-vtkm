@@ -1,16 +1,8 @@
-
-## Code generation ##
-
-anari_generate_queries(
-  NAME vtkm_device
-  PREFIX VTKmDevice
-  CPP_NAMESPACE vtkm_device
-  JSON_DEFINITIONS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vtkm_device.json
-)
+set(anari_vtkm_target anari_library_vtkm)
 
 ## Build device target ##
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${anari_vtkm_target} SHARED
   VTKmDevice.cpp
   VTKmDeviceQueries.cpp
   VTKmDeviceGlobalState.cpp
@@ -42,7 +34,7 @@ add_library(${PROJECT_NAME} SHARED
 #  scene/volume/TransferFunction1D.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${anari_vtkm_target}
 PRIVATE
   anari::helium
   vtkm::cont
@@ -52,19 +44,27 @@ PRIVATE
 )
 
 include(GenerateExportHeader)
-generate_export_header(${PROJECT_NAME}
+generate_export_header(${anari_vtkm_target}
   EXPORT_MACRO_NAME "VTKM_LIBRARY_INTERFACE"
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(${anari_vtkm_target}
 PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
+## Code generation ##
+
+anari_generate_queries(
+  DEVICE_TARGET ${anari_vtkm_target}
+  CPP_NAMESPACE vtkm_device
+  JSON_DEFINITIONS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vtkm_device.json
+)
+
 ## Installation ##
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${anari_vtkm_target}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
