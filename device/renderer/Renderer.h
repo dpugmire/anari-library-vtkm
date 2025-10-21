@@ -24,7 +24,8 @@ struct Renderer : public Object
   ~Renderer() override;
   static Renderer *createInstance(
       std::string_view subtype, VTKmDeviceGlobalState *d);
-  void commit() override;
+  void commitParameters() override;
+  void finalize() override;
 
   float4 background() const;
 
