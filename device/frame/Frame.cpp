@@ -54,13 +54,12 @@ class ConvertToRGBA : public vtkm::worklet::WorkletMapField
 {
  public:
   using ControlSignature = void(FieldIn inputArray, FieldOut outputArray);
-  using ExecutionSignature = void(InputIndex, _1, _2);
+  using ExecutionSignature = void(_1, _2);
   using InputDomain = _1;
 
   template <typename InFieldType, typename OutFieldType>
-  VTKM_EXEC void operator()(const vtkm::Id &inIdx,
-      const InFieldType &inField,
-      OutFieldType &outField) const
+  VTKM_EXEC void operator()(
+      const InFieldType &inField, OutFieldType &outField) const
   {
     outField = cvt_uint32(inField);
   }
@@ -70,19 +69,18 @@ class ConvertToSRGBA : public vtkm::worklet::WorkletMapField
 {
  public:
   using ControlSignature = void(FieldIn inputArray, FieldOut outputArray);
-  using ExecutionSignature = void(InputIndex, _1, _2);
+  using ExecutionSignature = void(_1, _2);
   using InputDomain = _1;
 
   template <typename InFieldType, typename OutFieldType>
-  VTKM_EXEC void operator()(const vtkm::Id &inIdx,
-      const InFieldType &inField,
-      OutFieldType &outField) const
+  VTKM_EXEC void operator()(
+      const InFieldType &inField, OutFieldType &outField) const
   {
     outField = cvt_uint32_srgb(inField);
   }
 
- private:
-  vtkm::Float32 Exponent = 1.1f / 2.2f;
+//  private:
+//   vtkm::Float32 Exponent = 1.1f / 2.2f;
 };
 
 // Helper functions ///////////////////////////////////////////////////////////
