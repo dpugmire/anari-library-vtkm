@@ -19,13 +19,16 @@ bool Group::getProperty(
   return Object::getProperty(name, type, ptr, flags);
 }
 
-void Group::commit()
+void Group::commitParameters()
+{
+  m_surfaceData = getParamObject<ObjectArray>("surface");
+  m_volumeData = getParamObject<ObjectArray>("volume");
+}
+
+void Group::finalize()
 {
   m_surfaces.clear();
   m_volumes.clear();
-
-  m_surfaceData = getParamObject<ObjectArray>("surface");
-  m_volumeData = getParamObject<ObjectArray>("volume");
 
   if (m_surfaceData) {
     m_surfaceData->addChangeObserver(this);

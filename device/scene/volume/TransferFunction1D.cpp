@@ -68,29 +68,45 @@ void FillColorTable(
 namespace vtkm_device {
 
 TransferFunction1D::TransferFunction1D(VTKmDeviceGlobalState *d)
-    : Volume(d), m_spatialField(this), m_colorArray(this), m_opacity(this)
+    : Volume(d), m_spatialField(this), m_colorArray(this), m_opacityArray(this)
 {}
 
-void TransferFunction1D::commit()
+void TransferFunction1D::commitParameters()
 {
-  this->Volume::commit();
+  this->Volume::commitParameters();
 
   this->m_spatialField = getParamObject<SpatialField>("value");
+
+  this->m_unitDistance = getParam("unitDistance", 1.0f);
+
+  this->m_colorArray = this->getParamObject<Array1D>("color");
+  this->m_color = {1, 1, 1, 1};
+  this->getParam("color", ANARI_FLOAT32_VEC4, &this->m_color);
+  this->getParam("color", ANARI_FLOAT32_VEC3, &this->m_color);
+
+  this->m_opacityArray = this->getParamObject<Array1D>("opacity");
+
+  box1 range = {0, 1};
+  this->getParam("valueRange", ANARI_FLOAT32_BOX1, &range);
+  this->m_valueRange = {range.lower, range.upper};
+}
+
+void TransferFunction1D::finalize()
+{
+  Volume::finalize();
+
   if (!this->m_spatialField) {
     reportMessage(ANARI_SEVERITY_WARNING,
         "'transferFunction1D' volume missing 'value' parameter");
     return;
   }
 
-  this->m_unitDistance = getParam("unitDistance", 1.0f);
-
   // Reset and fill color table
   this->m_colorTable = vtkm::cont::ColorTable(vtkm::ColorSpace::Lab);
-  Array1D *colorArray = this->getParamObject<Array1D>("color");
-  if (colorArray != nullptr) {
+  if (this->m_colorArray) {
     // Convert to VTK-m colors
     vtkm::cont::UnknownArrayHandle vtkmColors =
-        ANARIColorsToVTKmColors(colorArray->dataAsVTKmArray());
+        ANARIColorsToVTKmColors(this->m_colorArray->dataAsVTKmArray());
 
     // Copy colors into ColorTable
     // NOTE: I am not at all convinced that this is a good idea. If we are
@@ -104,31 +120,25 @@ void TransferFunction1D::commit()
       FillColorTable<vtkm::Float64>(this->m_colorTable, vtkmColors);
     }
   } else {
-    float4 color = {1, 1, 1, 1};
-    this->getParam("color", ANARI_FLOAT32_VEC4, &color);
-    this->getParam("color", ANARI_FLOAT32_VEC3, &color);
-    this->m_colorTable.AddPoint(0, {color[0], color[1], color[2]});
-    this->m_colorTable.AddPoint(1, {color[0], color[1], color[2]});
+    this->m_colorTable.AddPoint(0, {m_color[0], m_color[1], m_color[2]});
+    this->m_colorTable.AddPoint(1, {m_color[0], m_color[1], m_color[2]});
   }
 
-  Array1D *opacityArray = this->getParamObject<Array1D>("opacity");
-  if (opacityArray != nullptr) {
-    if (opacityArray->size() > 1) {
-      vtkm::Float64 scale = 1.0 / (opacityArray->size() - 1);
-      for (size_t index = 0; index < opacityArray->size(); ++index) {
-        float opacity = *opacityArray->valueAt<float>(index);
+  if (m_opacityArray) {
+    if (m_opacityArray->size() > 1) {
+      vtkm::Float64 scale = 1.0 / (m_opacityArray->size() - 1);
+      for (size_t index = 0; index < m_opacityArray->size(); ++index) {
+        float opacity = *m_opacityArray->valueAt<float>(index);
         this->m_colorTable.AddPointAlpha(index * scale, opacity);
       }
     } else {
-      float opacity = *opacityArray->valueAt<float>(0);
+      float opacity = *m_opacityArray->valueAt<float>(0);
       this->m_colorTable.AddPointAlpha(0, opacity);
       this->m_colorTable.AddPointAlpha(1, opacity);
     }
   }
 
-  box1 range = {0, 1};
-  this->getParam("valueRange", ANARI_FLOAT32_BOX1, &range);
-  this->m_colorTable.RescaleToRange({range.lower, range.upper});
+  this->m_colorTable.RescaleToRange(this->m_valueRange);
 
   vtkm::cont::DataSet dataSet = this->m_spatialField->getDataSet();
   this->m_actor = std::make_shared<vtkm::rendering::Actor>(dataSet.GetCellSet(),

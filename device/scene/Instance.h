@@ -12,7 +12,8 @@ struct Instance : public Object
   Instance(VTKmDeviceGlobalState *s);
   ~Instance() override;
 
-  void commit() override;
+  void commitParameters() override;
+  void finalize() override;
 
   uint32_t id() const;
 

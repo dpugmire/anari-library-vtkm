@@ -23,11 +23,6 @@ Geometry *Geometry::createInstance(
     return new UnknownGeometry(s);
 }
 
-void Geometry::commit()
-{
-  // no-op
-}
-
 void Geometry::AddAttributeInformation()
 {
   for (std::string &&attribName :
@@ -48,6 +43,16 @@ void Geometry::AddAttributeInformation()
 }
 
 UnknownGeometry::UnknownGeometry(VTKmDeviceGlobalState *s) : Geometry(s) {}
+
+void UnknownGeometry::commitParameters()
+{
+  // invalid
+}
+
+void UnknownGeometry::finalize()
+{
+  // invalid
+}
 
 bool UnknownGeometry::isValid() const
 {

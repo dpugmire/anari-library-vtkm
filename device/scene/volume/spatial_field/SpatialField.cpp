@@ -27,6 +27,15 @@ UnknownSpatialField::UnknownSpatialField(VTKmDeviceGlobalState *d)
     : SpatialField(d)
 {}
 
+void UnknownSpatialField::commitParameters()
+{
+  // invalid
+}
+void UnknownSpatialField::finalize()
+{
+  // invalid
+}
+
 bool UnknownSpatialField::isValid() const
 {
   return false;

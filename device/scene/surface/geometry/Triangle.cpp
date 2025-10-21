@@ -17,13 +17,22 @@ Triangle::Triangle(VTKmDeviceGlobalState *s)
     : Geometry(s), m_index(this), m_vertexPosition(this), m_vertexColor(this)
 {}
 
-void Triangle::commit()
+void Triangle::commitParameters()
 {
   // Stashing these in a ChangeObserverPtr means that commit will be
   // called again if the array contents change.
   this->m_index = getParamObject<Array1D>("primitive.index");
   this->m_vertexPosition = getParamObject<Array1D>("vertex.position");
 
+  this->m_vertexColor = getParamObject<Array1D>("vertex.color");
+
+  box1 range = {0, 1};
+  this->getParam("valueRange", ANARI_FLOAT32_BOX1, &range);
+  this->m_colorTable.RescaleToRange({range.lower, range.upper});
+}
+
+void Triangle::finalize()
+{
   if (!this->m_vertexPosition) {
     reportMessage(ANARI_SEVERITY_WARNING,
         "'triangle' geometry missing 'vertex.position' parameter");
@@ -70,7 +79,6 @@ void Triangle::commit()
   this->m_dataSet.AddCoordinateSystem(
       {"coords", this->m_vertexPosition->dataAsVTKmArray()});
 
-  this->m_vertexColor = getParamObject<Array1D>("vertex.color");
   if (!this->m_vertexColor) {
     reportMessage(
         ANARI_SEVERITY_INFO, "generating 'triangle' vertex.color array");
@@ -100,10 +108,6 @@ void Triangle::commit()
     vtkmArray = castArray;
   }
   this->m_dataSet.AddPointField("data", vtkmArray);
-
-  box1 range = {0, 1};
-  this->getParam("valueRange", ANARI_FLOAT32_BOX1, &range);
-  this->m_colorTable.RescaleToRange({range.lower, range.upper});
 
   this->m_actor =
       std::make_shared<vtkm::rendering::Actor>(this->m_dataSet.GetCellSet(),
