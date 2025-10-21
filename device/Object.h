@@ -23,8 +23,6 @@ struct Object : public helium::BaseObject
       void *ptr,
       uint32_t flags) override;
 
-  void commit() override;
-
   bool isValid() const override;
 
   VTKmDeviceGlobalState *deviceState() const;
@@ -36,6 +34,8 @@ struct UnknownObject : public Object
 {
   UnknownObject(ANARIDataType type, VTKmDeviceGlobalState *s);
   ~UnknownObject() override;
+  void commitParameters() override;
+  void finalize() override;
   bool isValid() const override;
 };
 

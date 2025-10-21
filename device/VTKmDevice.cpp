@@ -268,7 +268,7 @@ VTKmDevice::~VTKmDevice()
   reportMessage(ANARI_SEVERITY_DEBUG, "destroying VTKm device (%p)", this);
 
   auto &state = *deviceState();
-  state.commitBufferClear();
+  state.commitBuffer.clear();
 }
 
 void VTKmDevice::initDevice()

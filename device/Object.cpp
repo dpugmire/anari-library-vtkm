@@ -11,11 +11,6 @@ Object::Object(ANARIDataType type, VTKmDeviceGlobalState *s)
     : helium::BaseObject(type, s)
 {}
 
-void Object::commit()
-{
-  // no-op
-}
-
 bool Object::getProperty(
     const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
 {
@@ -57,6 +52,16 @@ UnknownObject::UnknownObject(ANARIDataType type, VTKmDeviceGlobalState *s)
 UnknownObject::~UnknownObject()
 {
   deviceState()->objectCounts.unknown--;
+}
+
+void UnknownObject::commitParameters()
+{
+  // no-op
+}
+
+void UnknownObject::finalize()
+{
+  // no-op
 }
 
 bool UnknownObject::isValid() const
