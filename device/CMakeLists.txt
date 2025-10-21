@@ -4,7 +4,6 @@ set(anari_vtkm_target anari_library_vtkm)
 
 add_library(${anari_vtkm_target} SHARED
   VTKmDevice.cpp
-  VTKmDeviceQueries.cpp
   VTKmDeviceGlobalState.cpp
   VTKmLibrary.cpp
   Object.cpp
