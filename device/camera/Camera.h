@@ -19,7 +19,8 @@ struct Camera : public Object
   static Camera *createInstance(
       std::string_view type, VTKmDeviceGlobalState *state);
 
-  virtual void commit() override;
+  virtual void commitParameters() override;
+  virtual void finalize() override;
 
   float4 imageRegion() const
   {

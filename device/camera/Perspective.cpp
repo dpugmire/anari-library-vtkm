@@ -7,14 +7,19 @@ namespace vtkm_device {
 
 Perspective::Perspective(VTKmDeviceGlobalState *s) : Camera(s) {}
 
-void Perspective::commit()
+void Perspective::commitParameters()
 {
-  Camera::commit();
+  Camera::commitParameters();
 
   this->m_fovy = this->getParam("fovy", vtkm::Pi_3f());
   this->m_aspect = this->getParam("aspect", vtkm::Float32(1));
   this->m_near = this->getParam("near", vtkm::Float32(-1));
   this->m_far = this->getParam("far", vtkm::Float32(-1));
+}
+
+void Perspective::finalize()
+{
+  Camera::finalize();
 }
 
 vtkm::rendering::Camera Perspective::camera(const vtkm::Bounds &bounds) const
