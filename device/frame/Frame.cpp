@@ -288,7 +288,7 @@ void *Frame::map(std::string_view channel,
     *pixelType = this->m_colorType;
     if (this->m_colorType == ANARI_FLOAT32_VEC4) {
       // change this to GetReadPointer().
-      viskores::cont::ArrayHandleBasic<viskores::Vec4f> basicArray =
+      viskores::cont::ArrayHandleBasic<viskores::Vec4f_32> basicArray =
           this->Canvas.GetColorBuffer();
       return basicArray.GetWritePointer();
     } else if (this->m_colorType == ANARI_UFIXED8_VEC4) {
