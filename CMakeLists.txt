@@ -35,8 +35,8 @@ include(GNUInstallDirs)
 
 ## Dependencies ##
 
-find_package(anari 0.10.0 REQUIRED)
-find_package(VTKm 2.1 REQUIRED)
+find_package(anari 0.14.0 REQUIRED)
+find_package(VTKm 2.3 REQUIRED)
 
 ## Build Targets ##
 

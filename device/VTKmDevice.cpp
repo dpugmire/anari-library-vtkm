@@ -10,7 +10,7 @@
 #include "frame/Frame.h"
 #include "scene/volume/spatial_field/SpatialField.h"
 
-#include "VTKmDeviceQueries.h"
+#include "anari_library_vtkm_queries.h"
 
 namespace vtkm_device {
 
@@ -268,7 +268,7 @@ VTKmDevice::~VTKmDevice()
   reportMessage(ANARI_SEVERITY_DEBUG, "destroying VTKm device (%p)", this);
 
   auto &state = *deviceState();
-  state.commitBufferClear();
+  state.commitBuffer.clear();
 }
 
 void VTKmDevice::initDevice()

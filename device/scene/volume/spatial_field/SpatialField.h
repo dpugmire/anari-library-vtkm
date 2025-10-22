@@ -26,6 +26,9 @@ struct UnknownSpatialField : public SpatialField
 {
   UnknownSpatialField(VTKmDeviceGlobalState *d);
 
+  void commitParameters() override;
+  void finalize() override;
+
   bool isValid() const override;
 };
 

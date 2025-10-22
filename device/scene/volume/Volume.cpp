@@ -19,9 +19,14 @@ Volume *Volume::createInstance(
     return new UnknownVolume(s);
 }
 
-void Volume::commit()
+void Volume::commitParameters()
 {
   m_id = getParam<uint32_t>("id", ~0u);
+}
+
+void Volume::finalize()
+{
+  // no-op
 }
 
 UnknownVolume::UnknownVolume(VTKmDeviceGlobalState *d) : Volume(d) {}

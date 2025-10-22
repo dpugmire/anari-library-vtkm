@@ -10,7 +10,8 @@ namespace vtkm_device {
 struct Orthographic : public Camera
 {
   Orthographic(VTKmDeviceGlobalState *s);
-  void commit() override;
+  void commitParameters() override;
+  void finalize() override;
 
   vtkm::rendering::Camera camera(const vtkm::Bounds &bounds) const override;
 

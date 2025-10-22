@@ -15,7 +15,8 @@ struct StructuredRegularField : public SpatialField
 {
   StructuredRegularField(VTKmDeviceGlobalState *d);
 
-  void commit() override;
+  void commitParameters() override;
+  void finalize() override;
 
  private:
   helium::ChangeObserverPtr<Array3D> m_dataArray;

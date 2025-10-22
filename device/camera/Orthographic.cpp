@@ -7,14 +7,19 @@ namespace vtkm_device {
 
 Orthographic::Orthographic(VTKmDeviceGlobalState *s) : Camera(s) {}
 
-void Orthographic::commit()
+void Orthographic::commitParameters()
 {
-  Camera::commit();
+  Camera::commitParameters();
 
   this->m_aspect = this->getParam("aspect", vtkm::Float32(1));
   this->m_height = this->getParam("height", vtkm::Float32(1));
   this->m_near = this->getParam("near", vtkm::Float32(-1));
   this->m_far = this->getParam("far", vtkm::Float32(-1));
+}
+
+void Orthographic::finalize()
+{
+  Camera::finalize();
 }
 
 vtkm::rendering::Camera Orthographic::camera(const vtkm::Bounds &bounds) const

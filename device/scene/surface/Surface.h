@@ -15,7 +15,8 @@ struct Surface : public Object
   Surface(VTKmDeviceGlobalState *s);
   ~Surface() override;
 
-  void commit() override;
+  void commitParameters() override;
+  void finalize() override;
 
   uint32_t id() const {return m_id;}
   const Geometry *geometry() const;

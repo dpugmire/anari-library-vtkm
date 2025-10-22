@@ -36,7 +36,7 @@ bool World::getProperty(
   return Object::getProperty(name, type, ptr, flags);
 }
 
-void World::commit()
+void World::commitParameters()
 {
   m_zeroSurfaceData = getParamObject<ObjectArray>("surface");
   m_zeroVolumeData = getParamObject<ObjectArray>("volume");
@@ -52,8 +52,9 @@ void World::commit()
         "vtkm_device::World found %zu surfaces in zero instance",
         m_zeroSurfaceData->size());
     m_zeroGroup->setParamDirect("surface", getParamDirect("surface"));
-  } else
+  } else {
     m_zeroGroup->removeParam("surface");
+  }
 
   if (m_zeroVolumeData) {
     reportMessage(ANARI_SEVERITY_DEBUG,
@@ -65,11 +66,14 @@ void World::commit()
 
   m_zeroInstance->setParam("id", getParam<uint32_t>("id", ~0u));
 
-  m_zeroGroup->commit();
-  m_zeroInstance->commit();
+  m_zeroGroup->commitParameters();
+  m_zeroInstance->commitParameters();
 
   m_instanceData = getParamObject<ObjectArray>("instance");
+}
 
+void World::finalize()
+{
   m_instances.clear();
 
   if (m_instanceData) {

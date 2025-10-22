@@ -54,13 +54,12 @@ class ConvertToRGBA : public vtkm::worklet::WorkletMapField
 {
  public:
   using ControlSignature = void(FieldIn inputArray, FieldOut outputArray);
-  using ExecutionSignature = void(InputIndex, _1, _2);
+  using ExecutionSignature = void(_1, _2);
   using InputDomain = _1;
 
   template <typename InFieldType, typename OutFieldType>
-  VTKM_EXEC void operator()(const vtkm::Id &inIdx,
-      const InFieldType &inField,
-      OutFieldType &outField) const
+  VTKM_EXEC void operator()(
+      const InFieldType &inField, OutFieldType &outField) const
   {
     outField = cvt_uint32(inField);
   }
@@ -70,19 +69,18 @@ class ConvertToSRGBA : public vtkm::worklet::WorkletMapField
 {
  public:
   using ControlSignature = void(FieldIn inputArray, FieldOut outputArray);
-  using ExecutionSignature = void(InputIndex, _1, _2);
+  using ExecutionSignature = void(_1, _2);
   using InputDomain = _1;
 
   template <typename InFieldType, typename OutFieldType>
-  VTKM_EXEC void operator()(const vtkm::Id &inIdx,
-      const InFieldType &inField,
-      OutFieldType &outField) const
+  VTKM_EXEC void operator()(
+      const InFieldType &inField, OutFieldType &outField) const
   {
     outField = cvt_uint32_srgb(inField);
   }
 
- private:
-  vtkm::Float32 Exponent = 1.1f / 2.2f;
+//  private:
+//   vtkm::Float32 Exponent = 1.1f / 2.2f;
 };
 
 // Helper functions ///////////////////////////////////////////////////////////
@@ -123,7 +121,7 @@ VTKmDeviceGlobalState *Frame::deviceState() const
   return (VTKmDeviceGlobalState *)helium::BaseObject::m_state;
 }
 
-void Frame::commit()
+void Frame::commitParameters()
 {
   m_renderer = getParamObject<Renderer>("renderer");
   if (!m_renderer) {
@@ -154,6 +152,9 @@ void Frame::commit()
   m_instIdType = getParam<anari::DataType>("channel.instanceId", ANARI_UNKNOWN);
 
   m_frameData.size = getParam<uint2>("size", uint2(10));
+}
+
+void Frame::finalize() {
   this->Canvas = vtkm::rendering::CanvasRayTracer(
       this->m_frameData.size[0], this->m_frameData.size[1]);
 
@@ -199,12 +200,7 @@ void Frame::renderFrame()
   m_future = async<void>([&, state]() {
     auto start = std::chrono::steady_clock::now();
     state->renderingSemaphore.frameStart();
-    state->commitBufferFlush();
-
-    if (m_lastCommitOccured < state->commitBufferLastFlush()) {
-      m_lastCommitOccured = state->commitBufferLastFlush();
-      reportMessage(ANARI_SEVERITY_DEBUG, "object changes committed");
-    }
+    state->commitBuffer.flush();
 
     if (!m_renderer) {
       reportMessage(
@@ -360,7 +356,7 @@ bool Frame::ready() const
   return is_ready(m_future);
 }
 
-void Frame::wait() const
+void Frame::wait()
 {
   if (m_future.valid()) {
     m_future.get();

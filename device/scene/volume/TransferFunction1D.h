@@ -20,7 +20,8 @@ struct TransferFunction1D : public Volume
 {
   TransferFunction1D(VTKmDeviceGlobalState *d);
 
-  void commit() override;
+  void commitParameters() override;
+  void finalize() override;
 
   const SpatialField *spatialField() const;
   vtkm::Bounds bounds() const override;
@@ -33,7 +34,8 @@ struct TransferFunction1D : public Volume
   helium::ChangeObserverPtr<SpatialField> m_spatialField;
   vtkm::Range m_valueRange;
   helium::ChangeObserverPtr<Array1D> m_colorArray;
-  helium::ChangeObserverPtr<Array1D> m_opacity;
+  helium::ChangeObserverPtr<Array1D> m_opacityArray;
+  float4 m_color;
   vtkm::Float32 m_unitDistance;
   vtkm::cont::ColorTable m_colorTable;
 

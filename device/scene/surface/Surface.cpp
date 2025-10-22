@@ -9,12 +9,15 @@ Surface::Surface(VTKmDeviceGlobalState *s) : Object(ANARI_SURFACE, s) {}
 
 Surface::~Surface() = default;
 
-void Surface::commit()
+void Surface::commitParameters()
 {
   m_id = getParam<uint32_t>("id", ~0u);
   m_geometry = getParamObject<Geometry>("geometry");
   m_material = getParamObject<Material>("material");
+}
 
+void Surface::finalize()
+{
   if (!m_material) {
     reportMessage(ANARI_SEVERITY_WARNING, "missing 'material' on ANARISurface");
     return;

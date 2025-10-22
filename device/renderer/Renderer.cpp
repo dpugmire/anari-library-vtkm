@@ -16,9 +16,14 @@ Renderer *Renderer::createInstance(
   return new Renderer(s);
 }
 
-void Renderer::commit()
+void Renderer::commitParameters()
 {
   m_bgColor = getParam<float4>("background", float4(0.f, 0.f, 0.f, 1.f));
+}
+
+void Renderer::finalize()
+{
+  // no-op
 }
 
 float4 Renderer::background() const

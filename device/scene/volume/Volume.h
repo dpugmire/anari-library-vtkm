@@ -20,7 +20,8 @@ struct Volume : public Object
   static Volume *createInstance(
       std::string_view subtype, VTKmDeviceGlobalState *d);
 
-  void commit() override;
+  void commitParameters() override;
+  void finalize() override;
 
   uint32_t id() const;
 

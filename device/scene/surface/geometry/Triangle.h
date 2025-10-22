@@ -14,7 +14,9 @@ struct Triangle : Geometry
 {
   Triangle(VTKmDeviceGlobalState *s);
 
-  void commit() override;
+  void commitParameters() override;
+  void finalize() override;
+
   virtual vtkm::rendering::Actor *actor() const override {return this->m_actor.get();}
   virtual vtkm::rendering::MapperRayTracer *mapper() const override {return this->m_mapper.get();}
 

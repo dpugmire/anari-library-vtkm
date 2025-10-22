@@ -31,7 +31,8 @@ struct Frame : public helium::BaseFrame
       void *ptr,
       uint32_t flags) override;
 
-  void commit() override;
+  void commitParameters() override;
+  void finalize() override;
 
   void renderFrame() override;
 
@@ -44,7 +45,7 @@ struct Frame : public helium::BaseFrame
   void discard() override;
 
   bool ready() const;
-  void wait() const;
+  void wait();
 
  private:
   float2 screenFromPixel(const float2 &p) const;
@@ -87,7 +88,6 @@ struct Frame : public helium::BaseFrame
   helium::TimeStamp m_cameraLastChanged{0};
   helium::TimeStamp m_rendererLastChanged{0};
   helium::TimeStamp m_worldLastChanged{0};
-  helium::TimeStamp m_lastCommitOccured{0};
   helium::TimeStamp m_frameLastRendered{0};
 
   mutable std::future<void> m_future;

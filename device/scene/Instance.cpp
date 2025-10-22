@@ -9,14 +9,18 @@ Instance::Instance(VTKmDeviceGlobalState *s) : Object(ANARI_INSTANCE, s) {}
 
 Instance::~Instance() = default;
 
-void Instance::commit()
+void Instance::commitParameters()
 {
   m_id = getParam<uint32_t>("id", ~0u);
   m_xfm = getParam<mat4>("transform", mat4(linalg::identity));
-  m_xfmInvRot = linalg::inverse(extractRotation(m_xfm));
   m_group = getParamObject<Group>("group");
   if (!m_group)
     reportMessage(ANARI_SEVERITY_WARNING, "missing 'group' on ANARIInstance");
+}
+
+void Instance::finalize()
+{
+  m_xfmInvRot = linalg::inverse(extractRotation(m_xfm));
 }
 
 uint32_t Instance::id() const

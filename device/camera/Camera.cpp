@@ -22,7 +22,7 @@ Camera *Camera::createInstance(std::string_view type, VTKmDeviceGlobalState *s)
     return new UnknownCamera(s);
 }
 
-void Camera::commit()
+void Camera::commitParameters()
 {
   this->m_position = getParam<vtkm::Vec3f_32>("position", {0.f, 0.f, 0.f});
   this->m_direction =
@@ -37,7 +37,12 @@ void Camera::commit()
   std::cout << "Up== " << this->m_up << std::endl;
 #endif
 
-  markUpdated();
+  this->markUpdated();
+}
+
+void Camera::finalize()
+{
+  // no-op
 }
 
 UnknownCamera::UnknownCamera(VTKmDeviceGlobalState *s) : Camera(s) {};

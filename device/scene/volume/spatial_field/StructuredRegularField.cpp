@@ -13,7 +13,7 @@ StructuredRegularField::StructuredRegularField(VTKmDeviceGlobalState *d)
 {
 }
 
-void StructuredRegularField::commit()
+void StructuredRegularField::commitParameters()
 {
   // Stashing these in a ChangeObserverPtr means that commit will be
   // called again if the array contents change.
@@ -27,7 +27,10 @@ void StructuredRegularField::commit()
       vtkm::Id3{ dimensions[0], dimensions[1], dimensions[2] },
       vtkm::Vec3f{ origin[0], origin[1], origin[2] },
       vtkm::Vec3f{ spacing[0], spacing[1], spacing[2] });
+}
 
+void StructuredRegularField::finalize()
+{
   // VTK-m volume render only supports float fields in volume rendering. Convert
   // if necessary.
   vtkm::cont::UnknownArrayHandle vtkmArray = this->m_dataArray->dataAsVTKmArray();

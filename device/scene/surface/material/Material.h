@@ -12,6 +12,8 @@ struct Material : public Object
 {
   Material(VTKmDeviceGlobalState *s);
   ~Material() override;
+  void commitParameters() override;
+  void finalize() override;
   static Material *createInstance(
       std::string_view subtype, VTKmDeviceGlobalState *s);
 };
