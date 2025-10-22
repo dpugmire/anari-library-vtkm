@@ -5,21 +5,21 @@
 
 #include "Camera.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Perspective : public Camera
 {
-  Perspective(VTKmDeviceGlobalState *s);
+  Perspective(ViskoresDeviceGlobalState *s);
   void commitParameters() override;
   void finalize() override;
 
-  vtkm::rendering::Camera camera(const vtkm::Bounds &bounds) const override;
+  viskores::rendering::Camera camera(const viskores::Bounds &bounds) const override;
 
  private:
-  vtkm::Float32 m_fovy;
-  vtkm::Float32 m_aspect;
-  vtkm::Float32 m_near;
-  vtkm::Float32 m_far;
+  viskores::Float32 m_fovy;
+  viskores::Float32 m_aspect;
+  viskores::Float32 m_near;
+  viskores::Float32 m_far;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device

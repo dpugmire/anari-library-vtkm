@@ -10,9 +10,9 @@
 
 #include "Object.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
-struct VTKmDevice : public helium::BaseDevice
+struct ViskoresDevice : public helium::BaseDevice
 {
   /////////////////////////////////////////////////////////////////////////////
   // Main interface to accepting API calls
@@ -84,9 +84,9 @@ struct VTKmDevice : public helium::BaseDevice
   // Helper/other functions and data members
   /////////////////////////////////////////////////////////////////////////////
 
-  VTKmDevice(ANARIStatusCallback defaultCallback, const void *userPtr);
-  VTKmDevice(ANARILibrary);
-  ~VTKmDevice() override;
+  ViskoresDevice(ANARIStatusCallback defaultCallback, const void *userPtr);
+  ViskoresDevice(ANARILibrary);
+  ~ViskoresDevice() override;
 
   void initDevice();
 
@@ -95,9 +95,9 @@ struct VTKmDevice : public helium::BaseDevice
       const char *name, ANARIDataType type, void *mem, uint64_t size) override;
 
  private:
-  VTKmDeviceGlobalState *deviceState() const;
+  ViskoresDeviceGlobalState *deviceState() const;
 
   bool m_initialized{false};
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device

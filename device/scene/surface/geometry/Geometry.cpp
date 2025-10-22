@@ -7,14 +7,14 @@
 
 #include "array/ArrayConversion.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
-Geometry::Geometry(VTKmDeviceGlobalState *s) : Object(ANARI_GEOMETRY, s) {}
+Geometry::Geometry(ViskoresDeviceGlobalState *s) : Object(ANARI_GEOMETRY, s) {}
 
 Geometry::~Geometry() = default;
 
 Geometry *Geometry::createInstance(
-    std::string_view subtype, VTKmDeviceGlobalState *s)
+    std::string_view subtype, ViskoresDeviceGlobalState *s)
 {
   std::cout << "Creating geometry of type " << subtype << "\n";
   if (subtype == "triangle")
@@ -30,19 +30,19 @@ void Geometry::AddAttributeInformation()
     std::string paramName = "vertex." + attribName;
     if (this->hasParam(paramName))
       this->m_dataSet.AddPointField(attribName,
-          this->getParamObject<Array1D>(paramName)->dataAsVTKmArray());
+          this->getParamObject<Array1D>(paramName)->dataAsViskoresArray());
   }
 
   if (this->hasParam("vertex.color")) {
-    vtkm::cont::UnknownArrayHandle colorArray =
-        this->getParamObject<Array1D>("vertex.color")->dataAsVTKmArray();
-    // Colors can be either float or a fixed integer type. VTK-m only supports
+    viskores::cont::UnknownArrayHandle colorArray =
+        this->getParamObject<Array1D>("vertex.color")->dataAsViskoresArray();
+    // Colors can be either float or a fixed integer type. Viskores only supports
     // float colors. If we get integer colors, convert them here.
-    this->m_dataSet.AddPointField("color", ANARIColorsToVTKmColors(colorArray));
+    this->m_dataSet.AddPointField("color", ANARIColorsToViskoresColors(colorArray));
   }
 }
 
-UnknownGeometry::UnknownGeometry(VTKmDeviceGlobalState *s) : Geometry(s) {}
+UnknownGeometry::UnknownGeometry(ViskoresDeviceGlobalState *s) : Geometry(s) {}
 
 void UnknownGeometry::commitParameters()
 {
@@ -59,6 +59,6 @@ bool UnknownGeometry::isValid() const
   return false;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Geometry *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Geometry *);

@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "Renderer.h"
-#include "../VTKmTypes.h"
+#include "../ViskoresTypes.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
-Renderer::Renderer(VTKmDeviceGlobalState *s) : Object(ANARI_RENDERER, s) {}
+Renderer::Renderer(ViskoresDeviceGlobalState *s) : Object(ANARI_RENDERER, s) {}
 
 Renderer::~Renderer() = default;
 
 Renderer *Renderer::createInstance(
-    std::string_view /* subtype */, VTKmDeviceGlobalState *s)
+    std::string_view /* subtype */, ViskoresDeviceGlobalState *s)
 {
   return new Renderer(s);
 }
@@ -31,6 +31,6 @@ float4 Renderer::background() const
   return m_bgColor;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Renderer *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Renderer *);

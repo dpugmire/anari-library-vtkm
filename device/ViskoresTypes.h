@@ -1,16 +1,16 @@
 #pragma once
 
-#include <vtkm/VecVariable.h>
-#include <vtkm/VectorAnalysis.h>
+#include <viskores/VecVariable.h>
+#include <viskores/VectorAnalysis.h>
 
 #include <limits>
 
-namespace vtkm_device
+namespace viskores_device
 {
 
-using float2 = vtkm::Vec2f_32;
-using float3 = vtkm::Vec3f_32;
-using float4 = vtkm::Vec4f_32;
+using float2 = viskores::Vec2f_32;
+using float3 = viskores::Vec3f_32;
+using float4 = viskores::Vec4f_32;
 
 #if 0
 struct float2
@@ -114,4 +114,4 @@ struct VolumeRay
   uint32_t instID; //{RTC_INVALID_GEOMETRY_ID};
 };
 
-} //namespace vtkm_device
+} //namespace viskores_device

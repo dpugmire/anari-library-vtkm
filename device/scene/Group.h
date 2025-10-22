@@ -8,11 +8,11 @@
 #include "surface/Surface.h"
 #include "volume/Volume.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Group : public Object
 {
-  Group(VTKmDeviceGlobalState *s);
+  Group(ViskoresDeviceGlobalState *s);
   ~Group() override;
 
   bool getProperty(const std::string_view &name,
@@ -34,6 +34,6 @@ struct Group : public Object
   std::vector<Volume *> m_volumes;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Group *, ANARI_GROUP);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Group *, ANARI_GROUP);

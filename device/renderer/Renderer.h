@@ -5,9 +5,9 @@
 
 #include "Object.h"
 #include "scene/World.h"
-#include "../VTKmTypes.h"
+#include "../ViskoresTypes.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct PixelSample
 {
@@ -20,10 +20,10 @@ struct PixelSample
 
 struct Renderer : public Object
 {
-  Renderer(VTKmDeviceGlobalState *s);
+  Renderer(ViskoresDeviceGlobalState *s);
   ~Renderer() override;
   static Renderer *createInstance(
-      std::string_view subtype, VTKmDeviceGlobalState *d);
+      std::string_view subtype, ViskoresDeviceGlobalState *d);
   void commitParameters() override;
   void finalize() override;
 
@@ -34,6 +34,6 @@ struct Renderer : public Object
   float4 m_bgColor{0.f, 0.f, 0.f, 1.f};
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Renderer *, ANARI_RENDERER);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Renderer *, ANARI_RENDERER);

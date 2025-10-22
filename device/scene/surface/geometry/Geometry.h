@@ -5,26 +5,26 @@
 
 #include "Object.h"
 
-#include <vtkm/cont/DataSet.h>
-#include <vtkm/rendering/Actor.h>
-#include <vtkm/rendering/MapperRayTracer.h>
+#include <viskores/cont/DataSet.h>
+#include <viskores/rendering/Actor.h>
+#include <viskores/rendering/MapperRayTracer.h>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Geometry : public Object
 {
-  Geometry(VTKmDeviceGlobalState *s);
+  Geometry(ViskoresDeviceGlobalState *s);
   ~Geometry() override;
   static Geometry *createInstance(
-      std::string_view subtype, VTKmDeviceGlobalState *s);
+      std::string_view subtype, ViskoresDeviceGlobalState *s);
 
-  virtual vtkm::rendering::Actor *actor() const {return nullptr; } // = 0;
-  const vtkm::cont::DataSet &getDataSet() const { return this->m_dataSet; }
-  virtual const  vtkm::rendering::MapperRayTracer *mapper() const {return this->m_mapper.get();}
+  virtual viskores::rendering::Actor *actor() const {return nullptr; } // = 0;
+  const viskores::cont::DataSet &getDataSet() const { return this->m_dataSet; }
+  virtual const  viskores::rendering::MapperRayTracer *mapper() const {return this->m_mapper.get();}
 
  protected:
-  vtkm::cont::DataSet m_dataSet;
-  std::shared_ptr<vtkm::rendering::MapperRayTracer> m_mapper;
+  viskores::cont::DataSet m_dataSet;
+  std::shared_ptr<viskores::rendering::MapperRayTracer> m_mapper;
 
   /// @brief A convenience method to pull attribute information into m_data.
   ///
@@ -35,18 +35,18 @@ struct Geometry : public Object
   /// matches the attribute strings specified by ANARI.
   ///
   /// If any of these properties are not provided, no such respective
-  /// array will be added as a field to the VTK-m data object.
+  /// array will be added as a field to the Viskores data object.
   void AddAttributeInformation();
 };
 
 struct UnknownGeometry : public Geometry
 {
-  UnknownGeometry(VTKmDeviceGlobalState *s);
+  UnknownGeometry(ViskoresDeviceGlobalState *s);
   void commitParameters() override;
   void finalize() override;
   bool isValid() const override;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Geometry *, ANARI_GEOMETRY);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Geometry *, ANARI_GEOMETRY);

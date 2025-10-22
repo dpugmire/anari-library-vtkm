@@ -5,18 +5,18 @@
 
 #include "Object.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Geometry;
 
 struct Sampler : public Object
 {
-  Sampler(VTKmDeviceGlobalState *d);
+  Sampler(ViskoresDeviceGlobalState *d);
   virtual ~Sampler();
   static Sampler *createInstance(
-      std::string_view subtype, VTKmDeviceGlobalState *d);
+      std::string_view subtype, ViskoresDeviceGlobalState *d);
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Sampler *, ANARI_SAMPLER);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Sampler *, ANARI_SAMPLER);

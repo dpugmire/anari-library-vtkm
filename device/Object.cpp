@@ -3,11 +3,11 @@
 
 #include "Object.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 // Object definitions /////////////////////////////////////////////////////////
 
-Object::Object(ANARIDataType type, VTKmDeviceGlobalState *s)
+Object::Object(ANARIDataType type, ViskoresDeviceGlobalState *s)
     : helium::BaseObject(type, s)
 {}
 
@@ -28,9 +28,9 @@ bool Object::isValid() const
   return true;
 }
 
-VTKmDeviceGlobalState *Object::deviceState() const
+ViskoresDeviceGlobalState *Object::deviceState() const
 {
-  return (VTKmDeviceGlobalState *)helium::BaseObject::m_state;
+  return (ViskoresDeviceGlobalState *)helium::BaseObject::m_state;
 }
 
 void Object::printParameters()
@@ -43,7 +43,7 @@ void Object::printParameters()
 
 // UnknownObject definitions //////////////////////////////////////////////////
 
-UnknownObject::UnknownObject(ANARIDataType type, VTKmDeviceGlobalState *s)
+UnknownObject::UnknownObject(ANARIDataType type, ViskoresDeviceGlobalState *s)
     : Object(type, s)
 {
   s->objectCounts.unknown++;
@@ -69,6 +69,6 @@ bool UnknownObject::isValid() const
   return false;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Object *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Object *);

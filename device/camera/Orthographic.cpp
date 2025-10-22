@@ -3,18 +3,18 @@
 
 #include "Orthographic.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
-Orthographic::Orthographic(VTKmDeviceGlobalState *s) : Camera(s) {}
+Orthographic::Orthographic(ViskoresDeviceGlobalState *s) : Camera(s) {}
 
 void Orthographic::commitParameters()
 {
   Camera::commitParameters();
 
-  this->m_aspect = this->getParam("aspect", vtkm::Float32(1));
-  this->m_height = this->getParam("height", vtkm::Float32(1));
-  this->m_near = this->getParam("near", vtkm::Float32(-1));
-  this->m_far = this->getParam("far", vtkm::Float32(-1));
+  this->m_aspect = this->getParam("aspect", viskores::Float32(1));
+  this->m_height = this->getParam("height", viskores::Float32(1));
+  this->m_near = this->getParam("near", viskores::Float32(-1));
+  this->m_far = this->getParam("far", viskores::Float32(-1));
 }
 
 void Orthographic::finalize()
@@ -22,13 +22,13 @@ void Orthographic::finalize()
   Camera::finalize();
 }
 
-vtkm::rendering::Camera Orthographic::camera(const vtkm::Bounds &bounds) const
+viskores::rendering::Camera Orthographic::camera(const viskores::Bounds &bounds) const
 {
   // TODO: Implement orthographic projection correctly
-  vtkm::rendering::Camera camera;
+  viskores::rendering::Camera camera;
 
-  vtkm::Vec3f_64 diagonal = { bounds.X.Length(), bounds.Y.Length(), bounds.Z.Length() };
-  vtkm::Float32 length = static_cast<vtkm::Float32>(vtkm::Magnitude(diagonal));
+  viskores::Vec3f_64 diagonal = { bounds.X.Length(), bounds.Y.Length(), bounds.Z.Length() };
+  viskores::Float32 length = static_cast<viskores::Float32>(viskores::Magnitude(diagonal));
 
   camera.SetPosition(this->m_position);
   camera.SetLookAt(this->m_position + (length * this->m_direction));
@@ -46,4 +46,4 @@ vtkm::rendering::Camera Orthographic::camera(const vtkm::Bounds &bounds) const
   return camera;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device

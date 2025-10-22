@@ -4,14 +4,14 @@
 #pragma once
 
 #include "Instance.h"
-// VTK-m
-#include <vtkm/Bounds.h>
+// Viskores
+#include <viskores/Bounds.h>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct World : public Object
 {
-  World(VTKmDeviceGlobalState *s);
+  World(ViskoresDeviceGlobalState *s);
   ~World() override;
 
   bool getProperty(const std::string_view &name,
@@ -28,7 +28,7 @@ struct World : public Object
   const Instance *instanceFromRay(const VolumeRay &ray) const { return this->instances()[ray.instID]; }
   const Surface *surfaceFromRay(const Ray &ray) const { return instanceFromRay(ray)->group()->surfaces()[ray.geomID]; }
 
-  const vtkm::Bounds &bounds() const { return this-> m_bounds; }
+  const viskores::Bounds &bounds() const { return this-> m_bounds; }
 
  private:
   helium::ChangeObserverPtr<ObjectArray> m_zeroSurfaceData;
@@ -41,9 +41,9 @@ struct World : public Object
   helium::IntrusivePtr<Group> m_zeroGroup;
   helium::IntrusivePtr<Instance> m_zeroInstance;
 
-  vtkm::Bounds m_bounds;
+  viskores::Bounds m_bounds;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::World *, ANARI_WORLD);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::World *, ANARI_WORLD);

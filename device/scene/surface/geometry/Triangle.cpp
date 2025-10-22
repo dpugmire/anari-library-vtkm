@@ -2,18 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "Triangle.h"
-// VTK-m
-#include <vtkm/CellShape.h>
-#include <vtkm/cont/ArrayCopy.h>
-#include <vtkm/cont/ArrayHandleRuntimeVec.h>
-#include <vtkm/cont/CellSetSingleType.h>
-#include <vtkm/cont/UnknownArrayHandle.h>
+// Viskores
+#include <viskores/CellShape.h>
+#include <viskores/cont/ArrayCopy.h>
+#include <viskores/cont/ArrayHandleRuntimeVec.h>
+#include <viskores/cont/CellSetSingleType.h>
+#include <viskores/cont/UnknownArrayHandle.h>
 // std
 #include <numeric>
 
-namespace vtkm_device {
+namespace viskores_device {
 
-Triangle::Triangle(VTKmDeviceGlobalState *s)
+Triangle::Triangle(ViskoresDeviceGlobalState *s)
     : Geometry(s), m_index(this), m_vertexPosition(this), m_vertexColor(this)
 {}
 
@@ -58,26 +58,26 @@ void Triangle::finalize()
   }
 
   // Reset data
-  this->m_dataSet = vtkm::cont::DataSet{};
-  this->m_mapper = std::make_shared<vtkm::rendering::MapperRayTracer>();
+  this->m_dataSet = viskores::cont::DataSet{};
+  this->m_mapper = std::make_shared<viskores::rendering::MapperRayTracer>();
 
   // Get the connection array.
   // Note that ANARI provides the connection array as a series of triples
-  // whereas VTK-m wants a flat array of indices. The easist way to do the
+  // whereas Viskores wants a flat array of indices. The easist way to do the
   // conversion (while sharing pointers) is to use ArrayHandleRuntimeVec.
-  vtkm::cont::ArrayHandleRuntimeVec<vtkm::Id> connectionArray(3);
-  vtkm::cont::ArrayCopyShallowIfPossible(
-      this->m_index->dataAsVTKmArray(), connectionArray);
+  viskores::cont::ArrayHandleRuntimeVec<viskores::Id> connectionArray(3);
+  viskores::cont::ArrayCopyShallowIfPossible(
+      this->m_index->dataAsViskoresArray(), connectionArray);
 
-  vtkm::cont::CellSetSingleType<> cellSet;
-  cellSet.Fill(static_cast<vtkm::Id>(this->m_vertexPosition->size()),
-      vtkm::CELL_SHAPE_TRIANGLE,
+  viskores::cont::CellSetSingleType<> cellSet;
+  cellSet.Fill(static_cast<viskores::Id>(this->m_vertexPosition->size()),
+      viskores::CELL_SHAPE_TRIANGLE,
       3,
       connectionArray.GetComponentsArray());
   this->m_dataSet.SetCellSet(cellSet);
 
   this->m_dataSet.AddCoordinateSystem(
-      {"coords", this->m_vertexPosition->dataAsVTKmArray()});
+      {"coords", this->m_vertexPosition->dataAsViskoresArray()});
 
   if (!this->m_vertexColor) {
     reportMessage(
@@ -99,18 +99,18 @@ void Triangle::finalize()
     std::fill(begin, end, 1.f);
   }
 
-  vtkm::cont::UnknownArrayHandle vtkmArray =
-      this->m_vertexColor->dataAsVTKmArray();
-  if (!vtkmArray.IsValueType<vtkm::Float32>()
-      && !vtkmArray.IsValueType<vtkm::Float64>()) {
-    vtkm::cont::ArrayHandle<vtkm::FloatDefault> castArray;
-    vtkm::cont::ArrayCopy(vtkmArray, castArray);
-    vtkmArray = castArray;
+  viskores::cont::UnknownArrayHandle viskoresArray =
+      this->m_vertexColor->dataAsViskoresArray();
+  if (!viskoresArray.IsValueType<viskores::Float32>()
+      && !viskoresArray.IsValueType<viskores::Float64>()) {
+    viskores::cont::ArrayHandle<viskores::FloatDefault> castArray;
+    viskores::cont::ArrayCopy(viskoresArray, castArray);
+    viskoresArray = castArray;
   }
-  this->m_dataSet.AddPointField("data", vtkmArray);
+  this->m_dataSet.AddPointField("data", viskoresArray);
 
   this->m_actor =
-      std::make_shared<vtkm::rendering::Actor>(this->m_dataSet.GetCellSet(),
+      std::make_shared<viskores::rendering::Actor>(this->m_dataSet.GetCellSet(),
           this->m_dataSet.GetCoordinateSystem(),
           this->m_dataSet.GetField("data"),
           this->m_colorTable);
@@ -123,4 +123,4 @@ bool Triangle::isValid() const
   return this->m_vertexPosition;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device

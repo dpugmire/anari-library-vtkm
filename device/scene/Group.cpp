@@ -5,9 +5,9 @@
 // std
 #include <iterator>
 
-namespace vtkm_device {
+namespace viskores_device {
 
-Group::Group(VTKmDeviceGlobalState *s)
+Group::Group(ViskoresDeviceGlobalState *s)
     : Object(ANARI_GROUP, s), m_surfaceData(this), m_volumeData(this)
 {}
 
@@ -96,6 +96,6 @@ static inline float MAXELEM(const float3 &a)
   return std::max(a[0], std::max(a[1], a[2]));
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Group *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Group *);

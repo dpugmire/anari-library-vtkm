@@ -11,20 +11,20 @@
 // std
 #include <future>
 #include <vector>
-#include "../VTKmTypes.h"
+#include "../ViskoresTypes.h"
 
-#include <vtkm/rendering/CanvasRayTracer.h>
+#include <viskores/rendering/CanvasRayTracer.h>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Frame : public helium::BaseFrame
 {
-  Frame(VTKmDeviceGlobalState *s);
+  Frame(ViskoresDeviceGlobalState *s);
   ~Frame();
 
   bool isValid() const override;
 
-  VTKmDeviceGlobalState *deviceState() const;
+  ViskoresDeviceGlobalState *deviceState() const;
 
   bool getProperty(const std::string_view &name,
       ANARIDataType type,
@@ -78,9 +78,9 @@ struct Frame : public helium::BaseFrame
   helium::IntrusivePtr<Camera> m_camera;
   helium::IntrusivePtr<World> m_world;
 
-  vtkm::rendering::CanvasRayTracer Canvas;
-  //vtkm::cont::ArrayHandle<vtkm::UInt8> m_bytesFrameBuffer;
-  vtkm::cont::ArrayHandle<vtkm::UInt32> m_intFrameBuffer;
+  viskores::rendering::CanvasRayTracer Canvas;
+  //viskores::cont::ArrayHandle<viskores::UInt8> m_bytesFrameBuffer;
+  viskores::cont::ArrayHandle<viskores::UInt32> m_intFrameBuffer;
 
   float m_duration{0.f};
 
@@ -93,6 +93,6 @@ struct Frame : public helium::BaseFrame
   mutable std::future<void> m_future;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Frame *, ANARI_FRAME);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Frame *, ANARI_FRAME);

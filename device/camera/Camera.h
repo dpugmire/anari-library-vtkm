@@ -3,21 +3,21 @@
 
 #pragma once
 
-#include "../VTKmTypes.h"
+#include "../ViskoresTypes.h"
 #include "../Object.h"
-#include <vtkm/interop/anari/VtkmANARITypes.h>
+#include <viskores/interop/anari/ViskoresANARITypes.h>
 
-#include <vtkm/rendering/Camera.h>
+#include <viskores/rendering/Camera.h>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Camera : public Object
 {
-  Camera(VTKmDeviceGlobalState *s);
+  Camera(ViskoresDeviceGlobalState *s);
   ~Camera() override;
 
   static Camera *createInstance(
-      std::string_view type, VTKmDeviceGlobalState *state);
+      std::string_view type, ViskoresDeviceGlobalState *state);
 
   virtual void commitParameters() override;
   virtual void finalize() override;
@@ -30,24 +30,24 @@ struct Camera : public Object
                   this->m_imageRegion[3]);
   }
 
-  virtual vtkm::rendering::Camera camera(const vtkm::Bounds &bounds) const = 0;
+  virtual viskores::rendering::Camera camera(const viskores::Bounds &bounds) const = 0;
 
  protected:
-  vtkm::Vec3f_32 m_position;
-  vtkm::Vec3f_32 m_direction;
-  vtkm::Vec3f_32 m_up;
-  vtkm::Vec4f_32 m_imageRegion;
+  viskores::Vec3f_32 m_position;
+  viskores::Vec3f_32 m_direction;
+  viskores::Vec3f_32 m_up;
+  viskores::Vec4f_32 m_imageRegion;
 };
 
 struct UnknownCamera : public Camera
 {
-  UnknownCamera(VTKmDeviceGlobalState *s);
+  UnknownCamera(ViskoresDeviceGlobalState *s);
 
-  vtkm::rendering::Camera camera(const vtkm::Bounds &) const override;
+  viskores::rendering::Camera camera(const viskores::Bounds &) const override;
 
   bool isValid() const override;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Camera *, ANARI_CAMERA);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Camera *, ANARI_CAMERA);

@@ -4,14 +4,14 @@
 #include "Volume.h"
 #include "TransferFunction1D.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
-Volume::Volume(VTKmDeviceGlobalState *s) : Object(ANARI_VOLUME, s) {}
+Volume::Volume(ViskoresDeviceGlobalState *s) : Object(ANARI_VOLUME, s) {}
 
 Volume::~Volume() = default;
 
 Volume *Volume::createInstance(
-    std::string_view subtype, VTKmDeviceGlobalState *s)
+    std::string_view subtype, ViskoresDeviceGlobalState *s)
 {
   if (subtype == "transferFunction1D")
     return new TransferFunction1D(s);
@@ -29,19 +29,19 @@ void Volume::finalize()
   // no-op
 }
 
-UnknownVolume::UnknownVolume(VTKmDeviceGlobalState *d) : Volume(d) {}
+UnknownVolume::UnknownVolume(ViskoresDeviceGlobalState *d) : Volume(d) {}
 
-vtkm::Bounds UnknownVolume::bounds() const
+viskores::Bounds UnknownVolume::bounds() const
 {
-  return vtkm::Bounds{};
+  return viskores::Bounds{};
 }
 
-vtkm::rendering::Actor *UnknownVolume::actor() const
+viskores::rendering::Actor *UnknownVolume::actor() const
 {
   return nullptr;
 }
 
-vtkm::rendering::Mapper *UnknownVolume::mapper() const
+viskores::rendering::Mapper *UnknownVolume::mapper() const
 {
   return nullptr;
 }
@@ -51,6 +51,6 @@ bool UnknownVolume::isValid() const
   return false;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Volume *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Volume *);

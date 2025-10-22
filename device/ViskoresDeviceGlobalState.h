@@ -4,18 +4,18 @@
 #pragma once
 
 #include "RenderingSemaphore.h"
-#include "vtkm_device_math.h"
+#include "viskores_device_math.h"
 // helium
 #include "helium/BaseGlobalDeviceState.h"
 // std
 #include <atomic>
 #include <mutex>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Frame;
 
-struct VTKmDeviceGlobalState : public helium::BaseGlobalDeviceState
+struct ViskoresDeviceGlobalState : public helium::BaseGlobalDeviceState
 {
   struct ObjectCounts
   {
@@ -40,26 +40,26 @@ struct VTKmDeviceGlobalState : public helium::BaseGlobalDeviceState
 
   // Helper methods //
 
-  VTKmDeviceGlobalState(ANARIDevice d);
+  ViskoresDeviceGlobalState(ANARIDevice d);
   void waitOnCurrentFrame() const;
 };
 
 // Helper functions/macros ////////////////////////////////////////////////////
 
-inline VTKmDeviceGlobalState *asVTKmDeviceState(
+inline ViskoresDeviceGlobalState *asViskoresDeviceState(
     helium::BaseGlobalDeviceState *s)
 {
-  return (VTKmDeviceGlobalState *)s;
+  return (ViskoresDeviceGlobalState *)s;
 }
 
-#define VTKM_ANARI_TYPEFOR_SPECIALIZATION(type, anari_type)                    \
+#define VISKORES_ANARI_TYPEFOR_SPECIALIZATION(type, anari_type)                    \
   namespace anari {                                                            \
   ANARI_TYPEFOR_SPECIALIZATION(type, anari_type);                              \
   }
 
-#define VTKM_ANARI_TYPEFOR_DEFINITION(type)                                    \
+#define VISKORES_ANARI_TYPEFOR_DEFINITION(type)                                    \
   namespace anari {                                                            \
   ANARI_TYPEFOR_DEFINITION(type);                                              \
   }
 
-} // namespace vtkm_device
+} // namespace viskores_device

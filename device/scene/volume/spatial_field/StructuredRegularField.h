@@ -8,12 +8,12 @@
 // helium
 #include <helium/utility/ChangeObserverPtr.h>
 
-namespace vtkm_device
+namespace viskores_device
 {
 
 struct StructuredRegularField : public SpatialField
 {
-  StructuredRegularField(VTKmDeviceGlobalState *d);
+  StructuredRegularField(ViskoresDeviceGlobalState *d);
 
   void commitParameters() override;
   void finalize() override;
@@ -22,4 +22,4 @@ struct StructuredRegularField : public SpatialField
   helium::ChangeObserverPtr<Array3D> m_dataArray;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device

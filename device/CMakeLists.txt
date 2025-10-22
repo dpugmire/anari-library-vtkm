@@ -1,11 +1,11 @@
-set(anari_vtkm_target anari_library_vtkm)
+set(anari_viskores_target anari_library_viskores)
 
 ## Build device target ##
 
-add_library(${anari_vtkm_target} SHARED
-  VTKmDevice.cpp
-  VTKmDeviceGlobalState.cpp
-  VTKmLibrary.cpp
+add_library(${anari_viskores_target} SHARED
+  ViskoresDevice.cpp
+  ViskoresDeviceGlobalState.cpp
+  ViskoresLibrary.cpp
   Object.cpp
   array/Array1D.cpp
   array/Array2D.cpp
@@ -33,21 +33,21 @@ add_library(${anari_vtkm_target} SHARED
 #  scene/volume/TransferFunction1D.cpp
 )
 
-target_link_libraries(${anari_vtkm_target}
+target_link_libraries(${anari_viskores_target}
 PRIVATE
   anari::helium
-  vtkm::cont
-  vtkm::worklet
-  vtkm::source
-  vtkm::rendering
+  viskores::cont
+  viskores::worklet
+  viskores::source
+  viskores::rendering
 )
 
 include(GenerateExportHeader)
-generate_export_header(${anari_vtkm_target}
-  EXPORT_MACRO_NAME "VTKM_LIBRARY_INTERFACE"
+generate_export_header(${anari_viskores_target}
+  EXPORT_MACRO_NAME "VISKORES_LIBRARY_INTERFACE"
 )
 
-target_include_directories(${anari_vtkm_target}
+target_include_directories(${anari_viskores_target}
 PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -56,14 +56,14 @@ PRIVATE
 ## Code generation ##
 
 anari_generate_queries(
-  DEVICE_TARGET ${anari_vtkm_target}
-  CPP_NAMESPACE vtkm_device
-  JSON_DEFINITIONS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vtkm_device.json
+  DEVICE_TARGET ${anari_viskores_target}
+  CPP_NAMESPACE viskores_device
+  JSON_DEFINITIONS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/viskores_device.json
 )
 
 ## Installation ##
 
-install(TARGETS ${anari_vtkm_target}
+install(TARGETS ${anari_viskores_target}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

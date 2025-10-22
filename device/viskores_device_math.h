@@ -5,13 +5,13 @@
 
 // helium
 #include "helium/helium_math.h"
-// vtk-m
-#include <vtkm/VectorAnalysis.h>
-#include <vtkm/interop/anari/VtkmANARITypes.h>
+// viskores
+#include <viskores/VectorAnalysis.h>
+#include <viskores/interop/anari/ViskoresANARITypes.h>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 using namespace anari::math;
 using namespace helium::math;
 
-} // namespace vtkm_device
+} // namespace viskores_device

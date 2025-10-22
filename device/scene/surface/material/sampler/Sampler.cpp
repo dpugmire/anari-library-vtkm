@@ -3,18 +3,18 @@
 
 #include "Sampler.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
-Sampler::Sampler(VTKmDeviceGlobalState *s) : Object(ANARI_SAMPLER, s) {}
+Sampler::Sampler(ViskoresDeviceGlobalState *s) : Object(ANARI_SAMPLER, s) {}
 
 Sampler::~Sampler() = default;
 
 Sampler *Sampler::createInstance(
-    std::string_view subtype, VTKmDeviceGlobalState *s)
+    std::string_view subtype, ViskoresDeviceGlobalState *s)
 {
   return (Sampler *)new UnknownObject(ANARI_SAMPLER, s);
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Sampler *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Sampler *);

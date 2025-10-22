@@ -3,9 +3,9 @@
 
 #include "Surface.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
-Surface::Surface(VTKmDeviceGlobalState *s) : Object(ANARI_SURFACE, s) {}
+Surface::Surface(ViskoresDeviceGlobalState *s) : Object(ANARI_SURFACE, s) {}
 
 Surface::~Surface() = default;
 
@@ -39,7 +39,7 @@ const Material *Surface::material() const
   return m_material.ptr;
 }
 
-vtkm::Bounds Surface::bounds() const
+viskores::Bounds Surface::bounds() const
 {
   return this->geometry()->getDataSet().GetCoordinateSystem().GetBounds();
 }
@@ -50,6 +50,6 @@ bool Surface::isValid() const
       && m_material->isValid();
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Surface *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Surface *);

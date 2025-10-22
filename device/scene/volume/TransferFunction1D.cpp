@@ -3,36 +3,36 @@
 
 #include "TransferFunction1D.h"
 #include "array/ArrayConversion.h"
-// VTK-m
-#include <vtkm/cont/ArrayExtractComponent.h>
-#include <vtkm/cont/ArrayHandleConstant.h>
-#include <vtkm/cont/ArrayHandleStride.h>
+// Viskores
+#include <viskores/cont/ArrayExtractComponent.h>
+#include <viskores/cont/ArrayHandleConstant.h>
+#include <viskores/cont/ArrayHandleStride.h>
 
 namespace {
 
 template <typename ComponentType>
 void FillColorTable(
-    vtkm::cont::ColorTable &table, const vtkm::cont::UnknownArrayHandle &array)
+    viskores::cont::ColorTable &table, const viskores::cont::UnknownArrayHandle &array)
 {
-  vtkm::Id numValues = array.GetNumberOfValues();
+  viskores::Id numValues = array.GetNumberOfValues();
 
-  std::array<vtkm::cont::ArrayHandleStride<ComponentType>, 3> colorChannels;
+  std::array<viskores::cont::ArrayHandleStride<ComponentType>, 3> colorChannels;
   colorChannels[0] = array.ExtractComponent<ComponentType>(0);
   if (array.GetNumberOfComponentsFlat() > 1) {
     colorChannels[1] = array.ExtractComponent<ComponentType>(1);
   } else {
-    colorChannels[1] = vtkm::cont::ArrayExtractComponent(
-        vtkm::cont::ArrayHandleConstant<ComponentType>(0, numValues), 0);
+    colorChannels[1] = viskores::cont::ArrayExtractComponent(
+        viskores::cont::ArrayHandleConstant<ComponentType>(0, numValues), 0);
   }
   if (array.GetNumberOfComponentsFlat() > 2) {
     colorChannels[2] = array.ExtractComponent<ComponentType>(2);
   } else {
-    colorChannels[2] = vtkm::cont::ArrayExtractComponent(
-        vtkm::cont::ArrayHandleConstant<ComponentType>(0, numValues), 0);
+    colorChannels[2] = viskores::cont::ArrayExtractComponent(
+        viskores::cont::ArrayHandleConstant<ComponentType>(0, numValues), 0);
   }
 
   std::array<
-      typename vtkm::cont::ArrayHandleStride<ComponentType>::ReadPortalType,
+      typename viskores::cont::ArrayHandleStride<ComponentType>::ReadPortalType,
       3>
       colorPortals;
   std::transform(colorChannels.begin(),
@@ -40,24 +40,24 @@ void FillColorTable(
       colorPortals.begin(),
       [](auto array) { return array.ReadPortal(); });
   if (numValues > 1) {
-    vtkm::Float64 scale = 1.0 / (numValues - 1);
-    for (vtkm::Id index = 0; index < numValues; ++index) {
-      std::array<vtkm::Float32, 3> color;
+    viskores::Float64 scale = 1.0 / (numValues - 1);
+    for (viskores::Id index = 0; index < numValues; ++index) {
+      std::array<viskores::Float32, 3> color;
       std::transform(colorPortals.begin(),
           colorPortals.end(),
           color.begin(),
           [index](auto portal) {
-            return static_cast<vtkm::Float32>(portal.Get(index));
+            return static_cast<viskores::Float32>(portal.Get(index));
           });
       table.AddPoint(index * scale, {color[0], color[1], color[2]});
     }
   } else {
     // Special case: only one color given in array.
-    std::array<vtkm::Float32, 3> color;
+    std::array<viskores::Float32, 3> color;
     std::transform(colorPortals.begin(),
         colorPortals.end(),
         color.begin(),
-        [](auto portal) { return static_cast<vtkm::Float32>(portal.Get(0)); });
+        [](auto portal) { return static_cast<viskores::Float32>(portal.Get(0)); });
     table.AddPoint(0, {color[0], color[1], color[2]});
     table.AddPoint(1, {color[0], color[1], color[2]});
   }
@@ -65,9 +65,9 @@ void FillColorTable(
 
 } // namespace
 
-namespace vtkm_device {
+namespace viskores_device {
 
-TransferFunction1D::TransferFunction1D(VTKmDeviceGlobalState *d)
+TransferFunction1D::TransferFunction1D(ViskoresDeviceGlobalState *d)
     : Volume(d), m_spatialField(this), m_colorArray(this), m_opacityArray(this)
 {}
 
@@ -102,11 +102,11 @@ void TransferFunction1D::finalize()
   }
 
   // Reset and fill color table
-  this->m_colorTable = vtkm::cont::ColorTable(vtkm::ColorSpace::Lab);
+  this->m_colorTable = viskores::cont::ColorTable(viskores::ColorSpace::Lab);
   if (this->m_colorArray) {
-    // Convert to VTK-m colors
-    vtkm::cont::UnknownArrayHandle vtkmColors =
-        ANARIColorsToVTKmColors(this->m_colorArray->dataAsVTKmArray());
+    // Convert to Viskores colors
+    viskores::cont::UnknownArrayHandle viskoresColors =
+        ANARIColorsToViskoresColors(this->m_colorArray->dataAsViskoresArray());
 
     // Copy colors into ColorTable
     // NOTE: I am not at all convinced that this is a good idea. If we are
@@ -114,10 +114,10 @@ void TransferFunction1D::finalize()
     // the colors to the desired level, and we should just use that array.
     // Insetad, we are building peicewise linear segments and then resampling
     // again.
-    if (vtkmColors.IsBaseComponentType<vtkm::Float32>()) {
-      FillColorTable<vtkm::Float32>(this->m_colorTable, vtkmColors);
-    } else if (vtkmColors.IsBaseComponentType<vtkm::Float64>()) {
-      FillColorTable<vtkm::Float64>(this->m_colorTable, vtkmColors);
+    if (viskoresColors.IsBaseComponentType<viskores::Float32>()) {
+      FillColorTable<viskores::Float32>(this->m_colorTable, viskoresColors);
+    } else if (viskoresColors.IsBaseComponentType<viskores::Float64>()) {
+      FillColorTable<viskores::Float64>(this->m_colorTable, viskoresColors);
     }
   } else {
     this->m_colorTable.AddPoint(0, {m_color[0], m_color[1], m_color[2]});
@@ -126,7 +126,7 @@ void TransferFunction1D::finalize()
 
   if (m_opacityArray) {
     if (m_opacityArray->size() > 1) {
-      vtkm::Float64 scale = 1.0 / (m_opacityArray->size() - 1);
+      viskores::Float64 scale = 1.0 / (m_opacityArray->size() - 1);
       for (size_t index = 0; index < m_opacityArray->size(); ++index) {
         float opacity = *m_opacityArray->valueAt<float>(index);
         this->m_colorTable.AddPointAlpha(index * scale, opacity);
@@ -140,13 +140,13 @@ void TransferFunction1D::finalize()
 
   this->m_colorTable.RescaleToRange(this->m_valueRange);
 
-  vtkm::cont::DataSet dataSet = this->m_spatialField->getDataSet();
-  this->m_actor = std::make_shared<vtkm::rendering::Actor>(dataSet.GetCellSet(),
+  viskores::cont::DataSet dataSet = this->m_spatialField->getDataSet();
+  this->m_actor = std::make_shared<viskores::rendering::Actor>(dataSet.GetCellSet(),
       dataSet.GetCoordinateSystem(),
       dataSet.GetField("data"),
       this->m_colorTable);
   this->m_actor->SetScalarRange(this->m_colorTable.GetRange());
-  this->m_mapper = std::make_shared<vtkm::rendering::MapperVolume>();
+  this->m_mapper = std::make_shared<viskores::rendering::MapperVolume>();
 }
 
 const SpatialField *TransferFunction1D::spatialField() const
@@ -154,19 +154,19 @@ const SpatialField *TransferFunction1D::spatialField() const
   return this->m_spatialField.get();
 }
 
-vtkm::Bounds TransferFunction1D::bounds() const
+viskores::Bounds TransferFunction1D::bounds() const
 {
   return isValid()
       ? this->m_spatialField->getDataSet().GetCoordinateSystem().GetBounds()
-      : vtkm::Bounds();
+      : viskores::Bounds();
 }
 
-vtkm::rendering::Actor *TransferFunction1D::actor() const
+viskores::rendering::Actor *TransferFunction1D::actor() const
 {
   return this->m_actor.get();
 }
 
-vtkm::rendering::MapperVolume *TransferFunction1D::mapper() const
+viskores::rendering::MapperVolume *TransferFunction1D::mapper() const
 {
   return this->m_mapper.get();
 }
@@ -176,4 +176,4 @@ bool TransferFunction1D::isValid() const
   return this->m_spatialField;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device

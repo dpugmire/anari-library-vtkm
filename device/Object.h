@@ -3,19 +3,19 @@
 
 #pragma once
 
-#include "VTKmDeviceGlobalState.h"
-#include "vtkm_device_math.h"
+#include "ViskoresDeviceGlobalState.h"
+#include "viskores_device_math.h"
 // helium
 #include <helium/BaseObject.h>
 #include <helium/utility/ChangeObserverPtr.h>
 // std
 #include <string_view>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Object : public helium::BaseObject
 {
-  Object(ANARIDataType type, VTKmDeviceGlobalState *s);
+  Object(ANARIDataType type, ViskoresDeviceGlobalState *s);
   virtual ~Object() = default;
 
   bool getProperty(const std::string_view &name,
@@ -25,20 +25,20 @@ struct Object : public helium::BaseObject
 
   bool isValid() const override;
 
-  VTKmDeviceGlobalState *deviceState() const;
+  ViskoresDeviceGlobalState *deviceState() const;
 
   void printParameters();
 };
 
 struct UnknownObject : public Object
 {
-  UnknownObject(ANARIDataType type, VTKmDeviceGlobalState *s);
+  UnknownObject(ANARIDataType type, ViskoresDeviceGlobalState *s);
   ~UnknownObject() override;
   void commitParameters() override;
   void finalize() override;
   bool isValid() const override;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Object *, ANARI_OBJECT);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Object *, ANARI_OBJECT);
