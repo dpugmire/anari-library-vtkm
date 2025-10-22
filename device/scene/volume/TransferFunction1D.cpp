@@ -105,8 +105,8 @@ void TransferFunction1D::finalize()
   this->m_colorTable = viskores::cont::ColorTable(viskores::ColorSpace::Lab);
   if (this->m_colorArray) {
     // Convert to Viskores colors
-    viskores::cont::UnknownArrayHandle vtkmColors =
-        ANARIColorsToVTKmColors(this->m_colorArray->dataAsVTKmArray());
+    viskores::cont::UnknownArrayHandle viskoresColors =
+        ANARIColorsToViskoresColors(this->m_colorArray->dataAsViskoresArray());
 
     // Copy colors into ColorTable
     // NOTE: I am not at all convinced that this is a good idea. If we are
@@ -114,10 +114,10 @@ void TransferFunction1D::finalize()
     // the colors to the desired level, and we should just use that array.
     // Insetad, we are building peicewise linear segments and then resampling
     // again.
-    if (vtkmColors.IsBaseComponentType<viskores::Float32>()) {
-      FillColorTable<viskores::Float32>(this->m_colorTable, vtkmColors);
-    } else if (vtkmColors.IsBaseComponentType<viskores::Float64>()) {
-      FillColorTable<viskores::Float64>(this->m_colorTable, vtkmColors);
+    if (viskoresColors.IsBaseComponentType<viskores::Float32>()) {
+      FillColorTable<viskores::Float32>(this->m_colorTable, viskoresColors);
+    } else if (viskoresColors.IsBaseComponentType<viskores::Float64>()) {
+      FillColorTable<viskores::Float64>(this->m_colorTable, viskoresColors);
     }
   } else {
     this->m_colorTable.AddPoint(0, {m_color[0], m_color[1], m_color[2]});

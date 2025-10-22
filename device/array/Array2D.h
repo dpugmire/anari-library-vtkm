@@ -25,10 +25,10 @@ struct Array2D : public helium::Array2D
          /// Note: Do not change the contents of the Viskores array handle. Although the
          /// data are in a Viskores array, it is still managed by ANARI, and changing the
          /// data outside of a map/unmap is forbidden.
-  viskores::cont::UnknownArrayHandle dataAsVTKmArray() const;
+  viskores::cont::UnknownArrayHandle dataAsViskoresArray() const;
 
  private:
-  viskores::cont::UnknownArrayHandle m_VTKmArray;
+  viskores::cont::UnknownArrayHandle m_ViskoresArray;
 };
 
 } // namespace viskores_device

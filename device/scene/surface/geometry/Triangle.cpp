@@ -67,7 +67,7 @@ void Triangle::finalize()
   // conversion (while sharing pointers) is to use ArrayHandleRuntimeVec.
   viskores::cont::ArrayHandleRuntimeVec<viskores::Id> connectionArray(3);
   viskores::cont::ArrayCopyShallowIfPossible(
-      this->m_index->dataAsVTKmArray(), connectionArray);
+      this->m_index->dataAsViskoresArray(), connectionArray);
 
   viskores::cont::CellSetSingleType<> cellSet;
   cellSet.Fill(static_cast<viskores::Id>(this->m_vertexPosition->size()),
@@ -77,7 +77,7 @@ void Triangle::finalize()
   this->m_dataSet.SetCellSet(cellSet);
 
   this->m_dataSet.AddCoordinateSystem(
-      {"coords", this->m_vertexPosition->dataAsVTKmArray()});
+      {"coords", this->m_vertexPosition->dataAsViskoresArray()});
 
   if (!this->m_vertexColor) {
     reportMessage(
@@ -99,15 +99,15 @@ void Triangle::finalize()
     std::fill(begin, end, 1.f);
   }
 
-  viskores::cont::UnknownArrayHandle vtkmArray =
-      this->m_vertexColor->dataAsVTKmArray();
-  if (!vtkmArray.IsValueType<viskores::Float32>()
-      && !vtkmArray.IsValueType<viskores::Float64>()) {
+  viskores::cont::UnknownArrayHandle viskoresArray =
+      this->m_vertexColor->dataAsViskoresArray();
+  if (!viskoresArray.IsValueType<viskores::Float32>()
+      && !viskoresArray.IsValueType<viskores::Float64>()) {
     viskores::cont::ArrayHandle<viskores::FloatDefault> castArray;
-    viskores::cont::ArrayCopy(vtkmArray, castArray);
-    vtkmArray = castArray;
+    viskores::cont::ArrayCopy(viskoresArray, castArray);
+    viskoresArray = castArray;
   }
-  this->m_dataSet.AddPointField("data", vtkmArray);
+  this->m_dataSet.AddPointField("data", viskoresArray);
 
   this->m_actor =
       std::make_shared<viskores::rendering::Actor>(this->m_dataSet.GetCellSet(),

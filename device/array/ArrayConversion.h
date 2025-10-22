@@ -14,7 +14,7 @@ namespace viskores_device {
 /// This routine allows you to take arrays of data provided in ANARI object parameters
 /// and move them over to a Viskores ArrayHandle. Memory is shared between the two arrays,
 /// so if the contents of the array is modified on one side, it can invalidate the other.
-viskores::cont::UnknownArrayHandle ANARIArrayToVTKmArray(const helium::Array *anariArray);
+viskores::cont::UnknownArrayHandle ANARIArrayToViskoresArray(const helium::Array *anariArray);
 
 /// @brief Convert an array of colors.
 ///
@@ -24,7 +24,7 @@ viskores::cont::UnknownArrayHandle ANARIArrayToVTKmArray(const helium::Array *an
 /// assumes colors are represented by floating point values in the range [0, 1]. This routine
 /// will check for those cases and convert the values if necessary. If no conversion is
 /// necessary, the same array will be returned.
-viskores::cont::UnknownArrayHandle ANARIColorsToVTKmColors(
+viskores::cont::UnknownArrayHandle ANARIColorsToViskoresColors(
     const viskores::cont::UnknownArrayHandle &anariColors);
 
 } // viskores_device

@@ -14,30 +14,30 @@
 namespace {
 
 template <typename BaseType, int NumComponents>
-struct VTKmTypeImpl
+struct ViskoresTypeImpl
 {
   using type = viskores::Vec<BaseType, static_cast<viskores::IdComponent>(NumComponents)>;
 };
 template <typename BaseType>
-struct VTKmTypeImpl<BaseType, 1>
+struct ViskoresTypeImpl<BaseType, 1>
 {
   using type = BaseType;
 };
 
 template <int ANARIDataTypeId>
-struct ANARIToVTKmTypeImpl
+struct ANARIToViskoresTypeImpl
 {
   using properties = anari::ANARITypeProperties<ANARIDataTypeId>;
-  using type = typename VTKmTypeImpl<typename properties::base_type, properties::components>::type;
+  using type = typename ViskoresTypeImpl<typename properties::base_type, properties::components>::type;
 };
 
 template <int ANARIDataTypeId>
-using ANARIToVTKmType = typename ANARIToVTKmTypeImpl<ANARIDataTypeId>::type;
+using ANARIToViskoresType = typename ANARIToViskoresTypeImpl<ANARIDataTypeId>::type;
 
 template <int ANARIDataTypeId>
 struct ConstructArrayHandle
 {
-  using T = ANARIToVTKmType<ANARIDataTypeId>;
+  using T = ANARIToViskoresType<ANARIDataTypeId>;
   viskores::cont::UnknownArrayHandle operator()(const void *memory, viskores::Id numValues)
   {
     return this->DoIt(memory, numValues, std::is_pointer<T>{});
@@ -107,7 +107,7 @@ inline void FixColorsForType(viskores::cont::UnknownArrayHandle& colorArray)
 
 namespace viskores_device {
 
-viskores::cont::UnknownArrayHandle ANARIArrayToVTKmArray(const helium::Array *anariArray)
+viskores::cont::UnknownArrayHandle ANARIArrayToViskoresArray(const helium::Array *anariArray)
 {
   viskores::Id numValues = anariArray->totalSize();
   const void *memory = anariArray->data();
@@ -116,15 +116,15 @@ viskores::cont::UnknownArrayHandle ANARIArrayToVTKmArray(const helium::Array *an
       anariArray->elementType(), memory, numValues);
 }
 
-viskores::cont::UnknownArrayHandle ANARIColorsToVTKmColors(
+viskores::cont::UnknownArrayHandle ANARIColorsToViskoresColors(
     const viskores::cont::UnknownArrayHandle &anariColors)
 {
-  viskores::cont::UnknownArrayHandle vtkmColors = anariColors;
-  FixColorsForType<viskores::UInt8>(vtkmColors);
-  FixColorsForType<viskores::UInt16>(vtkmColors);
-  FixColorsForType<viskores::UInt32>(vtkmColors);
-  FixColorsForType<viskores::UInt64>(vtkmColors);
-  return vtkmColors;
+  viskores::cont::UnknownArrayHandle viskoresColors = anariColors;
+  FixColorsForType<viskores::UInt8>(viskoresColors);
+  FixColorsForType<viskores::UInt16>(viskoresColors);
+  FixColorsForType<viskores::UInt32>(viskoresColors);
+  FixColorsForType<viskores::UInt64>(viskoresColors);
+  return viskoresColors;
 }
 
 } // namespace viskores_device

@@ -21,18 +21,18 @@ void Array3D::unmap()
 {
   this->helium::Array3D::unmap();
   // Invalidate Viskores ArrayHandle
-  this->m_VTKmArray.ReleaseResources();
+  this->m_ViskoresArray.ReleaseResources();
 }
 
-viskores::cont::UnknownArrayHandle Array3D::dataAsVTKmArray() const
+viskores::cont::UnknownArrayHandle Array3D::dataAsViskoresArray() const
 {
-  if (!this->m_VTKmArray.IsValid())
+  if (!this->m_ViskoresArray.IsValid())
   {
     // Pull data from ANARI into Viskores.
-    const_cast<Array3D *>(this)->m_VTKmArray = ANARIArrayToVTKmArray(this);
+    const_cast<Array3D *>(this)->m_ViskoresArray = ANARIArrayToViskoresArray(this);
   }
 
-  return this->m_VTKmArray;
+  return this->m_ViskoresArray;
 }
 
 } // namespace viskores_device

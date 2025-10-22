@@ -33,14 +33,14 @@ void StructuredRegularField::finalize()
 {
   // Viskores volume render only supports float fields in volume rendering. Convert
   // if necessary.
-  viskores::cont::UnknownArrayHandle vtkmArray = this->m_dataArray->dataAsVTKmArray();
-  if (!vtkmArray.IsValueType<viskores::Float32>() && !vtkmArray.IsValueType<viskores::Float64>())
+  viskores::cont::UnknownArrayHandle viskoresArray = this->m_dataArray->dataAsViskoresArray();
+  if (!viskoresArray.IsValueType<viskores::Float32>() && !viskoresArray.IsValueType<viskores::Float64>())
   {
     viskores::cont::ArrayHandle<viskores::FloatDefault> castArray;
-    viskores::cont::ArrayCopy(vtkmArray, castArray);
-    vtkmArray = castArray;
+    viskores::cont::ArrayCopy(viskoresArray, castArray);
+    viskoresArray = castArray;
   }
-  this->m_dataSet.AddPointField("data", vtkmArray);
+  this->m_dataSet.AddPointField("data", viskoresArray);
 
   this->m_dataSet.PrintSummary(std::cout);
 }

@@ -30,15 +30,15 @@ void Geometry::AddAttributeInformation()
     std::string paramName = "vertex." + attribName;
     if (this->hasParam(paramName))
       this->m_dataSet.AddPointField(attribName,
-          this->getParamObject<Array1D>(paramName)->dataAsVTKmArray());
+          this->getParamObject<Array1D>(paramName)->dataAsViskoresArray());
   }
 
   if (this->hasParam("vertex.color")) {
     viskores::cont::UnknownArrayHandle colorArray =
-        this->getParamObject<Array1D>("vertex.color")->dataAsVTKmArray();
+        this->getParamObject<Array1D>("vertex.color")->dataAsViskoresArray();
     // Colors can be either float or a fixed integer type. Viskores only supports
     // float colors. If we get integer colors, convert them here.
-    this->m_dataSet.AddPointField("color", ANARIColorsToVTKmColors(colorArray));
+    this->m_dataSet.AddPointField("color", ANARIColorsToViskoresColors(colorArray));
   }
 }
 
