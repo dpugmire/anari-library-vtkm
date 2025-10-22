@@ -4,14 +4,14 @@
 #pragma once
 
 #include "RenderingSemaphore.h"
-#include "vtkm_device_math.h"
+#include "viskores_device_math.h"
 // helium
 #include "helium/BaseGlobalDeviceState.h"
 // std
 #include <atomic>
 #include <mutex>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Frame;
 
@@ -52,14 +52,14 @@ inline VTKmDeviceGlobalState *asVTKmDeviceState(
   return (VTKmDeviceGlobalState *)s;
 }
 
-#define VTKM_ANARI_TYPEFOR_SPECIALIZATION(type, anari_type)                    \
+#define VISKORES_ANARI_TYPEFOR_SPECIALIZATION(type, anari_type)                    \
   namespace anari {                                                            \
   ANARI_TYPEFOR_SPECIALIZATION(type, anari_type);                              \
   }
 
-#define VTKM_ANARI_TYPEFOR_DEFINITION(type)                                    \
+#define VISKORES_ANARI_TYPEFOR_DEFINITION(type)                                    \
   namespace anari {                                                            \
   ANARI_TYPEFOR_DEFINITION(type);                                              \
   }
 
-} // namespace vtkm_device
+} // namespace viskores_device

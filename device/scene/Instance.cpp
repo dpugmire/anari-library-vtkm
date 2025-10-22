@@ -3,7 +3,7 @@
 
 #include "Instance.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 Instance::Instance(VTKmDeviceGlobalState *s) : Object(ANARI_INSTANCE, s) {}
 
@@ -58,6 +58,6 @@ bool Instance::isValid() const
   return m_group;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Instance *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Instance *);

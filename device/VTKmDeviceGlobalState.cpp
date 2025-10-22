@@ -4,7 +4,7 @@
 #include "VTKmDeviceGlobalState.h"
 #include "frame/Frame.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 VTKmDeviceGlobalState::VTKmDeviceGlobalState(ANARIDevice d)
     : helium::BaseGlobalDeviceState(d)
@@ -16,4 +16,4 @@ void VTKmDeviceGlobalState::waitOnCurrentFrame() const
     currentFrame->wait();
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device

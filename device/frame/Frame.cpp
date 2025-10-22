@@ -10,47 +10,47 @@
 
 #include <scene/World.h>
 
-#include <vtkm/cont/ArrayHandleBasic.h>
-#include <vtkm/rendering/Actor.h>
-#include <vtkm/rendering/MapperRayTracer.h>
-#include <vtkm/rendering/MapperVolume.h>
-#include <vtkm/rendering/MapperWireframer.h>
-#include <vtkm/rendering/Scene.h>
-#include <vtkm/rendering/View3D.h>
+#include <viskores/cont/ArrayHandleBasic.h>
+#include <viskores/rendering/Actor.h>
+#include <viskores/rendering/MapperRayTracer.h>
+#include <viskores/rendering/MapperVolume.h>
+#include <viskores/rendering/MapperWireframer.h>
+#include <viskores/rendering/Scene.h>
+#include <viskores/rendering/View3D.h>
 
-#include <vtkm/cont/Invoker.h>
-#include <vtkm/worklet/WorkletMapField.h>
+#include <viskores/cont/Invoker.h>
+#include <viskores/worklet/WorkletMapField.h>
 
-using vtkm::rendering::CanvasRayTracer;
-using vtkm::rendering::MapperRayTracer;
-using vtkm::rendering::MapperVolume;
-using vtkm::rendering::MapperWireframer;
+using viskores::rendering::CanvasRayTracer;
+using viskores::rendering::MapperRayTracer;
+using viskores::rendering::MapperVolume;
+using viskores::rendering::MapperWireframer;
 
-namespace vtkm_device {
+namespace viskores_device {
 
-constexpr float toneMap(vtkm::Float32 v)
+constexpr float toneMap(viskores::Float32 v)
 {
   return std::pow(v, 1.f / 2.2f);
 }
 
-static uint32_t cvt_uint32(const vtkm::Float32 &f)
+static uint32_t cvt_uint32(const viskores::Float32 &f)
 {
   return static_cast<uint32_t>(255.f * std::clamp(f, 0.f, 1.f));
 }
 
-static uint32_t cvt_uint32(const vtkm::Vec4f_32 &v)
+static uint32_t cvt_uint32(const viskores::Vec4f_32 &v)
 {
   return (cvt_uint32(v[0]) << 0) | (cvt_uint32(v[1]) << 8)
       | (cvt_uint32(v[2]) << 16) | (cvt_uint32(v[3]) << 24);
 }
 
-static uint32_t cvt_uint32_srgb(const vtkm::Vec4f_32 &v)
+static uint32_t cvt_uint32_srgb(const viskores::Vec4f_32 &v)
 {
   return cvt_uint32(
-      vtkm::Vec4f_32(toneMap(v[0]), toneMap(v[1]), toneMap(v[2]), v[3]));
+      viskores::Vec4f_32(toneMap(v[0]), toneMap(v[1]), toneMap(v[2]), v[3]));
 }
 
-class ConvertToRGBA : public vtkm::worklet::WorkletMapField
+class ConvertToRGBA : public viskores::worklet::WorkletMapField
 {
  public:
   using ControlSignature = void(FieldIn inputArray, FieldOut outputArray);
@@ -58,14 +58,14 @@ class ConvertToRGBA : public vtkm::worklet::WorkletMapField
   using InputDomain = _1;
 
   template <typename InFieldType, typename OutFieldType>
-  VTKM_EXEC void operator()(
+  VISKORES_EXEC void operator()(
       const InFieldType &inField, OutFieldType &outField) const
   {
     outField = cvt_uint32(inField);
   }
 };
 
-class ConvertToSRGBA : public vtkm::worklet::WorkletMapField
+class ConvertToSRGBA : public viskores::worklet::WorkletMapField
 {
  public:
   using ControlSignature = void(FieldIn inputArray, FieldOut outputArray);
@@ -73,14 +73,14 @@ class ConvertToSRGBA : public vtkm::worklet::WorkletMapField
   using InputDomain = _1;
 
   template <typename InFieldType, typename OutFieldType>
-  VTKM_EXEC void operator()(
+  VISKORES_EXEC void operator()(
       const InFieldType &inField, OutFieldType &outField) const
   {
     outField = cvt_uint32_srgb(inField);
   }
 
 //  private:
-//   vtkm::Float32 Exponent = 1.1f / 2.2f;
+//   viskores::Float32 Exponent = 1.1f / 2.2f;
 };
 
 // Helper functions ///////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ void Frame::commitParameters()
 }
 
 void Frame::finalize() {
-  this->Canvas = vtkm::rendering::CanvasRayTracer(
+  this->Canvas = viskores::rendering::CanvasRayTracer(
       this->m_frameData.size[0], this->m_frameData.size[1]);
 
   const auto numPixels = m_frameData.size[0] * m_frameData.size[1];
@@ -217,8 +217,8 @@ void Frame::renderFrame()
       camera.Print();
 #endif
 
-      vtkm::rendering::Scene surface_scene;
-      vtkm::rendering::Scene volume_scene;
+      viskores::rendering::Scene surface_scene;
+      viskores::rendering::Scene volume_scene;
 
       for (const auto &instance : instances) {
         if (!instance->isValid()) {
@@ -246,8 +246,8 @@ void Frame::renderFrame()
       }
 
       if (surface_scene.GetNumberOfActors() != 0) {
-        vtkm::rendering::View3D surface_view(surface_scene,
-            vtkm::rendering::MapperRayTracer(),
+        viskores::rendering::View3D surface_view(surface_scene,
+            viskores::rendering::MapperRayTracer(),
             this->Canvas,
             camera,
             this->m_renderer->background());
@@ -257,8 +257,8 @@ void Frame::renderFrame()
       }
 
       if (volume_scene.GetNumberOfActors() != 0) {
-        vtkm::rendering::View3D volume_view(volume_scene,
-            vtkm::rendering::MapperVolume(),
+        viskores::rendering::View3D volume_view(volume_scene,
+            viskores::rendering::MapperVolume(),
             this->Canvas,
             camera,
             this->m_renderer->background());
@@ -288,30 +288,30 @@ void *Frame::map(std::string_view channel,
     *pixelType = this->m_colorType;
     if (this->m_colorType == ANARI_FLOAT32_VEC4) {
       // change this to GetReadPointer().
-      vtkm::cont::ArrayHandleBasic<vtkm::Vec4f> basicArray =
+      viskores::cont::ArrayHandleBasic<viskores::Vec4f> basicArray =
           this->Canvas.GetColorBuffer();
       return basicArray.GetWritePointer();
     } else if (this->m_colorType == ANARI_UFIXED8_VEC4) {
       this->m_intFrameBuffer.Allocate(*width * *height);
       ConvertToRGBA worklet;
-      vtkm::cont::Invoker invoker;
+      viskores::cont::Invoker invoker;
       invoker(worklet, this->Canvas.GetColorBuffer(), this->m_intFrameBuffer);
-      vtkm::cont::ArrayHandleBasic<vtkm::UInt32> basicArray =
+      viskores::cont::ArrayHandleBasic<viskores::UInt32> basicArray =
           this->m_intFrameBuffer;
       return basicArray.GetWritePointer();
     } else if (this->m_colorType == ANARI_UFIXED8_RGBA_SRGB) {
       this->m_intFrameBuffer.Allocate(*width * *height);
       ConvertToSRGBA worklet;
-      vtkm::cont::Invoker invoker;
+      viskores::cont::Invoker invoker;
       invoker(worklet, this->Canvas.GetColorBuffer(), this->m_intFrameBuffer);
 
-      vtkm::cont::ArrayHandleBasic<vtkm::UInt32> basicArray =
+      viskores::cont::ArrayHandleBasic<viskores::UInt32> basicArray =
           this->m_intFrameBuffer;
       return basicArray.GetWritePointer();
     }
   } else if (channel == "channel.depth") {
     *pixelType = ANARI_FLOAT32;
-    vtkm::cont::ArrayHandleBasic<vtkm::Float32> basicArray =
+    viskores::cont::ArrayHandleBasic<viskores::Float32> basicArray =
         this->Canvas.GetDepthBuffer();
     return (void *)basicArray.GetWritePointer();
   } else if (channel == "channel.primitiveId" && !m_primIdBuffer.empty()) {
@@ -398,6 +398,6 @@ void Frame::writeSample(int x, int y, const PixelSample &s)
     m_instIdBuffer[idx] = s.instId;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Frame *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Frame *);

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "StructuredRegularField.h"
-// VTK-m
-#include <vtkm/cont/ArrayCopy.h>
-#include <vtkm/cont/DataSetBuilderUniform.h>
+// Viskores
+#include <viskores/cont/ArrayCopy.h>
+#include <viskores/cont/DataSetBuilderUniform.h>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 StructuredRegularField::StructuredRegularField(VTKmDeviceGlobalState *d)
     : SpatialField(d), m_dataArray(this)
@@ -23,21 +23,21 @@ void StructuredRegularField::commitParameters()
   float3 spacing = getParam("spacing", float3{ 1, 1, 1 });
   uint3 dimensions = this->m_dataArray->size();
 
-  this->m_dataSet = vtkm::cont::DataSetBuilderUniform::Create(
-      vtkm::Id3{ dimensions[0], dimensions[1], dimensions[2] },
-      vtkm::Vec3f{ origin[0], origin[1], origin[2] },
-      vtkm::Vec3f{ spacing[0], spacing[1], spacing[2] });
+  this->m_dataSet = viskores::cont::DataSetBuilderUniform::Create(
+      viskores::Id3{ dimensions[0], dimensions[1], dimensions[2] },
+      viskores::Vec3f{ origin[0], origin[1], origin[2] },
+      viskores::Vec3f{ spacing[0], spacing[1], spacing[2] });
 }
 
 void StructuredRegularField::finalize()
 {
-  // VTK-m volume render only supports float fields in volume rendering. Convert
+  // Viskores volume render only supports float fields in volume rendering. Convert
   // if necessary.
-  vtkm::cont::UnknownArrayHandle vtkmArray = this->m_dataArray->dataAsVTKmArray();
-  if (!vtkmArray.IsValueType<vtkm::Float32>() && !vtkmArray.IsValueType<vtkm::Float64>())
+  viskores::cont::UnknownArrayHandle vtkmArray = this->m_dataArray->dataAsVTKmArray();
+  if (!vtkmArray.IsValueType<viskores::Float32>() && !vtkmArray.IsValueType<viskores::Float64>())
   {
-    vtkm::cont::ArrayHandle<vtkm::FloatDefault> castArray;
-    vtkm::cont::ArrayCopy(vtkmArray, castArray);
+    viskores::cont::ArrayHandle<viskores::FloatDefault> castArray;
+    viskores::cont::ArrayCopy(vtkmArray, castArray);
     vtkmArray = castArray;
   }
   this->m_dataSet.AddPointField("data", vtkmArray);
@@ -45,4 +45,4 @@ void StructuredRegularField::finalize()
   this->m_dataSet.PrintSummary(std::cout);
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device

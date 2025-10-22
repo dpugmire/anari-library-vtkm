@@ -10,9 +10,9 @@
 #include "frame/Frame.h"
 #include "scene/volume/spatial_field/SpatialField.h"
 
-#include "anari_library_vtkm_queries.h"
+#include "anari_library_viskores_queries.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions ///////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ ANARIWorld VTKmDevice::newWorld()
 
 const char **VTKmDevice::getObjectSubtypes(ANARIDataType objectType)
 {
-  return vtkm_device::query_object_types(objectType);
+  return viskores_device::query_object_types(objectType);
 }
 
 const void *VTKmDevice::getObjectInfo(ANARIDataType objectType,
@@ -212,7 +212,7 @@ const void *VTKmDevice::getObjectInfo(ANARIDataType objectType,
     const char *infoName,
     ANARIDataType infoType)
 {
-  return vtkm_device::query_object_info(
+  return viskores_device::query_object_info(
       objectType, objectSubtype, infoName, infoType);
 }
 
@@ -223,7 +223,7 @@ const void *VTKmDevice::getParameterInfo(ANARIDataType objectType,
     const char *infoName,
     ANARIDataType infoType)
 {
-  return vtkm_device::query_param_info(objectType,
+  return viskores_device::query_param_info(objectType,
       objectSubtype,
       parameterName,
       parameterType,
@@ -265,7 +265,7 @@ VTKmDevice::VTKmDevice(ANARILibrary l) : helium::BaseDevice(l)
 
 VTKmDevice::~VTKmDevice()
 {
-  reportMessage(ANARI_SEVERITY_DEBUG, "destroying VTKm device (%p)", this);
+  reportMessage(ANARI_SEVERITY_DEBUG, "destroying Viskores device (%p)", this);
 
   auto &state = *deviceState();
   state.commitBuffer.clear();
@@ -276,7 +276,7 @@ void VTKmDevice::initDevice()
   if (m_initialized)
     return;
 
-  reportMessage(ANARI_SEVERITY_DEBUG, "initializing VTKm device (%p)", this);
+  reportMessage(ANARI_SEVERITY_DEBUG, "initializing Viskores device (%p)", this);
 
   m_initialized = true;
 }
@@ -293,7 +293,7 @@ int VTKmDevice::deviceGetProperty(
   if (prop == "extension" && type == ANARI_STRING_LIST) {
     helium::writeToVoidP(mem, query_extensions());
     return 1;
-  } else if (prop == "vtkm" && type == ANARI_BOOL) {
+  } else if (prop == "viskores" && type == ANARI_BOOL) {
     helium::writeToVoidP(mem, true);
     return 1;
   }
@@ -305,4 +305,4 @@ VTKmDeviceGlobalState *VTKmDevice::deviceState() const
   return (VTKmDeviceGlobalState *)helium::BaseDevice::m_state.get();
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device

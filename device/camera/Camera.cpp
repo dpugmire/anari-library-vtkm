@@ -6,7 +6,7 @@
 #include "Orthographic.h"
 #include "Perspective.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 Camera::Camera(VTKmDeviceGlobalState *s) : Object(ANARI_CAMERA, s) {}
 
@@ -24,11 +24,11 @@ Camera *Camera::createInstance(std::string_view type, VTKmDeviceGlobalState *s)
 
 void Camera::commitParameters()
 {
-  this->m_position = getParam<vtkm::Vec3f_32>("position", {0.f, 0.f, 0.f});
+  this->m_position = getParam<viskores::Vec3f_32>("position", {0.f, 0.f, 0.f});
   this->m_direction =
-      vtkm::Normal(getParam<vtkm::Vec3f_32>("direction", {0.f, 0.f, -1.f}));
-  this->m_up = vtkm::Normal(getParam<vtkm::Vec3f_32>("up", {0.f, 1.f, 0.f}));
-  this->m_imageRegion = vtkm::Vec4f_32(0.f, 0.f, 1.f, 1.f);
+      viskores::Normal(getParam<viskores::Vec3f_32>("direction", {0.f, 0.f, -1.f}));
+  this->m_up = viskores::Normal(getParam<viskores::Vec3f_32>("up", {0.f, 1.f, 0.f}));
+  this->m_imageRegion = viskores::Vec4f_32(0.f, 0.f, 1.f, 1.f);
   getParam("imageRegion", ANARI_FLOAT32_BOX2, &this->m_imageRegion);
 
 #if 0
@@ -47,7 +47,7 @@ void Camera::finalize()
 
 UnknownCamera::UnknownCamera(VTKmDeviceGlobalState *s) : Camera(s) {};
 
-vtkm::rendering::Camera UnknownCamera::camera(const vtkm::Bounds &) const
+viskores::rendering::Camera UnknownCamera::camera(const viskores::Bounds &) const
 {
   return {};
 }
@@ -57,6 +57,6 @@ bool UnknownCamera::isValid() const
   return false;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Camera *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Camera *);

@@ -8,12 +8,12 @@
 #include "spatial_field/SpatialField.h"
 // helium
 #include <helium/utility/ChangeObserverPtr.h>
-// VTK-m
-#include <vtkm/Range.h>
-#include <vtkm/cont/ColorTable.h>
-#include <vtkm/rendering/MapperVolume.h>
+// Viskores
+#include <viskores/Range.h>
+#include <viskores/cont/ColorTable.h>
+#include <viskores/rendering/MapperVolume.h>
 
-namespace vtkm_device
+namespace viskores_device
 {
 
 struct TransferFunction1D : public Volume
@@ -24,23 +24,23 @@ struct TransferFunction1D : public Volume
   void finalize() override;
 
   const SpatialField *spatialField() const;
-  vtkm::Bounds bounds() const override;
-  vtkm::rendering::Actor *actor() const override;
-  vtkm::rendering::MapperVolume *mapper() const override;
+  viskores::Bounds bounds() const override;
+  viskores::rendering::Actor *actor() const override;
+  viskores::rendering::MapperVolume *mapper() const override;
 
   bool isValid() const override;
 
  private:
   helium::ChangeObserverPtr<SpatialField> m_spatialField;
-  vtkm::Range m_valueRange;
+  viskores::Range m_valueRange;
   helium::ChangeObserverPtr<Array1D> m_colorArray;
   helium::ChangeObserverPtr<Array1D> m_opacityArray;
   float4 m_color;
-  vtkm::Float32 m_unitDistance;
-  vtkm::cont::ColorTable m_colorTable;
+  viskores::Float32 m_unitDistance;
+  viskores::cont::ColorTable m_colorTable;
 
-  std::shared_ptr<vtkm::rendering::Actor> m_actor;
-  std::shared_ptr<vtkm::rendering::MapperVolume> m_mapper;
+  std::shared_ptr<viskores::rendering::Actor> m_actor;
+  std::shared_ptr<viskores::rendering::MapperVolume> m_mapper;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device

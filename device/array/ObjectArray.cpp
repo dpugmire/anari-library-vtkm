@@ -4,7 +4,7 @@
 #include "array/ObjectArray.h"
 #include "../VTKmDeviceGlobalState.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 ObjectArray::ObjectArray(
     VTKmDeviceGlobalState *state, const Array1DMemoryDescriptor &d)
@@ -18,6 +18,6 @@ ObjectArray::~ObjectArray()
   asVTKmDeviceState(deviceState())->objectCounts.arrays--;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::ObjectArray *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::ObjectArray *);

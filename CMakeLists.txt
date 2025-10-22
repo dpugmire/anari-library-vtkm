@@ -25,7 +25,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 ## Establish project ##
 
-project(anari_library_vtkm LANGUAGES C CXX)
+project(anari_library_viskores LANGUAGES C CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
@@ -36,7 +36,7 @@ include(GNUInstallDirs)
 ## Dependencies ##
 
 find_package(anari 0.14.0 REQUIRED)
-find_package(VTKm 2.3 REQUIRED)
+find_package(Viskores REQUIRED)
 
 ## Build Targets ##
 

@@ -8,7 +8,7 @@
 // helium
 #include "helium/array/ObjectArray.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct ObjectArray : public helium::ObjectArray
 {
@@ -16,6 +16,6 @@ struct ObjectArray : public helium::ObjectArray
   ~ObjectArray() override;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::ObjectArray *, ANARI_ARRAY1D);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::ObjectArray *, ANARI_ARRAY1D);

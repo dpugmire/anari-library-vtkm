@@ -3,7 +3,7 @@
 
 #include "Object.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 // Object definitions /////////////////////////////////////////////////////////
 
@@ -69,6 +69,6 @@ bool UnknownObject::isValid() const
   return false;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Object *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Object *);

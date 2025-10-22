@@ -5,7 +5,7 @@
 // Subtypes
 #include "StructuredRegularField.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 SpatialField::SpatialField(VTKmDeviceGlobalState *s)
     : Object(ANARI_SPATIAL_FIELD, s)
@@ -41,6 +41,6 @@ bool UnknownSpatialField::isValid() const
   return false;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::SpatialField *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::SpatialField *);

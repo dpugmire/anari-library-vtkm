@@ -3,7 +3,7 @@
 
 #include "Material.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 Material::Material(VTKmDeviceGlobalState *s) : Object(ANARI_MATERIAL, s) {}
 
@@ -30,6 +30,6 @@ Material *Material::createInstance(
 #endif
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Material *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Material *);

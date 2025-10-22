@@ -4,14 +4,14 @@
 #pragma once
 
 #include "VTKmDeviceGlobalState.h"
-#include "vtkm_device_math.h"
+#include "viskores_device_math.h"
 // helium
 #include <helium/BaseObject.h>
 #include <helium/utility/ChangeObserverPtr.h>
 // std
 #include <string_view>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Object : public helium::BaseObject
 {
@@ -39,6 +39,6 @@ struct UnknownObject : public Object
   bool isValid() const override;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Object *, ANARI_OBJECT);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Object *, ANARI_OBJECT);

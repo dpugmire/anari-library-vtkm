@@ -7,7 +7,7 @@
 
 #include "array/ArrayConversion.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 Geometry::Geometry(VTKmDeviceGlobalState *s) : Object(ANARI_GEOMETRY, s) {}
 
@@ -34,9 +34,9 @@ void Geometry::AddAttributeInformation()
   }
 
   if (this->hasParam("vertex.color")) {
-    vtkm::cont::UnknownArrayHandle colorArray =
+    viskores::cont::UnknownArrayHandle colorArray =
         this->getParamObject<Array1D>("vertex.color")->dataAsVTKmArray();
-    // Colors can be either float or a fixed integer type. VTK-m only supports
+    // Colors can be either float or a fixed integer type. Viskores only supports
     // float colors. If we get integer colors, convert them here.
     this->m_dataSet.AddPointField("color", ANARIColorsToVTKmColors(colorArray));
   }
@@ -59,6 +59,6 @@ bool UnknownGeometry::isValid() const
   return false;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Geometry *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Geometry *);

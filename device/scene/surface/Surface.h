@@ -5,10 +5,10 @@
 
 #include "geometry/Geometry.h"
 #include "material/Material.h"
-// VTK-m
-#include <vtkm/Bounds.h>
+// Viskores
+#include <viskores/Bounds.h>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Surface : public Object
 {
@@ -22,7 +22,7 @@ struct Surface : public Object
   const Geometry *geometry() const;
   const Material *material() const;
 
-  vtkm::Bounds bounds() const;
+  viskores::Bounds bounds() const;
 
   bool isValid() const override;
 
@@ -32,6 +32,6 @@ struct Surface : public Object
   helium::IntrusivePtr<Material> m_material;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Surface *, ANARI_SURFACE);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Surface *, ANARI_SURFACE);

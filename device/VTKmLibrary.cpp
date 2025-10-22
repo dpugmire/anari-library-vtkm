@@ -3,9 +3,9 @@
 
 #include "VTKmDevice.h"
 #include "anari/backend/LibraryImpl.h"
-#include "anari_library_vtkm_export.h"
+#include "anari_library_viskores_export.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct VTKmLibrary : public anari::LibraryImpl
 {
@@ -33,12 +33,12 @@ const char **VTKmLibrary::getDeviceExtensions(const char * /*deviceType*/)
   return nullptr;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
 // Define library entrypoint //////////////////////////////////////////////////
 
-extern "C" VTKM_LIBRARY_INTERFACE ANARI_DEFINE_LIBRARY_ENTRYPOINT(
-    vtkm, handle, scb, scbPtr)
+extern "C" VISKORES_LIBRARY_INTERFACE ANARI_DEFINE_LIBRARY_ENTRYPOINT(
+    viskores, handle, scb, scbPtr)
 {
-  return (ANARILibrary) new vtkm_device::VTKmLibrary(handle, scb, scbPtr);
+  return (ANARILibrary) new viskores_device::VTKmLibrary(handle, scb, scbPtr);
 }

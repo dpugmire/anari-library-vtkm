@@ -5,7 +5,7 @@
 #include "surface/Surface.h"
 #include "volume/Volume.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 World::World(VTKmDeviceGlobalState *s)
     : Object(ANARI_WORLD, s),
@@ -28,8 +28,8 @@ bool World::getProperty(
     const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
 {
   if (name == "bounds" && type == ANARI_FLOAT32_BOX3) {
-    vtkm::Vec3f_32 anariBounds[] = {vtkm::Vec3f_32(this->m_bounds.MinCorner()),
-        vtkm::Vec3f_32(this->m_bounds.MaxCorner())};
+    viskores::Vec3f_32 anariBounds[] = {viskores::Vec3f_32(this->m_bounds.MinCorner()),
+        viskores::Vec3f_32(this->m_bounds.MaxCorner())};
     std::memcpy(ptr, &anariBounds, sizeof(anariBounds));
     return true;
   }
@@ -44,12 +44,12 @@ void World::commitParameters()
   m_addZeroInstance = m_zeroSurfaceData || m_zeroVolumeData;
   if (m_addZeroInstance) {
     reportMessage(
-        ANARI_SEVERITY_DEBUG, "vtkm_device::World will add zero instance");
+        ANARI_SEVERITY_DEBUG, "viskores_device::World will add zero instance");
   }
 
   if (m_zeroSurfaceData) {
     reportMessage(ANARI_SEVERITY_DEBUG,
-        "vtkm_device::World found %zu surfaces in zero instance",
+        "viskores_device::World found %zu surfaces in zero instance",
         m_zeroSurfaceData->size());
     m_zeroGroup->setParamDirect("surface", getParamDirect("surface"));
   } else {
@@ -58,7 +58,7 @@ void World::commitParameters()
 
   if (m_zeroVolumeData) {
     reportMessage(ANARI_SEVERITY_DEBUG,
-        "vtkm_device::World found %zu volumes in zero instance",
+        "viskores_device::World found %zu volumes in zero instance",
         m_zeroVolumeData->size());
     m_zeroGroup->setParamDirect("volume", getParamDirect("volume"));
   } else
@@ -94,7 +94,7 @@ void World::finalize()
   if (m_zeroSurfaceData)
     m_zeroSurfaceData->addChangeObserver(this);
 
-  this->m_bounds = vtkm::Bounds{};
+  this->m_bounds = viskores::Bounds{};
   for (auto &&instance : this->instances()) {
     for (auto &&surface : instance->group()->surfaces()) {
       this->m_bounds.Include(surface->bounds());
@@ -110,6 +110,6 @@ const std::vector<Instance *> &World::instances() const
   return m_instances;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::World *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::World *);

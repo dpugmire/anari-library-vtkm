@@ -5,7 +5,7 @@
 
 #include "Group.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Instance : public Object
 {
@@ -33,6 +33,6 @@ struct Instance : public Object
   helium::IntrusivePtr<Group> m_group;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Instance *, ANARI_INSTANCE);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Instance *, ANARI_INSTANCE);

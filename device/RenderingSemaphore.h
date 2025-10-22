@@ -6,7 +6,7 @@
 #include <condition_variable>
 #include <mutex>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct RenderingSemaphore
 {
@@ -56,4 +56,4 @@ inline void RenderingSemaphore::frameEnd()
   m_conditionFrame.notify_all();
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device

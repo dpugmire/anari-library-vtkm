@@ -5,10 +5,10 @@
 
 #include "Geometry.h"
 #include "array/Array1D.h"
-// vtkm
-#include <vtkm/rendering/Actor.h>
+// viskores
+#include <viskores/rendering/Actor.h>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Triangle : Geometry
 {
@@ -17,8 +17,8 @@ struct Triangle : Geometry
   void commitParameters() override;
   void finalize() override;
 
-  virtual vtkm::rendering::Actor *actor() const override {return this->m_actor.get();}
-  virtual vtkm::rendering::MapperRayTracer *mapper() const override {return this->m_mapper.get();}
+  virtual viskores::rendering::Actor *actor() const override {return this->m_actor.get();}
+  virtual viskores::rendering::MapperRayTracer *mapper() const override {return this->m_mapper.get();}
 
   bool isValid() const override;
 
@@ -27,11 +27,11 @@ struct Triangle : Geometry
   helium::ChangeObserverPtr<Array1D> m_vertexPosition;
   // TODO: Add other attributes to observe changes.
 
-  std::shared_ptr<vtkm::rendering::Actor> m_actor;
-  std::shared_ptr<vtkm::rendering::MapperRayTracer> m_mapper;
+  std::shared_ptr<viskores::rendering::Actor> m_actor;
+  std::shared_ptr<viskores::rendering::MapperRayTracer> m_mapper;
 
-  vtkm::cont::ColorTable m_colorTable;
+  viskores::cont::ColorTable m_colorTable;
   helium::ChangeObserverPtr<Array1D> m_vertexColor;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device

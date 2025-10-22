@@ -6,10 +6,10 @@
 #include "../VTKmDeviceGlobalState.h"
 // helium
 #include "helium/array/Array1D.h"
-// VTK-m
-#include <vtkm/cont/UnknownArrayHandle.h>
+// Viskores
+#include <viskores/cont/UnknownArrayHandle.h>
 
-namespace vtkm_device {
+namespace viskores_device {
 
 using Array1DMemoryDescriptor = helium::Array1DMemoryDescriptor;
 
@@ -20,17 +20,17 @@ struct Array1D : public helium::Array1D
 
   void unmap() override;
 
-  /// @brief Return the data for this array wrapped into a VTK-m array handle.
+  /// @brief Return the data for this array wrapped into a Viskores array handle.
   ///
-  /// Note: Do not change the contents of the VTK-m array handle. Although the
-  /// data are in a VTK-m array, it is still managed by ANARI, and changing the
+  /// Note: Do not change the contents of the Viskores array handle. Although the
+  /// data are in a Viskores array, it is still managed by ANARI, and changing the
   /// data outside of a map/unmap is forbidden.
-  vtkm::cont::UnknownArrayHandle dataAsVTKmArray() const;
+  viskores::cont::UnknownArrayHandle dataAsVTKmArray() const;
 
  private:
-  vtkm::cont::UnknownArrayHandle m_VTKmArray;
+  viskores::cont::UnknownArrayHandle m_VTKmArray;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Array1D *, ANARI_ARRAY1D);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Array1D *, ANARI_ARRAY1D);

@@ -10,7 +10,7 @@
 
 #include "Object.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct VTKmDevice : public helium::BaseDevice
 {
@@ -100,4 +100,4 @@ struct VTKmDevice : public helium::BaseDevice
   bool m_initialized{false};
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device

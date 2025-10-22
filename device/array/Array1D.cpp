@@ -4,7 +4,7 @@
 #include "Array1D.h"
 #include "ArrayConversion.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 Array1D::Array1D(VTKmDeviceGlobalState *state, const Array1DMemoryDescriptor &d)
     : helium::Array1D(state, d)
@@ -20,21 +20,21 @@ Array1D::~Array1D()
 void Array1D::unmap()
 {
   this->helium::Array1D::unmap();
-  // Invalidate VTK-m ArrayHandle
+  // Invalidate Viskores ArrayHandle
   this->m_VTKmArray.ReleaseResources();
 }
 
-vtkm::cont::UnknownArrayHandle Array1D::dataAsVTKmArray() const
+viskores::cont::UnknownArrayHandle Array1D::dataAsVTKmArray() const
 {
   if (!this->m_VTKmArray.IsValid())
   {
-    // Pull data from ANARI into VTK-m.
+    // Pull data from ANARI into Viskores.
     const_cast<Array1D *>(this)->m_VTKmArray = ANARIArrayToVTKmArray(this);
   }
 
   return this->m_VTKmArray;
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Array1D *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Array1D *);

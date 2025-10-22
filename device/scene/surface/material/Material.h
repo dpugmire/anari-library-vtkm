@@ -6,7 +6,7 @@
 #include "Object.h"
 #include "sampler/Sampler.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Material : public Object
 {
@@ -18,6 +18,6 @@ struct Material : public Object
       std::string_view subtype, VTKmDeviceGlobalState *s);
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Material *, ANARI_MATERIAL);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Material *, ANARI_MATERIAL);

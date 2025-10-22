@@ -7,7 +7,7 @@
 #include "scene/World.h"
 #include "../VTKmTypes.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct PixelSample
 {
@@ -34,6 +34,6 @@ struct Renderer : public Object
   float4 m_bgColor{0.f, 0.f, 0.f, 1.f};
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Renderer *, ANARI_RENDERER);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Renderer *, ANARI_RENDERER);

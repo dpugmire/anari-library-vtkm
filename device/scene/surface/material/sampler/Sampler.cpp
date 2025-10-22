@@ -3,7 +3,7 @@
 
 #include "Sampler.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 Sampler::Sampler(VTKmDeviceGlobalState *s) : Object(ANARI_SAMPLER, s) {}
 
@@ -15,6 +15,6 @@ Sampler *Sampler::createInstance(
   return (Sampler *)new UnknownObject(ANARI_SAMPLER, s);
 }
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_DEFINITION(vtkm_device::Sampler *);
+VISKORES_ANARI_TYPEFOR_DEFINITION(viskores_device::Sampler *);

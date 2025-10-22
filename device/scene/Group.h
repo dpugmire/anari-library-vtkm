@@ -8,7 +8,7 @@
 #include "surface/Surface.h"
 #include "volume/Volume.h"
 
-namespace vtkm_device {
+namespace viskores_device {
 
 struct Group : public Object
 {
@@ -34,6 +34,6 @@ struct Group : public Object
   std::vector<Volume *> m_volumes;
 };
 
-} // namespace vtkm_device
+} // namespace viskores_device
 
-VTKM_ANARI_TYPEFOR_SPECIALIZATION(vtkm_device::Group *, ANARI_GROUP);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Group *, ANARI_GROUP);
