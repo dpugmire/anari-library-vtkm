@@ -13,7 +13,7 @@ namespace viskores_device
 
 struct StructuredRegularField : public SpatialField
 {
-  StructuredRegularField(VTKmDeviceGlobalState *d);
+  StructuredRegularField(ViskoresDeviceGlobalState *d);
 
   void commitParameters() override;
   void finalize() override;

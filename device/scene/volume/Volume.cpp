@@ -6,12 +6,12 @@
 
 namespace viskores_device {
 
-Volume::Volume(VTKmDeviceGlobalState *s) : Object(ANARI_VOLUME, s) {}
+Volume::Volume(ViskoresDeviceGlobalState *s) : Object(ANARI_VOLUME, s) {}
 
 Volume::~Volume() = default;
 
 Volume *Volume::createInstance(
-    std::string_view subtype, VTKmDeviceGlobalState *s)
+    std::string_view subtype, ViskoresDeviceGlobalState *s)
 {
   if (subtype == "transferFunction1D")
     return new TransferFunction1D(s);
@@ -29,7 +29,7 @@ void Volume::finalize()
   // no-op
 }
 
-UnknownVolume::UnknownVolume(VTKmDeviceGlobalState *d) : Volume(d) {}
+UnknownVolume::UnknownVolume(ViskoresDeviceGlobalState *d) : Volume(d) {}
 
 viskores::Bounds UnknownVolume::bounds() const
 {

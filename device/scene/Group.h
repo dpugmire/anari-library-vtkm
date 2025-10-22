@@ -12,7 +12,7 @@ namespace viskores_device {
 
 struct Group : public Object
 {
-  Group(VTKmDeviceGlobalState *s);
+  Group(ViskoresDeviceGlobalState *s);
   ~Group() override;
 
   bool getProperty(const std::string_view &name,

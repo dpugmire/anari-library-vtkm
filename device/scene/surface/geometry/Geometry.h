@@ -13,10 +13,10 @@ namespace viskores_device {
 
 struct Geometry : public Object
 {
-  Geometry(VTKmDeviceGlobalState *s);
+  Geometry(ViskoresDeviceGlobalState *s);
   ~Geometry() override;
   static Geometry *createInstance(
-      std::string_view subtype, VTKmDeviceGlobalState *s);
+      std::string_view subtype, ViskoresDeviceGlobalState *s);
 
   virtual viskores::rendering::Actor *actor() const {return nullptr; } // = 0;
   const viskores::cont::DataSet &getDataSet() const { return this->m_dataSet; }
@@ -41,7 +41,7 @@ struct Geometry : public Object
 
 struct UnknownGeometry : public Geometry
 {
-  UnknownGeometry(VTKmDeviceGlobalState *s);
+  UnknownGeometry(ViskoresDeviceGlobalState *s);
   void commitParameters() override;
   void finalize() override;
   bool isValid() const override;

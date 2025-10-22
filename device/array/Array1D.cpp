@@ -6,7 +6,7 @@
 
 namespace viskores_device {
 
-Array1D::Array1D(VTKmDeviceGlobalState *state, const Array1DMemoryDescriptor &d)
+Array1D::Array1D(ViskoresDeviceGlobalState *state, const Array1DMemoryDescriptor &d)
     : helium::Array1D(state, d)
 {
   state->objectCounts.arrays++;
@@ -14,7 +14,7 @@ Array1D::Array1D(VTKmDeviceGlobalState *state, const Array1DMemoryDescriptor &d)
 
 Array1D::~Array1D()
 {
-  asVTKmDeviceState(deviceState())->objectCounts.arrays--;
+  asViskoresDeviceState(deviceState())->objectCounts.arrays--;
 }
 
 void Array1D::unmap()

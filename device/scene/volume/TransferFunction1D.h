@@ -18,7 +18,7 @@ namespace viskores_device
 
 struct TransferFunction1D : public Volume
 {
-  TransferFunction1D(VTKmDeviceGlobalState *d);
+  TransferFunction1D(ViskoresDeviceGlobalState *d);
 
   void commitParameters() override;
   void finalize() override;

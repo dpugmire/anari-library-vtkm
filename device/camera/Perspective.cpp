@@ -5,7 +5,7 @@
 
 namespace viskores_device {
 
-Perspective::Perspective(VTKmDeviceGlobalState *s) : Camera(s) {}
+Perspective::Perspective(ViskoresDeviceGlobalState *s) : Camera(s) {}
 
 void Perspective::commitParameters()
 {

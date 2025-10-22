@@ -1,16 +1,16 @@
 // Copyright 2023 The Khronos Group
 // SPDX-License-Identifier: Apache-2.0
 
-#include "VTKmDeviceGlobalState.h"
+#include "ViskoresDeviceGlobalState.h"
 #include "frame/Frame.h"
 
 namespace viskores_device {
 
-VTKmDeviceGlobalState::VTKmDeviceGlobalState(ANARIDevice d)
+ViskoresDeviceGlobalState::ViskoresDeviceGlobalState(ANARIDevice d)
     : helium::BaseGlobalDeviceState(d)
 {}
 
-void VTKmDeviceGlobalState::waitOnCurrentFrame() const
+void ViskoresDeviceGlobalState::waitOnCurrentFrame() const
 {
   if (currentFrame)
     currentFrame->wait();

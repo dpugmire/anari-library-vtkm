@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "../VTKmTypes.h"
+#include "../ViskoresTypes.h"
 #include "../Object.h"
 #include <viskores/interop/anari/ViskoresANARITypes.h>
 
@@ -13,11 +13,11 @@ namespace viskores_device {
 
 struct Camera : public Object
 {
-  Camera(VTKmDeviceGlobalState *s);
+  Camera(ViskoresDeviceGlobalState *s);
   ~Camera() override;
 
   static Camera *createInstance(
-      std::string_view type, VTKmDeviceGlobalState *state);
+      std::string_view type, ViskoresDeviceGlobalState *state);
 
   virtual void commitParameters() override;
   virtual void finalize() override;
@@ -41,7 +41,7 @@ struct Camera : public Object
 
 struct UnknownCamera : public Camera
 {
-  UnknownCamera(VTKmDeviceGlobalState *s);
+  UnknownCamera(ViskoresDeviceGlobalState *s);
 
   viskores::rendering::Camera camera(const viskores::Bounds &) const override;
 

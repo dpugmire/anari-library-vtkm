@@ -5,7 +5,7 @@
 
 namespace viskores_device {
 
-Surface::Surface(VTKmDeviceGlobalState *s) : Object(ANARI_SURFACE, s) {}
+Surface::Surface(ViskoresDeviceGlobalState *s) : Object(ANARI_SURFACE, s) {}
 
 Surface::~Surface() = default;
 

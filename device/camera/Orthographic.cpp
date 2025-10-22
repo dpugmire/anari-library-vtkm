@@ -5,7 +5,7 @@
 
 namespace viskores_device {
 
-Orthographic::Orthographic(VTKmDeviceGlobalState *s) : Camera(s) {}
+Orthographic::Orthographic(ViskoresDeviceGlobalState *s) : Camera(s) {}
 
 void Orthographic::commitParameters()
 {

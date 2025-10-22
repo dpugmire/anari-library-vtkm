@@ -7,7 +7,7 @@
 
 namespace viskores_device {
 
-Group::Group(VTKmDeviceGlobalState *s)
+Group::Group(ViskoresDeviceGlobalState *s)
     : Object(ANARI_GROUP, s), m_surfaceData(this), m_volumeData(this)
 {}
 

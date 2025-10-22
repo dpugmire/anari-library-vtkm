@@ -103,7 +103,7 @@ static bool is_ready(const std::future<R> &f)
 
 // Frame definitions //////////////////////////////////////////////////////////
 
-Frame::Frame(VTKmDeviceGlobalState *s) : helium::BaseFrame(s) {}
+Frame::Frame(ViskoresDeviceGlobalState *s) : helium::BaseFrame(s) {}
 
 Frame::~Frame()
 {
@@ -116,9 +116,9 @@ bool Frame::isValid() const
   return m_valid;
 }
 
-VTKmDeviceGlobalState *Frame::deviceState() const
+ViskoresDeviceGlobalState *Frame::deviceState() const
 {
-  return (VTKmDeviceGlobalState *)helium::BaseObject::m_state;
+  return (ViskoresDeviceGlobalState *)helium::BaseObject::m_state;
 }
 
 void Frame::commitParameters()

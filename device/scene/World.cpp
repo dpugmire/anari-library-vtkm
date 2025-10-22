@@ -7,7 +7,7 @@
 
 namespace viskores_device {
 
-World::World(VTKmDeviceGlobalState *s)
+World::World(ViskoresDeviceGlobalState *s)
     : Object(ANARI_WORLD, s),
       m_zeroSurfaceData(this),
       m_zeroVolumeData(this),

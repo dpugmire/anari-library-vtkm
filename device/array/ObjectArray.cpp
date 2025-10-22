@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "array/ObjectArray.h"
-#include "../VTKmDeviceGlobalState.h"
+#include "../ViskoresDeviceGlobalState.h"
 
 namespace viskores_device {
 
 ObjectArray::ObjectArray(
-    VTKmDeviceGlobalState *state, const Array1DMemoryDescriptor &d)
+    ViskoresDeviceGlobalState *state, const Array1DMemoryDescriptor &d)
     : helium::ObjectArray(state, d)
 {
   state->objectCounts.arrays++;
@@ -15,7 +15,7 @@ ObjectArray::ObjectArray(
 
 ObjectArray::~ObjectArray()
 {
-  asVTKmDeviceState(deviceState())->objectCounts.arrays--;
+  asViskoresDeviceState(deviceState())->objectCounts.arrays--;
 }
 
 } // namespace viskores_device

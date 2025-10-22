@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Object.h"
-#include "VTKmTypes.h"
+#include "ViskoresTypes.h"
 // Viskores
 #include <viskores/Bounds.h>
 #include <viskores/cont/DataSet.h>
@@ -15,10 +15,10 @@ namespace viskores_device {
 
 struct Volume : public Object
 {
-  Volume(VTKmDeviceGlobalState *d);
+  Volume(ViskoresDeviceGlobalState *d);
   virtual ~Volume();
   static Volume *createInstance(
-      std::string_view subtype, VTKmDeviceGlobalState *d);
+      std::string_view subtype, ViskoresDeviceGlobalState *d);
 
   void commitParameters() override;
   void finalize() override;
@@ -35,7 +35,7 @@ struct Volume : public Object
 
 struct UnknownVolume : public Volume
 {
-  UnknownVolume(VTKmDeviceGlobalState *d);
+  UnknownVolume(ViskoresDeviceGlobalState *d);
 
   viskores::Bounds bounds() const override;
   viskores::rendering::Actor *actor() const override;

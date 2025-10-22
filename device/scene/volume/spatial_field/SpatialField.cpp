@@ -7,14 +7,14 @@
 
 namespace viskores_device {
 
-SpatialField::SpatialField(VTKmDeviceGlobalState *s)
+SpatialField::SpatialField(ViskoresDeviceGlobalState *s)
     : Object(ANARI_SPATIAL_FIELD, s)
 {}
 
 SpatialField::~SpatialField() = default;
 
 SpatialField *SpatialField::createInstance(
-    std::string_view subtype, VTKmDeviceGlobalState *s)
+    std::string_view subtype, ViskoresDeviceGlobalState *s)
 {
   if (subtype == "structuredRegular") {
     return new StructuredRegularField(s);
@@ -23,7 +23,7 @@ SpatialField *SpatialField::createInstance(
   }
 }
 
-UnknownSpatialField::UnknownSpatialField(VTKmDeviceGlobalState *d)
+UnknownSpatialField::UnknownSpatialField(ViskoresDeviceGlobalState *d)
     : SpatialField(d)
 {}
 

@@ -9,7 +9,7 @@ namespace viskores_device {
 
 struct Instance : public Object
 {
-  Instance(VTKmDeviceGlobalState *s);
+  Instance(ViskoresDeviceGlobalState *s);
   ~Instance() override;
 
   void commitParameters() override;

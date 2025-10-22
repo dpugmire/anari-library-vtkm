@@ -11,7 +11,7 @@
 // std
 #include <future>
 #include <vector>
-#include "../VTKmTypes.h"
+#include "../ViskoresTypes.h"
 
 #include <viskores/rendering/CanvasRayTracer.h>
 
@@ -19,12 +19,12 @@ namespace viskores_device {
 
 struct Frame : public helium::BaseFrame
 {
-  Frame(VTKmDeviceGlobalState *s);
+  Frame(ViskoresDeviceGlobalState *s);
   ~Frame();
 
   bool isValid() const override;
 
-  VTKmDeviceGlobalState *deviceState() const;
+  ViskoresDeviceGlobalState *deviceState() const;
 
   bool getProperty(const std::string_view &name,
       ANARIDataType type,

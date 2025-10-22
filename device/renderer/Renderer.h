@@ -5,7 +5,7 @@
 
 #include "Object.h"
 #include "scene/World.h"
-#include "../VTKmTypes.h"
+#include "../ViskoresTypes.h"
 
 namespace viskores_device {
 
@@ -20,10 +20,10 @@ struct PixelSample
 
 struct Renderer : public Object
 {
-  Renderer(VTKmDeviceGlobalState *s);
+  Renderer(ViskoresDeviceGlobalState *s);
   ~Renderer() override;
   static Renderer *createInstance(
-      std::string_view subtype, VTKmDeviceGlobalState *d);
+      std::string_view subtype, ViskoresDeviceGlobalState *d);
   void commitParameters() override;
   void finalize() override;
 

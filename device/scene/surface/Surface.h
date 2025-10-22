@@ -12,7 +12,7 @@ namespace viskores_device {
 
 struct Surface : public Object
 {
-  Surface(VTKmDeviceGlobalState *s);
+  Surface(ViskoresDeviceGlobalState *s);
   ~Surface() override;
 
   void commitParameters() override;

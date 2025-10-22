@@ -9,12 +9,12 @@
 
 namespace viskores_device {
 
-Geometry::Geometry(VTKmDeviceGlobalState *s) : Object(ANARI_GEOMETRY, s) {}
+Geometry::Geometry(ViskoresDeviceGlobalState *s) : Object(ANARI_GEOMETRY, s) {}
 
 Geometry::~Geometry() = default;
 
 Geometry *Geometry::createInstance(
-    std::string_view subtype, VTKmDeviceGlobalState *s)
+    std::string_view subtype, ViskoresDeviceGlobalState *s)
 {
   std::cout << "Creating geometry of type " << subtype << "\n";
   if (subtype == "triangle")
@@ -42,7 +42,7 @@ void Geometry::AddAttributeInformation()
   }
 }
 
-UnknownGeometry::UnknownGeometry(VTKmDeviceGlobalState *s) : Geometry(s) {}
+UnknownGeometry::UnknownGeometry(ViskoresDeviceGlobalState *s) : Geometry(s) {}
 
 void UnknownGeometry::commitParameters()
 {

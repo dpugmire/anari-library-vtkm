@@ -11,7 +11,7 @@ namespace viskores_device {
 
 struct World : public Object
 {
-  World(VTKmDeviceGlobalState *s);
+  World(ViskoresDeviceGlobalState *s);
   ~World() override;
 
   bool getProperty(const std::string_view &name,

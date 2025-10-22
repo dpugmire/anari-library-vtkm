@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "../VTKmDeviceGlobalState.h"
+#include "../ViskoresDeviceGlobalState.h"
 // helium
 #include "helium/array/Array1D.h"
 // Viskores
@@ -15,7 +15,7 @@ using Array1DMemoryDescriptor = helium::Array1DMemoryDescriptor;
 
 struct Array1D : public helium::Array1D
 {
-  Array1D(VTKmDeviceGlobalState *state, const Array1DMemoryDescriptor &d);
+  Array1D(ViskoresDeviceGlobalState *state, const Array1DMemoryDescriptor &d);
   ~Array1D() override;
 
   void unmap() override;

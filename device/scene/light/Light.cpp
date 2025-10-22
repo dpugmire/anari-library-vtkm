@@ -5,9 +5,9 @@
 
 namespace viskores_device {
 
-Light::Light(VTKmDeviceGlobalState *s) : Object(ANARI_LIGHT, s) {}
+Light::Light(ViskoresDeviceGlobalState *s) : Object(ANARI_LIGHT, s) {}
 
-Light *Light::createInstance(std::string_view /*subtype*/, VTKmDeviceGlobalState *s)
+Light *Light::createInstance(std::string_view /*subtype*/, ViskoresDeviceGlobalState *s)
 {
   return (Light *)new UnknownObject(ANARI_LIGHT, s);
 }

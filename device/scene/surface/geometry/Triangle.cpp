@@ -13,7 +13,7 @@
 
 namespace viskores_device {
 
-Triangle::Triangle(VTKmDeviceGlobalState *s)
+Triangle::Triangle(ViskoresDeviceGlobalState *s)
     : Geometry(s), m_index(this), m_vertexPosition(this), m_vertexColor(this)
 {}
 

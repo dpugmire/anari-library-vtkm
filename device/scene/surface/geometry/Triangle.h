@@ -12,7 +12,7 @@ namespace viskores_device {
 
 struct Triangle : Geometry
 {
-  Triangle(VTKmDeviceGlobalState *s);
+  Triangle(ViskoresDeviceGlobalState *s);
 
   void commitParameters() override;
   void finalize() override;

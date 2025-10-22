@@ -8,7 +8,7 @@
 
 namespace viskores_device {
 
-StructuredRegularField::StructuredRegularField(VTKmDeviceGlobalState *d)
+StructuredRegularField::StructuredRegularField(ViskoresDeviceGlobalState *d)
     : SpatialField(d), m_dataArray(this)
 {
 }

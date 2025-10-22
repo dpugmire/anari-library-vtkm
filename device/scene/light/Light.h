@@ -9,8 +9,8 @@ namespace viskores_device {
 
 struct Light : public Object
 {
-  Light(VTKmDeviceGlobalState *d);
-  static Light *createInstance(std::string_view subtype, VTKmDeviceGlobalState *d);
+  Light(ViskoresDeviceGlobalState *d);
+  static Light *createInstance(std::string_view subtype, ViskoresDeviceGlobalState *d);
 };
 
 } // namespace viskores_device

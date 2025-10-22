@@ -5,7 +5,7 @@
 
 namespace viskores_device {
 
-Instance::Instance(VTKmDeviceGlobalState *s) : Object(ANARI_INSTANCE, s) {}
+Instance::Instance(ViskoresDeviceGlobalState *s) : Object(ANARI_INSTANCE, s) {}
 
 Instance::~Instance() = default;
 

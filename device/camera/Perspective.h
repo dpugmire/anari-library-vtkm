@@ -9,7 +9,7 @@ namespace viskores_device {
 
 struct Perspective : public Camera
 {
-  Perspective(VTKmDeviceGlobalState *s);
+  Perspective(ViskoresDeviceGlobalState *s);
   void commitParameters() override;
   void finalize() override;
 

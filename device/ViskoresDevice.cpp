@@ -1,7 +1,7 @@
 // Copyright 2021 The Khronos Group
 // SPDX-License-Identifier: Apache-2.0
 
-#include "VTKmDevice.h"
+#include "ViskoresDevice.h"
 
 #include "array/Array1D.h"
 #include "array/Array2D.h"
@@ -25,25 +25,25 @@ inline HANDLE_T getHandleForAPI(OBJECT_T *object)
 }
 
 template <typename OBJECT_T, typename HANDLE_T, typename... Args>
-inline HANDLE_T createObjectForAPI(VTKmDeviceGlobalState *s, Args &&...args)
+inline HANDLE_T createObjectForAPI(ViskoresDeviceGlobalState *s, Args &&...args)
 {
   return getHandleForAPI<HANDLE_T>(
       new OBJECT_T(s, std::forward<Args>(args)...));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// VTKmDevice definitions /////////////////////////////////////////////////////
+// ViskoresDevice definitions /////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 // Data Arrays ////////////////////////////////////////////////////////////////
 
-void *VTKmDevice::mapArray(ANARIArray a)
+void *ViskoresDevice::mapArray(ANARIArray a)
 {
   deviceState()->renderingSemaphore.arrayMapAcquire();
   return helium::BaseDevice::mapArray(a);
 }
 
-void VTKmDevice::unmapArray(ANARIArray a)
+void ViskoresDevice::unmapArray(ANARIArray a)
 {
   helium::BaseDevice::unmapArray(a);
   deviceState()->renderingSemaphore.arrayMapRelease();
@@ -51,7 +51,7 @@ void VTKmDevice::unmapArray(ANARIArray a)
 
 // API Objects ////////////////////////////////////////////////////////////////
 
-ANARIArray1D VTKmDevice::newArray1D(const void *appMemory,
+ANARIArray1D ViskoresDevice::newArray1D(const void *appMemory,
     ANARIMemoryDeleter deleter,
     const void *userData,
     ANARIDataType type,
@@ -72,7 +72,7 @@ ANARIArray1D VTKmDevice::newArray1D(const void *appMemory,
     return createObjectForAPI<Array1D, ANARIArray1D>(deviceState(), md);
 }
 
-ANARIArray2D VTKmDevice::newArray2D(const void *appMemory,
+ANARIArray2D ViskoresDevice::newArray2D(const void *appMemory,
     ANARIMemoryDeleter deleter,
     const void *userData,
     ANARIDataType type,
@@ -92,7 +92,7 @@ ANARIArray2D VTKmDevice::newArray2D(const void *appMemory,
   return createObjectForAPI<Array2D, ANARIArray2D>(deviceState(), md);
 }
 
-ANARIArray3D VTKmDevice::newArray3D(const void *appMemory,
+ANARIArray3D ViskoresDevice::newArray3D(const void *appMemory,
     ANARIMemoryDeleter deleter,
     const void *userData,
     ANARIDataType type,
@@ -114,87 +114,87 @@ ANARIArray3D VTKmDevice::newArray3D(const void *appMemory,
   return createObjectForAPI<Array3D, ANARIArray3D>(deviceState(), md);
 }
 
-ANARICamera VTKmDevice::newCamera(const char *subtype)
+ANARICamera ViskoresDevice::newCamera(const char *subtype)
 {
   initDevice();
   return getHandleForAPI<ANARICamera>(
       Camera::createInstance(subtype, deviceState()));
 }
 
-ANARIFrame VTKmDevice::newFrame()
+ANARIFrame ViskoresDevice::newFrame()
 {
   initDevice();
   return createObjectForAPI<Frame, ANARIFrame>(deviceState());
 }
 
-ANARIGeometry VTKmDevice::newGeometry(const char *subtype)
+ANARIGeometry ViskoresDevice::newGeometry(const char *subtype)
 {
   initDevice();
   return getHandleForAPI<ANARIGeometry>(
       Geometry::createInstance(subtype, deviceState()));
 }
 
-ANARIGroup VTKmDevice::newGroup()
+ANARIGroup ViskoresDevice::newGroup()
 {
   initDevice();
   return createObjectForAPI<Group, ANARIGroup>(deviceState());
 }
 
-ANARIInstance VTKmDevice::newInstance(const char * /*subtype*/)
+ANARIInstance ViskoresDevice::newInstance(const char * /*subtype*/)
 {
   initDevice();
   return createObjectForAPI<Instance, ANARIInstance>(deviceState());
 }
 
-ANARILight VTKmDevice::newLight(const char *subtype)
+ANARILight ViskoresDevice::newLight(const char *subtype)
 {
   initDevice();
   return getHandleForAPI<ANARILight>(
       Light::createInstance(subtype, deviceState()));
 }
 
-ANARIMaterial VTKmDevice::newMaterial(const char *subtype)
+ANARIMaterial ViskoresDevice::newMaterial(const char *subtype)
 {
   initDevice();
   return getHandleForAPI<ANARIMaterial>(
       Material::createInstance(subtype, deviceState()));
 }
 
-ANARIRenderer VTKmDevice::newRenderer(const char *subtype)
+ANARIRenderer ViskoresDevice::newRenderer(const char *subtype)
 {
   initDevice();
   return getHandleForAPI<ANARIRenderer>(
       Renderer::createInstance(subtype, deviceState()));
 }
 
-ANARISampler VTKmDevice::newSampler(const char *subtype)
+ANARISampler ViskoresDevice::newSampler(const char *subtype)
 {
   initDevice();
   return getHandleForAPI<ANARISampler>(
       Sampler::createInstance(subtype, deviceState()));
 }
 
-ANARISpatialField VTKmDevice::newSpatialField(const char *subtype)
+ANARISpatialField ViskoresDevice::newSpatialField(const char *subtype)
 {
   initDevice();
   return getHandleForAPI<ANARISpatialField>(
       SpatialField::createInstance(subtype, deviceState()));
 }
 
-ANARISurface VTKmDevice::newSurface()
+ANARISurface ViskoresDevice::newSurface()
 {
   initDevice();
   return createObjectForAPI<Surface, ANARISurface>(deviceState());
 }
 
-ANARIVolume VTKmDevice::newVolume(const char *subtype)
+ANARIVolume ViskoresDevice::newVolume(const char *subtype)
 {
   initDevice();
   return getHandleForAPI<ANARIVolume>(
       Volume::createInstance(subtype, deviceState()));
 }
 
-ANARIWorld VTKmDevice::newWorld()
+ANARIWorld ViskoresDevice::newWorld()
 {
   initDevice();
   return createObjectForAPI<World, ANARIWorld>(deviceState());
@@ -202,12 +202,12 @@ ANARIWorld VTKmDevice::newWorld()
 
 // Query functions ////////////////////////////////////////////////////////////
 
-const char **VTKmDevice::getObjectSubtypes(ANARIDataType objectType)
+const char **ViskoresDevice::getObjectSubtypes(ANARIDataType objectType)
 {
   return viskores_device::query_object_types(objectType);
 }
 
-const void *VTKmDevice::getObjectInfo(ANARIDataType objectType,
+const void *ViskoresDevice::getObjectInfo(ANARIDataType objectType,
     const char *objectSubtype,
     const char *infoName,
     ANARIDataType infoType)
@@ -216,7 +216,7 @@ const void *VTKmDevice::getObjectInfo(ANARIDataType objectType,
       objectType, objectSubtype, infoName, infoType);
 }
 
-const void *VTKmDevice::getParameterInfo(ANARIDataType objectType,
+const void *ViskoresDevice::getParameterInfo(ANARIDataType objectType,
     const char *objectSubtype,
     const char *parameterName,
     ANARIDataType parameterType,
@@ -233,7 +233,7 @@ const void *VTKmDevice::getParameterInfo(ANARIDataType objectType,
 
 // Object + Parameter Lifetime Management /////////////////////////////////////
 
-int VTKmDevice::getProperty(ANARIObject object,
+int ViskoresDevice::getProperty(ANARIObject object,
     const char *name,
     ANARIDataType type,
     void *mem,
@@ -248,22 +248,22 @@ int VTKmDevice::getProperty(ANARIObject object,
   return helium::BaseDevice::getProperty(object, name, type, mem, size, mask);
 }
 
-// Other VTKmDevice definitions /////////////////////////////////////////////
+// Other ViskoresDevice definitions /////////////////////////////////////////////
 
-VTKmDevice::VTKmDevice(ANARIStatusCallback cb, const void *ptr)
+ViskoresDevice::ViskoresDevice(ANARIStatusCallback cb, const void *ptr)
     : helium::BaseDevice(cb, ptr)
 {
-  m_state = std::make_unique<VTKmDeviceGlobalState>(this_device());
+  m_state = std::make_unique<ViskoresDeviceGlobalState>(this_device());
   deviceCommitParameters();
 }
 
-VTKmDevice::VTKmDevice(ANARILibrary l) : helium::BaseDevice(l)
+ViskoresDevice::ViskoresDevice(ANARILibrary l) : helium::BaseDevice(l)
 {
-  m_state = std::make_unique<VTKmDeviceGlobalState>(this_device());
+  m_state = std::make_unique<ViskoresDeviceGlobalState>(this_device());
   deviceCommitParameters();
 }
 
-VTKmDevice::~VTKmDevice()
+ViskoresDevice::~ViskoresDevice()
 {
   reportMessage(ANARI_SEVERITY_DEBUG, "destroying Viskores device (%p)", this);
 
@@ -271,7 +271,7 @@ VTKmDevice::~VTKmDevice()
   state.commitBuffer.clear();
 }
 
-void VTKmDevice::initDevice()
+void ViskoresDevice::initDevice()
 {
   if (m_initialized)
     return;
@@ -281,12 +281,12 @@ void VTKmDevice::initDevice()
   m_initialized = true;
 }
 
-void VTKmDevice::deviceCommitParameters()
+void ViskoresDevice::deviceCommitParameters()
 {
   helium::BaseDevice::deviceCommitParameters();
 }
 
-int VTKmDevice::deviceGetProperty(
+int ViskoresDevice::deviceGetProperty(
     const char *name, ANARIDataType type, void *mem, uint64_t size)
 {
   std::string_view prop = name;
@@ -300,9 +300,9 @@ int VTKmDevice::deviceGetProperty(
   return 0;
 }
 
-VTKmDeviceGlobalState *VTKmDevice::deviceState() const
+ViskoresDeviceGlobalState *ViskoresDevice::deviceState() const
 {
-  return (VTKmDeviceGlobalState *)helium::BaseDevice::m_state.get();
+  return (ViskoresDeviceGlobalState *)helium::BaseDevice::m_state.get();
 }
 
 } // namespace viskores_device

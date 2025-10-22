@@ -5,7 +5,7 @@
 
 namespace viskores_device {
 
-Material::Material(VTKmDeviceGlobalState *s) : Object(ANARI_MATERIAL, s) {}
+Material::Material(ViskoresDeviceGlobalState *s) : Object(ANARI_MATERIAL, s) {}
 
 Material::~Material() = default;
 
@@ -20,7 +20,7 @@ void Material::finalize()
 }
 
 Material *Material::createInstance(
-    std::string_view subtype, VTKmDeviceGlobalState *s)
+    std::string_view subtype, ViskoresDeviceGlobalState *s)
 {
 #if 0
   return (Material *)new UnknownObject(ANARI_MATERIAL, s);

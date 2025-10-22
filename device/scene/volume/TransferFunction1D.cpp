@@ -67,7 +67,7 @@ void FillColorTable(
 
 namespace viskores_device {
 
-TransferFunction1D::TransferFunction1D(VTKmDeviceGlobalState *d)
+TransferFunction1D::TransferFunction1D(ViskoresDeviceGlobalState *d)
     : Volume(d), m_spatialField(this), m_colorArray(this), m_opacityArray(this)
 {}
 

@@ -8,11 +8,11 @@
 
 namespace viskores_device {
 
-Camera::Camera(VTKmDeviceGlobalState *s) : Object(ANARI_CAMERA, s) {}
+Camera::Camera(ViskoresDeviceGlobalState *s) : Object(ANARI_CAMERA, s) {}
 
 Camera::~Camera() = default;
 
-Camera *Camera::createInstance(std::string_view type, VTKmDeviceGlobalState *s)
+Camera *Camera::createInstance(std::string_view type, ViskoresDeviceGlobalState *s)
 {
   if (type == "perspective")
     return new Perspective(s);
@@ -45,7 +45,7 @@ void Camera::finalize()
   // no-op
 }
 
-UnknownCamera::UnknownCamera(VTKmDeviceGlobalState *s) : Camera(s) {};
+UnknownCamera::UnknownCamera(ViskoresDeviceGlobalState *s) : Camera(s) {};
 
 viskores::rendering::Camera UnknownCamera::camera(const viskores::Bounds &) const
 {

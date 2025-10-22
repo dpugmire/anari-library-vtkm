@@ -11,10 +11,10 @@ struct Geometry;
 
 struct Sampler : public Object
 {
-  Sampler(VTKmDeviceGlobalState *d);
+  Sampler(ViskoresDeviceGlobalState *d);
   virtual ~Sampler();
   static Sampler *createInstance(
-      std::string_view subtype, VTKmDeviceGlobalState *d);
+      std::string_view subtype, ViskoresDeviceGlobalState *d);
 };
 
 } // namespace viskores_device

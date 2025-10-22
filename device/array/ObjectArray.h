@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "../VTKmDeviceGlobalState.h"
+#include "../ViskoresDeviceGlobalState.h"
 #include "Array1D.h"
 // helium
 #include "helium/array/ObjectArray.h"
@@ -12,7 +12,7 @@ namespace viskores_device {
 
 struct ObjectArray : public helium::ObjectArray
 {
-  ObjectArray(VTKmDeviceGlobalState *state, const Array1DMemoryDescriptor &d);
+  ObjectArray(ViskoresDeviceGlobalState *state, const Array1DMemoryDescriptor &d);
   ~ObjectArray() override;
 };
 

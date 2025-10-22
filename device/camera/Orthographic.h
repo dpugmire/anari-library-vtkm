@@ -9,7 +9,7 @@ namespace viskores_device {
 
 struct Orthographic : public Camera
 {
-  Orthographic(VTKmDeviceGlobalState *s);
+  Orthographic(ViskoresDeviceGlobalState *s);
   void commitParameters() override;
   void finalize() override;
 

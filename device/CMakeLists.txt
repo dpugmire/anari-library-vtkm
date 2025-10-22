@@ -3,9 +3,9 @@ set(anari_viskores_target anari_library_viskores)
 ## Build device target ##
 
 add_library(${anari_viskores_target} SHARED
-  VTKmDevice.cpp
-  VTKmDeviceGlobalState.cpp
-  VTKmLibrary.cpp
+  ViskoresDevice.cpp
+  ViskoresDeviceGlobalState.cpp
+  ViskoresLibrary.cpp
   Object.cpp
   array/Array1D.cpp
   array/Array2D.cpp

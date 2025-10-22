@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "VTKmDeviceGlobalState.h"
+#include "ViskoresDeviceGlobalState.h"
 #include "viskores_device_math.h"
 // helium
 #include <helium/BaseObject.h>
@@ -15,7 +15,7 @@ namespace viskores_device {
 
 struct Object : public helium::BaseObject
 {
-  Object(ANARIDataType type, VTKmDeviceGlobalState *s);
+  Object(ANARIDataType type, ViskoresDeviceGlobalState *s);
   virtual ~Object() = default;
 
   bool getProperty(const std::string_view &name,
@@ -25,14 +25,14 @@ struct Object : public helium::BaseObject
 
   bool isValid() const override;
 
-  VTKmDeviceGlobalState *deviceState() const;
+  ViskoresDeviceGlobalState *deviceState() const;
 
   void printParameters();
 };
 
 struct UnknownObject : public Object
 {
-  UnknownObject(ANARIDataType type, VTKmDeviceGlobalState *s);
+  UnknownObject(ANARIDataType type, ViskoresDeviceGlobalState *s);
   ~UnknownObject() override;
   void commitParameters() override;
   void finalize() override;
