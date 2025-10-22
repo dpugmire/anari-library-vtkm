@@ -24,9 +24,11 @@ void StructuredRegularField::commitParameters()
   uint3 dimensions = this->m_dataArray->size();
 
   this->m_dataSet = viskores::cont::DataSetBuilderUniform::Create(
-      viskores::Id3{ dimensions[0], dimensions[1], dimensions[2] },
-      viskores::Vec3f{ origin[0], origin[1], origin[2] },
-      viskores::Vec3f{ spacing[0], spacing[1], spacing[2] });
+      viskores::Id3{static_cast<viskores::Id>(dimensions[0]),
+          static_cast<viskores::Id>(dimensions[1]),
+          static_cast<viskores::Id>(dimensions[2])},
+      viskores::Vec3f{origin[0], origin[1], origin[2]},
+      viskores::Vec3f{spacing[0], spacing[1], spacing[2]});
 }
 
 void StructuredRegularField::finalize()
