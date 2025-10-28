@@ -36,6 +36,7 @@ struct TransferFunction1D : public Volume
   helium::ChangeObserverPtr<Array1D> m_colorArray;
   helium::ChangeObserverPtr<Array1D> m_opacityArray;
   float4 m_color;
+  viskores::Float32 m_alpha;
   viskores::Float32 m_unitDistance;
   viskores::cont::ColorTable m_colorTable;
 
