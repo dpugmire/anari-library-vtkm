@@ -11,8 +11,8 @@
 namespace {
 
 template <typename ComponentType>
-void FillColorTable(
-    viskores::cont::ColorTable &table, const viskores::cont::UnknownArrayHandle &array)
+void FillColorTable(viskores::cont::ColorTable &table,
+    const viskores::cont::UnknownArrayHandle &array)
 {
   viskores::Id numValues = array.GetNumberOfValues();
 
@@ -31,6 +31,15 @@ void FillColorTable(
         viskores::cont::ArrayHandleConstant<ComponentType>(0, numValues), 0);
   }
 
+  bool hasOpacity;
+  viskores::cont::ArrayHandleStride<ComponentType> alphaChannel;
+  if (array.GetNumberOfComponentsFlat() > 3) {
+    alphaChannel = array.ExtractComponent<ComponentType>(3);
+    hasOpacity = true;
+  } else {
+    hasOpacity = false;
+  }
+
   std::array<
       typename viskores::cont::ArrayHandleStride<ComponentType>::ReadPortalType,
       3>
@@ -39,6 +48,11 @@ void FillColorTable(
       colorChannels.end(),
       colorPortals.begin(),
       [](auto array) { return array.ReadPortal(); });
+  typename viskores::cont::ArrayHandleStride<ComponentType>::ReadPortalType
+      alphaPortal;
+  if (hasOpacity) {
+    alphaPortal = alphaChannel.ReadPortal();
+  }
   if (numValues > 1) {
     viskores::Float64 scale = 1.0 / (numValues - 1);
     for (viskores::Id index = 0; index < numValues; ++index) {
@@ -50,6 +64,10 @@ void FillColorTable(
             return static_cast<viskores::Float32>(portal.Get(index));
           });
       table.AddPoint(index * scale, {color[0], color[1], color[2]});
+      if (hasOpacity) {
+        table.AddPointAlpha(index * scale,
+            static_cast<viskores::Float32>(alphaPortal.Get(index)));
+      }
     }
   } else {
     // Special case: only one color given in array.
@@ -57,9 +75,17 @@ void FillColorTable(
     std::transform(colorPortals.begin(),
         colorPortals.end(),
         color.begin(),
-        [](auto portal) { return static_cast<viskores::Float32>(portal.Get(0)); });
+        [](auto portal) {
+          return static_cast<viskores::Float32>(portal.Get(0));
+        });
     table.AddPoint(0, {color[0], color[1], color[2]});
     table.AddPoint(1, {color[0], color[1], color[2]});
+    if (hasOpacity) {
+      viskores::Float32 alpha =
+          static_cast<viskores::Float32>(alphaPortal.Get(0));
+      table.AddPointAlpha(0, alpha);
+      table.AddPointAlpha(1, alpha);
+    }
   }
 }
 
@@ -85,6 +111,8 @@ void TransferFunction1D::commitParameters()
   this->getParam("color", ANARI_FLOAT32_VEC3, &this->m_color);
 
   this->m_opacityArray = this->getParamObject<Array1D>("opacity");
+  this->m_alpha = 1.0f;
+  this->getParam("opacity", ANARI_FLOAT32, &this->m_alpha);
 
   box1 range = {0, 1};
   this->getParam("valueRange", ANARI_FLOAT32_BOX1, &range);
@@ -103,10 +131,14 @@ void TransferFunction1D::finalize()
 
   // Reset and fill color table
   this->m_colorTable = viskores::cont::ColorTable(viskores::ColorSpace::Lab);
+  bool colorsHaveAlpha = false;
   if (this->m_colorArray) {
     // Convert to Viskores colors
     viskores::cont::UnknownArrayHandle viskoresColors =
         ANARIColorsToViskoresColors(this->m_colorArray->dataAsViskoresArray());
+    if (viskoresColors.GetNumberOfComponentsFlat() > 3) {
+      colorsHaveAlpha = true;
+    }
 
     // Copy colors into ColorTable
     // NOTE: I am not at all convinced that this is a good idea. If we are
@@ -118,6 +150,9 @@ void TransferFunction1D::finalize()
       FillColorTable<viskores::Float32>(this->m_colorTable, viskoresColors);
     } else if (viskoresColors.IsBaseComponentType<viskores::Float64>()) {
       FillColorTable<viskores::Float64>(this->m_colorTable, viskoresColors);
+    } else {
+      reportMessage(
+          ANARI_SEVERITY_ERROR, "Unexpected type for color table data.");
     }
   } else {
     this->m_colorTable.AddPoint(0, {m_color[0], m_color[1], m_color[2]});
@@ -125,6 +160,10 @@ void TransferFunction1D::finalize()
   }
 
   if (m_opacityArray) {
+    if (colorsHaveAlpha) {
+      reportMessage(ANARI_SEVERITY_WARNING,
+          "Alpha given in both color and opacity parameters.");
+    }
     if (m_opacityArray->size() > 1) {
       viskores::Float64 scale = 1.0 / (m_opacityArray->size() - 1);
       for (size_t index = 0; index < m_opacityArray->size(); ++index) {
@@ -136,17 +175,22 @@ void TransferFunction1D::finalize()
       this->m_colorTable.AddPointAlpha(0, opacity);
       this->m_colorTable.AddPointAlpha(1, opacity);
     }
+  } else if (!colorsHaveAlpha) {
+      this->m_colorTable.AddPointAlpha(0, this->m_alpha);
+      this->m_colorTable.AddPointAlpha(1, this->m_alpha);
   }
 
   this->m_colorTable.RescaleToRange(this->m_valueRange);
 
   viskores::cont::DataSet dataSet = this->m_spatialField->getDataSet();
-  this->m_actor = std::make_shared<viskores::rendering::Actor>(dataSet.GetCellSet(),
-      dataSet.GetCoordinateSystem(),
-      dataSet.GetField("data"),
-      this->m_colorTable);
+  this->m_actor =
+      std::make_shared<viskores::rendering::Actor>(dataSet.GetCellSet(),
+          dataSet.GetCoordinateSystem(),
+          dataSet.GetField("data"),
+          this->m_colorTable);
   this->m_actor->SetScalarRange(this->m_colorTable.GetRange());
   this->m_mapper = std::make_shared<viskores::rendering::MapperVolume>();
+  this->m_mapper->SetSampleDistance(this->m_unitDistance);
 }
 
 const SpatialField *TransferFunction1D::spatialField() const
