@@ -24,8 +24,11 @@ World::World(ViskoresDeviceGlobalState *s)
 
 World::~World() = default;
 
-bool World::getProperty(
-    const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
+bool World::getProperty(const std::string_view &name,
+                         ANARIDataType type,
+                         void *ptr,
+                         uint64_t size,
+                         uint32_t flags) 
 {
   if (name == "bounds" && type == ANARI_FLOAT32_BOX3) {
     viskores::Vec3f_32 anariBounds[] = {viskores::Vec3f_32(this->m_bounds.MinCorner()),
@@ -33,7 +36,7 @@ bool World::getProperty(
     std::memcpy(ptr, &anariBounds, sizeof(anariBounds));
     return true;
   }
-  return Object::getProperty(name, type, ptr, flags);
+  return Object::getProperty(name, type, ptr, size, flags);
 }
 
 void World::commitParameters()
