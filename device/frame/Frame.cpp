@@ -183,8 +183,8 @@ void Frame::finalize()
 bool Frame::getProperty(const std::string_view &name,
                          ANARIDataType type,
                          void *ptr,
-                         uint64_t size,
-                         uint32_t flags) 
+                         uint64_t viskoresNotUsed(size),
+                         uint32_t viskoresNotUsed(flags))
 {
   if (type == ANARI_FLOAT32 && name == "duration") {
     helium::writeToVoidP(ptr, m_duration);
@@ -250,8 +250,6 @@ void Frame::renderFrame()
         }
       }
 
-      this->Canvas.BlendBackground();
-
       if (surface_scene.GetNumberOfActors() != 0) {
         viskores::rendering::View3D surface_view(surface_scene,
             viskores::rendering::MapperRayTracer(),
@@ -274,6 +272,8 @@ void Frame::renderFrame()
         volume_view.Paint();
       }
     }
+
+      this->Canvas.BlendBackground();
 
     state->renderingSemaphore.frameEnd();
     auto end = std::chrono::steady_clock::now();
