@@ -33,6 +33,11 @@ add_library(${anari_viskores_target} SHARED
 #  scene/volume/TransferFunction1D.cpp
 )
 
+#target_include_directories(${anari_viskores_target}
+#  PRIVATE
+#  /home/wald/opt/include/viskores-1.1
+#)
+
 target_link_libraries(${anari_viskores_target}
 PRIVATE
   anari::helium
