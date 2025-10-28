@@ -5,6 +5,8 @@
 #include "anari/backend/LibraryImpl.h"
 #include "anari_library_viskores_export.h"
 
+#include <viskores/cont/Initialize.h>
+
 namespace viskores_device {
 
 struct ViskoresLibrary : public anari::LibraryImpl
@@ -21,7 +23,12 @@ struct ViskoresLibrary : public anari::LibraryImpl
 ViskoresLibrary::ViskoresLibrary(
     void *lib, ANARIStatusCallback defaultStatusCB, const void *statusCBPtr)
     : anari::LibraryImpl(lib, defaultStatusCB, statusCBPtr)
-{}
+{
+  if (!viskores::cont::IsInitialized())
+  {
+    viskores::cont::Initialize();
+  }
+}
 
 ANARIDevice ViskoresLibrary::newDevice(const char * /*subtype*/)
 {
