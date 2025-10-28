@@ -33,18 +33,18 @@ constexpr float toneMap(viskores::Float32 v)
   return std::pow(v, 1.f / 2.2f);
 }
 
-static uint32_t cvt_uint32(const viskores::Float32 &f)
+constexpr uint32_t cvt_uint32(const viskores::Float32 &f)
 {
   return static_cast<uint32_t>(255.f * std::clamp(f, 0.f, 1.f));
 }
 
-static uint32_t cvt_uint32(const viskores::Vec4f_32 &v)
+constexpr uint32_t cvt_uint32(const viskores::Vec4f_32 &v)
 {
   return (cvt_uint32(v[0]) << 0) | (cvt_uint32(v[1]) << 8)
       | (cvt_uint32(v[2]) << 16) | (cvt_uint32(v[3]) << 24);
 }
 
-static uint32_t cvt_uint32_srgb(const viskores::Vec4f_32 &v)
+constexpr uint32_t cvt_uint32_srgb(const viskores::Vec4f_32 &v)
 {
   return cvt_uint32(
       viskores::Vec4f_32(toneMap(v[0]), toneMap(v[1]), toneMap(v[2]), v[3]));
@@ -79,8 +79,8 @@ class ConvertToSRGBA : public viskores::worklet::WorkletMapField
     outField = cvt_uint32_srgb(inField);
   }
 
-//  private:
-//   viskores::Float32 Exponent = 1.1f / 2.2f;
+  //  private:
+  //   viskores::Float32 Exponent = 1.1f / 2.2f;
 };
 
 // Helper functions ///////////////////////////////////////////////////////////
@@ -154,9 +154,11 @@ void Frame::commitParameters()
   m_frameData.size = getParam<uint2>("size", uint2(10));
 }
 
-void Frame::finalize() {
+void Frame::finalize()
+{
   this->Canvas = viskores::rendering::CanvasRayTracer(
       this->m_frameData.size[0], this->m_frameData.size[1]);
+  this->Canvas.SetBackgroundColor(this->m_renderer->background());
 
   const auto numPixels = m_frameData.size[0] * m_frameData.size[1];
 
@@ -248,6 +250,8 @@ void Frame::renderFrame()
         }
       }
 
+      this->Canvas.BlendBackground();
+
       if (surface_scene.GetNumberOfActors() != 0) {
         viskores::rendering::View3D surface_view(surface_scene,
             viskores::rendering::MapperRayTracer(),
@@ -310,13 +314,19 @@ void *Frame::map(std::string_view channel,
 
       viskores::cont::ArrayHandleBasic<viskores::UInt32> basicArray =
           this->m_intFrameBuffer;
-      return basicArray.GetWritePointer();
+      // Note: Although we are returning a non-const pointer, this is
+      // essentially a mistake in the ANARI API. Client code is not supposed
+      // to modify the buffer.
+      return const_cast<viskores::UInt32 *>(basicArray.GetReadPointer());
     }
   } else if (channel == "channel.depth") {
     *pixelType = ANARI_FLOAT32;
     viskores::cont::ArrayHandleBasic<viskores::Float32> basicArray =
         this->Canvas.GetDepthBuffer();
-    return (void *)basicArray.GetWritePointer();
+    // Note: Although we are returning a non-const pointer, this is
+    // essentially a mistake in the ANARI API. Client code is not supposed
+    // to modify the buffer.
+    return const_cast<viskores::Float32 *>(basicArray.GetReadPointer());
   } else if (channel == "channel.primitiveId" && !m_primIdBuffer.empty()) {
     *pixelType = ANARI_UINT32;
     return m_primIdBuffer.data();
