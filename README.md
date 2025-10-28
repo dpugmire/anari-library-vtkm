@@ -26,5 +26,5 @@ the Viskores libraries next to the SDK), you can test the Viskores data with a
 command like this:
 
 ```sh
-./ANARI-SDK/build/anariRenderTests -l vtkm --scene demo gravity_spheres_volume
+./ANARI-SDK/build/anariRenderTests -l viskores --scene demo gravity_spheres_volume
 ```
