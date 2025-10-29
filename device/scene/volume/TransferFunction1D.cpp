@@ -129,6 +129,15 @@ void TransferFunction1D::finalize()
     return;
   }
 
+  // Determine sample distance (which also affects colors).
+  viskores::cont::DataSet dataSet = this->m_spatialField->getDataSet();
+  viskores::Bounds bounds = dataSet.GetCoordinateSystem().GetBounds();
+  viskores::Float32 diagonalLength = static_cast<viskores::Float32>(
+      viskores::Magnitude(bounds.MaxCorner() - bounds.MinCorner()));
+  constexpr viskores::IdComponent numberOfSamples = 200;
+  viskores::Float32 sampleDistance =
+      static_cast<viskores::Float32>(diagonalLength / numberOfSamples);
+
   // Reset and fill color table
   this->m_colorTable = viskores::cont::ColorTable(viskores::ColorSpace::RGB);
   bool colorsHaveAlpha = false;
@@ -176,13 +185,33 @@ void TransferFunction1D::finalize()
       this->m_colorTable.AddPointAlpha(1, opacity);
     }
   } else if (!colorsHaveAlpha) {
-      this->m_colorTable.AddPointAlpha(0, this->m_alpha);
-      this->m_colorTable.AddPointAlpha(1, this->m_alpha);
+    this->m_colorTable.AddPointAlpha(0, this->m_alpha);
+    this->m_colorTable.AddPointAlpha(1, this->m_alpha);
+  }
+
+  // The alpha channel provided by ANARI is actually meant to be interpreted as
+  // a transparency coefficient whereas the Viskores volume mapper uses the
+  // alpha channel as the opacity between two samples. The relationship between
+  // the two is:
+  //
+  // opacity = 1 - exp(-transparency * distance)
+  //
+  // Generally, the distance here will be the uniform sample distance used in
+  // the ray stepper. However, the units of the color distance might not be the
+  // same as the spatial units. This is given by ANARI's unit distance
+  // parameter, which can be used to convert the spatial units.
+  viskores::Float32 alphaSampleDistance = sampleDistance / this->m_unitDistance;
+  for (viskores::IdComponent pointId = 0;
+      pointId < this->m_colorTable.GetNumberOfPointsAlpha();
+      ++pointId) {
+    viskores::Vec4f_64 alphaPoint;
+    this->m_colorTable.GetPointAlpha(pointId, alphaPoint);
+    alphaPoint[1] = 1.0f - viskores::Exp(-alphaSampleDistance * alphaPoint[1]);
+    this->m_colorTable.UpdatePointAlpha(pointId, alphaPoint);
   }
 
   this->m_colorTable.RescaleToRange(this->m_valueRange);
 
-  viskores::cont::DataSet dataSet = this->m_spatialField->getDataSet();
   this->m_actor =
       std::make_shared<viskores::rendering::Actor>(dataSet.GetCellSet(),
           dataSet.GetCoordinateSystem(),
@@ -190,7 +219,7 @@ void TransferFunction1D::finalize()
           this->m_colorTable);
   this->m_actor->SetScalarRange(this->m_colorTable.GetRange());
   this->m_mapper = std::make_shared<viskores::rendering::MapperVolume>();
-  this->m_mapper->SetSampleDistance(this->m_unitDistance);
+  this->m_mapper->SetSampleDistance(sampleDistance);
 }
 
 const SpatialField *TransferFunction1D::spatialField() const
