@@ -181,10 +181,10 @@ void Frame::finalize()
 }
 
 bool Frame::getProperty(const std::string_view &name,
-                         ANARIDataType type,
-                         void *ptr,
-                         uint64_t viskoresNotUsed(size),
-                         uint32_t viskoresNotUsed(flags))
+    ANARIDataType type,
+    void *ptr,
+    uint64_t viskoresNotUsed(size),
+    uint32_t viskoresNotUsed(flags))
 {
   if (type == ANARI_FLOAT32 && name == "duration") {
     helium::writeToVoidP(ptr, m_duration);
@@ -222,8 +222,8 @@ void Frame::renderFrame()
       camera.Print();
 #endif
 
-      viskores::rendering::Scene surface_scene;
-      viskores::rendering::Scene volume_scene;
+      std::vector<Surface *> surfacesToRender;
+      std::vector<Volume *> volumesToRender;
 
       for (const auto &instance : instances) {
         if (!instance->isValid()) {
@@ -231,49 +231,51 @@ void Frame::renderFrame()
           continue;
         }
 
-        for (const auto &surface : instance->group()->surfaces()) {
-          if (!surface || !surface->isValid()) {
-            reportMessage(
-                ANARI_SEVERITY_DEBUG, "skip rendering invalid surface");
-            continue;
-          }
-          surface_scene.AddActor(*surface->geometry()->actor());
-        }
+        auto &surfaces = instance->group()->surfaces();
+        surfacesToRender.insert(
+            surfacesToRender.end(), surfaces.begin(), surfaces.end());
 
-        for (const auto &volume : instance->group()->volumes()) {
-          if (!volume || !volume->isValid()) {
-            reportMessage(
-                ANARI_SEVERITY_DEBUG, "skip rendering invalid volume");
-            continue;
-          }
-          volume_scene.AddActor(*volume->actor());
-        }
+        auto &volumes = instance->group()->volumes();
+        volumesToRender.insert(
+            volumesToRender.end(), volumes.begin(), volumes.end());
       }
 
-      if (surface_scene.GetNumberOfActors() != 0) {
-        viskores::rendering::View3D surface_view(surface_scene,
-            viskores::rendering::MapperRayTracer(),
+      for (const auto &surface : surfacesToRender) {
+        if (!surface || !surface->isValid()) {
+          reportMessage(ANARI_SEVERITY_DEBUG, "skip rendering invalid surface");
+          continue;
+        }
+        viskores::rendering::Scene scene;
+        scene.AddActor(*surface->geometry()->actor());
+        viskores::rendering::View3D view(scene,
+            *surface->geometry()->mapper(),
             this->Canvas,
             camera,
             this->m_renderer->background());
-        surface_view.SetWorldAnnotationsEnabled(false);
-        surface_view.SetRenderAnnotationsEnabled(false);
-        surface_view.Paint();
+        view.SetWorldAnnotationsEnabled(false);
+        view.SetRenderAnnotationsEnabled(false);
+        view.Paint();
       }
 
-      if (volume_scene.GetNumberOfActors() != 0) {
-        viskores::rendering::View3D volume_view(volume_scene,
-            viskores::rendering::MapperVolume(),
+      for (const auto &volume : volumesToRender) {
+        if (!volume || !volume->isValid()) {
+          reportMessage(ANARI_SEVERITY_DEBUG, "skip rendering invalid volume");
+          continue;
+        }
+        viskores::rendering::Scene scene;
+        scene.AddActor(*volume->actor());
+        viskores::rendering::View3D view(scene,
+            *volume->mapper(),
             this->Canvas,
             camera,
             this->m_renderer->background());
-        volume_view.SetWorldAnnotationsEnabled(false);
-        volume_view.SetRenderAnnotationsEnabled(false);
-        volume_view.Paint();
+        view.SetWorldAnnotationsEnabled(false);
+        view.SetRenderAnnotationsEnabled(false);
+        view.Paint();
       }
     }
 
-      this->Canvas.BlendBackground();
+    this->Canvas.BlendBackground();
 
     state->renderingSemaphore.frameEnd();
     auto end = std::chrono::steady_clock::now();
