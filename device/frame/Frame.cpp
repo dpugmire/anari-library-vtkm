@@ -240,6 +240,8 @@ void Frame::renderFrame()
             volumesToRender.end(), volumes.begin(), volumes.end());
       }
 
+      this->Canvas.Clear();
+
       for (const auto &surface : surfacesToRender) {
         if (!surface || !surface->isValid()) {
           reportMessage(ANARI_SEVERITY_DEBUG, "skip rendering invalid surface");
@@ -247,14 +249,8 @@ void Frame::renderFrame()
         }
         viskores::rendering::Scene scene;
         scene.AddActor(*surface->geometry()->actor());
-        viskores::rendering::View3D view(scene,
-            *surface->geometry()->mapper(),
-            this->Canvas,
-            camera,
-            this->m_renderer->background());
-        view.SetWorldAnnotationsEnabled(false);
-        view.SetRenderAnnotationsEnabled(false);
-        view.Paint();
+        std::unique_ptr<viskores::rendering::Mapper> mapper{ surface->geometry()->mapper()->NewCopy() };
+        scene.Render(*mapper, this->Canvas, camera);
       }
 
       for (const auto &volume : volumesToRender) {
@@ -264,14 +260,8 @@ void Frame::renderFrame()
         }
         viskores::rendering::Scene scene;
         scene.AddActor(*volume->actor());
-        viskores::rendering::View3D view(scene,
-            *volume->mapper(),
-            this->Canvas,
-            camera,
-            this->m_renderer->background());
-        view.SetWorldAnnotationsEnabled(false);
-        view.SetRenderAnnotationsEnabled(false);
-        view.Paint();
+        std::unique_ptr<viskores::rendering::Mapper> mapper{ volume->mapper()->NewCopy() };
+        scene.Render(*mapper, this->Canvas, camera);
       }
     }
 

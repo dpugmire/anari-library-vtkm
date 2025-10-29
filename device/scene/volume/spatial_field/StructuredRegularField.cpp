@@ -44,7 +44,7 @@ void StructuredRegularField::finalize()
   }
   this->m_dataSet.AddPointField("data", viskoresArray);
 
-  this->m_dataSet.PrintSummary(std::cout);
+  // this->m_dataSet.PrintSummary(std::cout);
 }
 
 } // namespace viskores_device
