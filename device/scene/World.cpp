@@ -25,13 +25,14 @@ World::World(ViskoresDeviceGlobalState *s)
 World::~World() = default;
 
 bool World::getProperty(const std::string_view &name,
-                         ANARIDataType type,
-                         void *ptr,
-                         uint64_t size,
-                         uint32_t flags) 
+    ANARIDataType type,
+    void *ptr,
+    uint64_t size,
+    uint32_t flags)
 {
   if (name == "bounds" && type == ANARI_FLOAT32_BOX3) {
-    viskores::Vec3f_32 anariBounds[] = {viskores::Vec3f_32(this->m_bounds.MinCorner()),
+    viskores::Vec3f_32 anariBounds[] = {
+        viskores::Vec3f_32(this->m_bounds.MinCorner()),
         viskores::Vec3f_32(this->m_bounds.MaxCorner())};
     std::memcpy(ptr, &anariBounds, sizeof(anariBounds));
     return true;
@@ -73,7 +74,7 @@ void World::commitParameters()
   m_zeroGroup->finalize();
   m_zeroInstance->commitParameters();
   m_zeroInstance->finalize();
-  
+
   m_instanceData = getParamObject<ObjectArray>("instance");
 }
 
@@ -101,10 +102,24 @@ void World::finalize()
 
   this->m_bounds = viskores::Bounds{};
   for (auto &&instance : this->instances()) {
+    if (!instance->isValid()) {
+      reportMessage(ANARI_SEVERITY_DEBUG, "skip bounds check on invalid group");
+      continue;
+    }
     for (auto &&surface : instance->group()->surfaces()) {
+      if (!surface || !surface->isValid()) {
+        reportMessage(
+            ANARI_SEVERITY_DEBUG, "skip bounds check on invalid surface");
+        continue;
+      }
       this->m_bounds.Include(surface->bounds());
     }
     for (auto &&volume : instance->group()->volumes()) {
+      if (!volume || !volume->isValid()) {
+        reportMessage(
+            ANARI_SEVERITY_DEBUG, "skip bounds check on invalid volume");
+        continue;
+      }
       this->m_bounds.Include(volume->bounds());
     }
   }

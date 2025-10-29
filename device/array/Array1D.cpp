@@ -21,7 +21,7 @@ void Array1D::unmap()
 {
   this->helium::Array1D::unmap();
   // Invalidate Viskores ArrayHandle
-  this->m_ViskoresArray.ReleaseResources();
+  this->m_ViskoresArray = viskores::cont::UnknownArrayHandle{};
 }
 
 viskores::cont::UnknownArrayHandle Array1D::dataAsViskoresArray() const
