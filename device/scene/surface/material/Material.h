@@ -12,8 +12,6 @@ struct Material : public Object
 {
   Material(ViskoresDeviceGlobalState *s);
   ~Material() override;
-  void commitParameters() override;
-  void finalize() override;
   static Material *createInstance(
       std::string_view subtype, ViskoresDeviceGlobalState *s);
 };
