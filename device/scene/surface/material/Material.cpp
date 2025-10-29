@@ -15,6 +15,9 @@ struct UnknownMaterial : viskores_device::Material
   void finalize() override;
 
   bool isValid() const override;
+
+  std::shared_ptr<viskores::rendering::Actor> createActor(
+      const viskores::cont::DataSet &data) override;
 };
 
 UnknownMaterial::UnknownMaterial(viskores_device::ViskoresDeviceGlobalState *d)
@@ -33,6 +36,12 @@ void UnknownMaterial::finalize()
 bool UnknownMaterial::isValid() const
 {
   return false;
+}
+
+std::shared_ptr<viskores::rendering::Actor> UnknownMaterial::createActor(
+    const viskores::cont::DataSet &)
+{
+  return nullptr;
 }
 
 } // anonymous namespace

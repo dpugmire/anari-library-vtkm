@@ -11,16 +11,37 @@ struct MatteMaterial : public Material
   void commitParameters() override;
   void finalize() override;
 
-  helium::Attribute colorAttribute() const { return this->m_colorAttribute; }
-  const viskores::Vec3f_32& color() const { return this->m_color; }
+  std::shared_ptr<viskores::rendering::Actor> createActor(
+      const viskores::cont::DataSet &data) override;
 
-  helium::Attribute opacityAttribute() const { return this->m_opacityAttribute; }
-  viskores::Float32 opacity() const { return this->m_opacity; }
+  helium::Attribute colorAttribute() const
+  {
+    return this->m_colorAttribute;
+  }
+  const viskores::Vec3f_32 &color() const
+  {
+    return this->m_color;
+  }
 
-  helium::AlphaMode alphaMode() const { return this->m_alphaMode; }
-  viskores::Float32 alphaCutoff() const { return this->m_alphaCutoff; }
+  helium::Attribute opacityAttribute() const
+  {
+    return this->m_opacityAttribute;
+  }
+  viskores::Float32 opacity() const
+  {
+    return this->m_opacity;
+  }
 
-private:
+  helium::AlphaMode alphaMode() const
+  {
+    return this->m_alphaMode;
+  }
+  viskores::Float32 alphaCutoff() const
+  {
+    return this->m_alphaCutoff;
+  }
+
+ private:
   helium::Attribute m_colorAttribute;
   viskores::Vec3f_32 m_color;
 
