@@ -130,7 +130,7 @@ void TransferFunction1D::finalize()
   }
 
   // Reset and fill color table
-  this->m_colorTable = viskores::cont::ColorTable(viskores::ColorSpace::Lab);
+  this->m_colorTable = viskores::cont::ColorTable(viskores::ColorSpace::RGB);
   bool colorsHaveAlpha = false;
   if (this->m_colorArray) {
     // Convert to Viskores colors
