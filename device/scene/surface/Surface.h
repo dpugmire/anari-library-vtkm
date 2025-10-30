@@ -36,8 +36,8 @@ struct Surface : public Object
 
  private:
   uint32_t m_id{~0u};
-  helium::IntrusivePtr<Geometry> m_geometry;
-  helium::IntrusivePtr<Material> m_material;
+  helium::ChangeObserverPtr<Geometry> m_geometry;
+  helium::ChangeObserverPtr<Material> m_material;
 
   std::shared_ptr<viskores::rendering::Actor> m_actor;
 };
