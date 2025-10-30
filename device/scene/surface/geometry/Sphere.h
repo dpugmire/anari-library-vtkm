@@ -25,6 +25,8 @@ struct Sphere : public Geometry
   }
 
  private:
+  void SetupIndexBased();
+
   helium::ChangeObserverPtr<Array1D> m_index;
   helium::ChangeObserverPtr<Array1D> m_vertexPosition;
   // optional- radius per position
