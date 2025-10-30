@@ -19,10 +19,6 @@ struct Sphere : public Geometry
   void commitParameters() override;
   void finalize() override;
 
-  virtual viskores::rendering::Actor *actor() const override
-  {
-    return this->m_actor.get();
-  }
   virtual viskores::rendering::Mapper *mapper() const override
   {
     return this->m_mapper.get();
@@ -34,9 +30,7 @@ struct Sphere : public Geometry
   // optional- radius per position
   helium::ChangeObserverPtr<Array1D> m_vertexRadius;
 
-  std::shared_ptr<viskores::rendering::Actor> m_actor;
   std::shared_ptr<viskores::rendering::Mapper> m_mapper;
-
   viskores::cont::ColorTable m_colorTable;
 
   // TODO: Add these later.

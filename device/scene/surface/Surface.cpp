@@ -5,7 +5,9 @@
 
 namespace viskores_device {
 
-Surface::Surface(ViskoresDeviceGlobalState *s) : Object(ANARI_SURFACE, s) {}
+Surface::Surface(ViskoresDeviceGlobalState *s)
+    : Object(ANARI_SURFACE, s), m_geometry(this), m_material(this)
+{}
 
 Surface::~Surface() = default;
 
@@ -27,16 +29,18 @@ void Surface::finalize()
     reportMessage(ANARI_SEVERITY_WARNING, "missing 'geometry' on ANARISurface");
     return;
   }
+
+  this->m_actor = this->m_material->createActor(this->m_geometry->getDataSet());
 }
 
 const Geometry *Surface::geometry() const
 {
-  return m_geometry.ptr;
+  return m_geometry.get();
 }
 
 const Material *Surface::material() const
 {
-  return m_material.ptr;
+  return m_material.get();
 }
 
 viskores::Bounds Surface::bounds() const

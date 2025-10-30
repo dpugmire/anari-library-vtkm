@@ -5,7 +5,7 @@
 
 // helium
 #include "helium/BaseDevice.h"
-//#include "ChangeObserverPtr.h"
+// #include "ChangeObserverPtr.h"
 #include "HelideMath.h"
 
 #include "Object.h"
@@ -92,10 +92,10 @@ struct ViskoresDevice : public helium::BaseDevice
 
   void deviceCommitParameters() override;
   int deviceGetProperty(const char *name,
-                        ANARIDataType type,
-                        void *mem,
-                        uint64_t size,
-                        uint32_t flags) override;
+      ANARIDataType type,
+      void *mem,
+      uint64_t size,
+      uint32_t mask) override;
 
  private:
   ViskoresDeviceGlobalState *deviceState() const;

@@ -12,13 +12,7 @@ namespace viskores_device {
 
 Sphere::Sphere(ViskoresDeviceGlobalState *s)
     : Geometry(s), m_index(this), m_vertexPosition(this), m_vertexRadius(this)
-{
-  std::cout << "Sphere!!!!" << std::endl;
-  /*
-  m_embreeGeometry =
-      rtcNewGeometry(s->embreeDevice, RTC_GEOMETRY_TYPE_SPHERE_POINT);
-      */
-}
+{}
 
 void Sphere::commitParameters()
 {
@@ -97,11 +91,13 @@ void Sphere::finalize()
   this->m_dataSet.SetCellSet(cellSet);
   this->m_dataSet.AddPointField("data", viskoresArray);
 
+  /*
   this->m_actor =
       std::make_shared<viskores::rendering::Actor>(this->m_dataSet.GetCellSet(),
           this->m_dataSet.GetCoordinateSystem(),
           this->m_dataSet.GetField("data"),
           this->m_colorTable);
+          */
 }
 
 } // namespace viskores_device

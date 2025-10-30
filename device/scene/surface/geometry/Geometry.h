@@ -18,10 +18,6 @@ struct Geometry : public Object
   static Geometry *createInstance(
       std::string_view subtype, ViskoresDeviceGlobalState *s);
 
-  virtual viskores::rendering::Actor *actor() const
-  {
-    return nullptr;
-  } // = 0;
   const viskores::cont::DataSet &getDataSet() const
   {
     return this->m_dataSet;
