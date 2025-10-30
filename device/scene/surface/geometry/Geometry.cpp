@@ -28,22 +28,22 @@ Geometry *Geometry::createInstance(
 
 void Geometry::AddAttributeInformation()
 {
-  for (std::string &&attribName :
-      {"attribute0", "attribute1", "attribute2", "attribute3"}) {
-    std::string paramName = "vertex." + attribName;
-    if (this->hasParam(paramName))
-      this->m_dataSet.AddPointField(attribName,
-          this->getParamObject<Array1D>(paramName)->dataAsViskoresArray());
-  }
+  // for (std::string &&attribName :
+  //     {"attribute0", "attribute1", "attribute2", "attribute3"}) {
+  //   std::string paramName = "vertex." + attribName;
+  //   if (this->hasParam(paramName))
+  //     this->m_dataSet.AddPointField(attribName,
+  //         this->getParamObject<Array1D>(paramName)->dataAsViskoresArray());
+  // }
 
-  if (this->hasParam("vertex.color")) {
-    viskores::cont::UnknownArrayHandle colorArray =
-        this->getParamObject<Array1D>("vertex.color")->dataAsViskoresArray();
-    // Colors can be either float or a fixed integer type. Viskores only
-    // supports float colors. If we get integer colors, convert them here.
-    this->m_dataSet.AddPointField(
-        "color", ANARIColorsToViskoresColors(colorArray));
-  }
+  // if (this->hasParam("vertex.color")) {
+  //   viskores::cont::UnknownArrayHandle colorArray =
+  //       this->getParamObject<Array1D>("vertex.color")->dataAsViskoresArray();
+  //   // Colors can be either float or a fixed integer type. Viskores only
+  //   // supports float colors. If we get integer colors, convert them here.
+  //   this->m_dataSet.AddPointField(
+  //       "color", ANARIColorsToViskoresColors(colorArray));
+  // }
 }
 
 UnknownGeometry::UnknownGeometry(ViskoresDeviceGlobalState *s) : Geometry(s) {}

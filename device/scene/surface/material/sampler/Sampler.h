@@ -6,6 +6,7 @@
 #include "Object.h"
 
 #include <viskores/Matrix.h>
+#include <viskores/rendering/Actor.h>
 
 namespace viskores_device {
 
@@ -23,6 +24,8 @@ struct Sampler : public Object
 
   const Mat4f_32& outTransform() const { return this->m_outTransform; }
   const viskores::Vec4f_32& outOffset() const { return this->m_outOffset; }
+
+  virtual std::shared_ptr<viskores::rendering::Actor> createActor(const viskores::cont::DataSet& data) = 0;
 
  private:
   Mat4f_32 m_outTransform;

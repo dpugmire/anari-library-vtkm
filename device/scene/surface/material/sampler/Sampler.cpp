@@ -13,6 +13,9 @@ struct UnknownSampler : viskores_device::Sampler
   void finalize() override;
 
   bool isValid() const override;
+
+  std::shared_ptr<viskores::rendering::Actor> createActor(
+      const viskores::cont::DataSet &data) override;
 };
 
 UnknownSampler::UnknownSampler(viskores_device::ViskoresDeviceGlobalState *d)
@@ -31,6 +34,12 @@ void UnknownSampler::finalize()
 bool UnknownSampler::isValid() const
 {
   return false;
+}
+
+std::shared_ptr<viskores::rendering::Actor> UnknownSampler::createActor(
+    const viskores::cont::DataSet &)
+{
+  return nullptr;
 }
 
 } // anonymous namespace

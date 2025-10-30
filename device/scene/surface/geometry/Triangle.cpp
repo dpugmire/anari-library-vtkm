@@ -9,22 +9,43 @@
 #include <viskores/cont/CellSetSingleType.h>
 #include <viskores/cont/UnknownArrayHandle.h>
 // std
+#include <array>
 #include <numeric>
 
 namespace viskores_device {
 
 Triangle::Triangle(ViskoresDeviceGlobalState *s)
-    : Geometry(s), m_index(this), m_vertexPosition(this), m_vertexColor(this)
-{}
+    : Geometry(s), m_index(this), m_vertexColor(this)
+{
+  this->m_vertexAttributes.emplace("position", this);
+  this->m_vertexAttributes.emplace("normal", this);
+  this->m_vertexAttributes.emplace("tangent", this);
+  this->m_vertexAttributes.emplace("color", this);
+  this->m_vertexAttributes.emplace("attribute0", this);
+  this->m_vertexAttributes.emplace("attribute1", this);
+  this->m_vertexAttributes.emplace("attribute2", this);
+  this->m_vertexAttributes.emplace("attribute3", this);
+
+  this->m_faceVaryingAttributes.emplace("normal", this);
+  this->m_faceVaryingAttributes.emplace("tangent", this);
+  this->m_faceVaryingAttributes.emplace("color", this);
+  this->m_faceVaryingAttributes.emplace("attribute0", this);
+  this->m_faceVaryingAttributes.emplace("attribute1", this);
+  this->m_faceVaryingAttributes.emplace("attribute2", this);
+  this->m_faceVaryingAttributes.emplace("attribute3", this);
+}
 
 void Triangle::commitParameters()
 {
   // Stashing these in a ChangeObserverPtr means that commit will be
   // called again if the array contents change.
   this->m_index = getParamObject<Array1D>("primitive.index");
-  this->m_vertexPosition = getParamObject<Array1D>("vertex.position");
-
-  this->m_vertexColor = getParamObject<Array1D>("vertex.color");
+  for (auto &iter : this->m_vertexAttributes) {
+    iter.second = getParamObject<Array1D>("vertex." + iter.first);
+  }
+  for (auto &iter : this->m_faceVaryingAttributes) {
+    iter.second = getParamObject<Array1D>("faceVarying." + iter.first);
+  }
 
   box1 range = {0, 1};
   this->getParam("valueRange", ANARI_FLOAT32_BOX1, &range);
@@ -33,7 +54,9 @@ void Triangle::commitParameters()
 
 void Triangle::finalize()
 {
-  if (!this->m_vertexPosition) {
+  helium::ChangeObserverPtr<Array1D> &positionArray =
+      this->vertexAttribute("position");
+  if (!positionArray) {
     reportMessage(ANARI_SEVERITY_WARNING,
         "'triangle' geometry missing 'vertex.position' parameter");
     return;
@@ -47,7 +70,7 @@ void Triangle::finalize()
     md.deleter = nullptr;
     md.deleterPtr = nullptr;
     md.elementType = ANARI_UINT32_VEC3;
-    md.numItems = this->m_vertexPosition->totalSize() / 3;
+    md.numItems = positionArray->totalSize() / 3;
 
     this->m_index = new Array1D(this->deviceState(), md);
     this->m_index->refDec(helium::RefType::PUBLIC); // no public references
@@ -70,51 +93,34 @@ void Triangle::finalize()
       this->m_index->dataAsViskoresArray(), connectionArray);
 
   viskores::cont::CellSetSingleType<> cellSet;
-  cellSet.Fill(static_cast<viskores::Id>(this->m_vertexPosition->size()),
+  cellSet.Fill(static_cast<viskores::Id>(positionArray->size()),
       viskores::CELL_SHAPE_TRIANGLE,
       3,
       connectionArray.GetComponentsArray());
   this->m_dataSet.SetCellSet(cellSet);
 
-  this->m_dataSet.AddCoordinateSystem(
-      {"coords", this->m_vertexPosition->dataAsViskoresArray()});
-
-  if (!this->m_vertexColor) {
-    reportMessage(
-        ANARI_SEVERITY_INFO, "generating 'triangle' vertex.color array");
-
-    Array1DMemoryDescriptor md;
-    md.appMemory = nullptr;
-    md.deleter = nullptr;
-    md.deleterPtr = nullptr;
-    md.elementType = ANARI_FLOAT32_VEC4;
-    md.numItems = this->m_vertexPosition->totalSize();
-
-    this->m_vertexColor = new Array1D(this->deviceState(), md);
-    this->m_vertexColor->refDec(
-        helium::RefType::PUBLIC); // no public references
-
-    auto *begin = (float *)this->m_vertexColor->map();
-    auto *end = begin + this->m_vertexColor->totalSize() * 4;
-    std::fill(begin, end, 1.f);
+  for (auto &iter : this->m_vertexAttributes) {
+    if (iter.second) {
+      this->m_dataSet.AddPointField(
+          iter.first, iter.second->dataAsViskoresArray());
+    }
+  }
+  for (auto &iter : this->m_faceVaryingAttributes) {
+    if (iter.second) {
+      this->m_dataSet.AddCellField(
+          iter.first, iter.second->dataAsViskoresArray());
+    }
   }
 
-  viskores::cont::UnknownArrayHandle viskoresArray =
-      this->m_vertexColor->dataAsViskoresArray();
-  if (!viskoresArray.IsValueType<viskores::Float32>()
-      && !viskoresArray.IsValueType<viskores::Float64>()) {
-    viskores::cont::ArrayHandle<viskores::FloatDefault> castArray;
-    viskores::cont::ArrayCopy(viskoresArray, castArray);
-    viskoresArray = castArray;
-  }
-  this->m_dataSet.AddPointField("data", viskoresArray);
+  // We have already checked that the position array exists.
+  this->m_dataSet.AddCoordinateSystem("position");
 
   this->AddAttributeInformation();
 }
 
 bool Triangle::isValid() const
 {
-  return this->m_vertexPosition;
+  return this->vertexAttribute("position");
 }
 
 } // namespace viskores_device

@@ -1,6 +1,7 @@
 #include "Image1DSampler.h"
 // Viskores
 #include <viskores/TypeTraits.h>
+#include <viskores/cont/ArrayCopy.h>
 #include <viskores/cont/ArrayExtractComponent.h>
 #include <viskores/cont/ArrayHandleConstant.h>
 // std
@@ -50,14 +51,16 @@ void captureColorTableType(const viskores::cont::UnknownArrayHandle &colorArray,
     }
     colorChannelPortals[channel] = colorChannelArrays[channel].ReadPortal();
   }
-  ComponentType sampleDelta = 1.0f / ComponentType(numValues);
+  viskores::Float32 sampleDelta = 1.0f / viskores::Float32(numValues - 1);
   for (viskores::Id sample = 0; sample < numValues; ++sample) {
     viskores::Vec3f_32 color{floatConvert(colorChannelPortals[0].Get(sample)),
         floatConvert(colorChannelPortals[1].Get(sample)),
         floatConvert(colorChannelPortals[2].Get(sample))};
     colorTable.AddPoint(sample * sampleDelta, color);
-    ComponentType alpha = floatConvert(colorChannelPortals[3].Get(sample));
-    colorTable.AddPointAlpha(sample * sampleDelta, alpha);
+    if (colorArray.GetNumberOfComponentsFlat() > 3) {
+      viskores::Float32 alpha = floatConvert(colorChannelPortals[3].Get(sample));
+      colorTable.AddPointAlpha(sample * sampleDelta, alpha);
+    }
   }
 }
 
@@ -71,10 +74,10 @@ bool captureColorTable(const viskores::cont::UnknownArrayHandle &colorArray,
     captureColorTableType<viskores::UInt16>(colorArray, colorTable);
     return true;
   } else if (colorArray.IsBaseComponentType<viskores::UInt32>()) {
-    captureColorTableType<viskores::UInt16>(colorArray, colorTable);
+    captureColorTableType<viskores::UInt32>(colorArray, colorTable);
     return true;
   } else if (colorArray.IsBaseComponentType<viskores::Float32>()) {
-    captureColorTableType<viskores::UInt16>(colorArray, colorTable);
+    captureColorTableType<viskores::Float32>(colorArray, colorTable);
     return true;
   } else {
     return false;
@@ -119,9 +122,11 @@ void Image1DSampler::finalize()
   bool colorTableFilled = false;
   if (this->m_colorArray) {
     // TODO: This method does not properly handle vec2 nor SRGB.
-    colorTableFilled = captureColorTable(this->m_colorArray->dataAsViskoresArray(), this->m_colorTable);
+    colorTableFilled = captureColorTable(
+        this->m_colorArray->dataAsViskoresArray(), this->m_colorTable);
     if (!colorTableFilled) {
-      this->reportMessage(ANARI_SEVERITY_WARNING, "color array provided for image1D sampling has unrecognized type");
+      this->reportMessage(ANARI_SEVERITY_WARNING,
+          "color array provided for image1D sampling has unrecognized type");
     }
   }
 
@@ -130,6 +135,42 @@ void Image1DSampler::finalize()
         "image1D sampling requested, but no color array given");
     this->m_colorTable.AddPoint(0, {1, 1, 1});
   }
+}
+
+std::shared_ptr<viskores::rendering::Actor> Image1DSampler::createActor(
+    const viskores::cont::DataSet &data)
+{
+  if (!data.HasField(this->inAttribute())) {
+    this->reportMessage(ANARI_SEVERITY_WARNING,
+        "sampler attribute %s not found",
+        this->inAttribute().c_str());
+    return nullptr;
+  }
+
+  viskores::cont::Field attribField = data.GetField(this->inAttribute());
+  viskores::cont::UnknownArrayHandle attribArray = attribField.GetData();
+  if (!attribArray
+          .CanConvert<viskores::cont::ArrayHandle<viskores::Float32>>()) {
+    if (!attribArray.IsBaseComponentType<viskores::Float32>()) {
+      this->reportMessage(ANARI_SEVERITY_WARNING,
+          "attribute array type not currently supported for image1D sampler.");
+      return nullptr;
+    }
+    this->reportMessage(ANARI_SEVERITY_PERFORMANCE_WARNING,
+        "todo: handle vector attributes more efficiently");
+    viskores::cont::UnknownArrayHandle newArray;
+    viskores::cont::ArrayCopy(
+        attribArray.ExtractComponent<viskores::Float32>(0), newArray);
+    attribArray = newArray;
+  }
+
+  auto actor = std::make_shared<viskores::rendering::Actor>(data.GetCellSet(),
+      data.GetCoordinateSystem(),
+      viskores::cont::Field{
+          attribField.GetName(), attribField.GetAssociation(), attribArray},
+      this->colorTable());
+  actor->SetScalarRange({ 0, 1 });
+  return actor;
 }
 
 } // namespace viskores_device

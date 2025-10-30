@@ -41,6 +41,9 @@ struct Image1DSampler : public Sampler
     return this->m_colorTable;
   }
 
+  std::shared_ptr<viskores::rendering::Actor> createActor(
+      const viskores::cont::DataSet &data) override;
+
  private:
   Mat4f_32 m_inTransform;
   viskores::Vec4f_32 m_inOffset;
