@@ -3,6 +3,7 @@
 
 #include "Geometry.h"
 // subtypes
+#include "Sphere.h"
 #include "Triangle.h"
 
 #include "array/ArrayConversion.h"
@@ -19,6 +20,8 @@ Geometry *Geometry::createInstance(
   std::cout << "Creating geometry of type " << subtype << "\n";
   if (subtype == "triangle")
     return new Triangle(s);
+  else if (subtype == "sphere")
+    return new Sphere(s);
   else
     return new UnknownGeometry(s);
 }
@@ -36,9 +39,10 @@ void Geometry::AddAttributeInformation()
   if (this->hasParam("vertex.color")) {
     viskores::cont::UnknownArrayHandle colorArray =
         this->getParamObject<Array1D>("vertex.color")->dataAsViskoresArray();
-    // Colors can be either float or a fixed integer type. Viskores only supports
-    // float colors. If we get integer colors, convert them here.
-    this->m_dataSet.AddPointField("color", ANARIColorsToViskoresColors(colorArray));
+    // Colors can be either float or a fixed integer type. Viskores only
+    // supports float colors. If we get integer colors, convert them here.
+    this->m_dataSet.AddPointField(
+        "color", ANARIColorsToViskoresColors(colorArray));
   }
 }
 

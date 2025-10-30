@@ -18,13 +18,22 @@ struct Geometry : public Object
   static Geometry *createInstance(
       std::string_view subtype, ViskoresDeviceGlobalState *s);
 
-  virtual viskores::rendering::Actor *actor() const {return nullptr; } // = 0;
-  const viskores::cont::DataSet &getDataSet() const { return this->m_dataSet; }
-  virtual const  viskores::rendering::MapperRayTracer *mapper() const {return this->m_mapper.get();}
+  virtual viskores::rendering::Actor *actor() const
+  {
+    return nullptr;
+  } // = 0;
+  const viskores::cont::DataSet &getDataSet() const
+  {
+    return this->m_dataSet;
+  }
+  virtual const viskores::rendering::Mapper *mapper() const
+  {
+    return this->m_mapper.get();
+  }
 
  protected:
   viskores::cont::DataSet m_dataSet;
-  std::shared_ptr<viskores::rendering::MapperRayTracer> m_mapper;
+  std::shared_ptr<viskores::rendering::Mapper> m_mapper;
 
   /// @brief A convenience method to pull attribute information into m_data.
   ///
@@ -49,4 +58,5 @@ struct UnknownGeometry : public Geometry
 
 } // namespace viskores_device
 
-VISKORES_ANARI_TYPEFOR_SPECIALIZATION(viskores_device::Geometry *, ANARI_GEOMETRY);
+VISKORES_ANARI_TYPEFOR_SPECIALIZATION(
+    viskores_device::Geometry *, ANARI_GEOMETRY);
