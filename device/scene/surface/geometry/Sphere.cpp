@@ -41,8 +41,6 @@ void Sphere::finalize()
   } else {
     this->m_dataSet.AddCoordinateSystem(
         {"coords", this->m_vertexPosition->dataAsViskoresArray()});
-    this->m_dataSet.AddPointField(
-        "data", this->m_vertexRadius->dataAsViskoresArray());
   }
 
   auto pointMapper = std::make_shared<viskores::rendering::MapperPoint>();
@@ -50,6 +48,8 @@ void Sphere::finalize()
 
   if (this->m_vertexRadius) {
     pointMapper->UseVariableRadius(true);
+    this->m_dataSet.AddPointField(
+        "data", this->m_vertexRadius->dataAsViskoresArray());
   } else {
     pointMapper->UseVariableRadius(false);
     pointMapper->SetRadius(this->m_globalRadius);
