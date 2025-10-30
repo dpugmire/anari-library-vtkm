@@ -17,7 +17,7 @@ Geometry::~Geometry() = default;
 Geometry *Geometry::createInstance(
     std::string_view subtype, ViskoresDeviceGlobalState *s)
 {
-  std::cout << "Creating geometry of type " << subtype << "\n";
+  // std::cout << "Creating geometry of type " << subtype << "\n";
   if (subtype == "triangle")
     return new Triangle(s);
   else if (subtype == "sphere")

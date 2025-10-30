@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Material.h"
+#include "sampler/Sampler.h"
+// helium
+#include <helium/utility/ChangeObserverPtr.h>
 
 namespace viskores_device {
 
@@ -13,6 +16,11 @@ struct MatteMaterial : public Material
 
   std::shared_ptr<viskores::rendering::Actor> createActor(
       const viskores::cont::DataSet &data) override;
+
+  Sampler *sampler() const
+  {
+    return this->m_sampler.get();
+  }
 
   helium::Attribute colorAttribute() const
   {
@@ -42,6 +50,7 @@ struct MatteMaterial : public Material
   }
 
  private:
+  helium::ChangeObserverPtr<Sampler> m_sampler;
   helium::Attribute m_colorAttribute;
   viskores::Vec3f_32 m_color;
 

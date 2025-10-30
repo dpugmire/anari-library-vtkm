@@ -4,10 +4,13 @@
 
 namespace viskores_device {
 
-MatteMaterial::MatteMaterial(ViskoresDeviceGlobalState *d) : Material(d) {}
+MatteMaterial::MatteMaterial(ViskoresDeviceGlobalState *d)
+    : Material(d), m_sampler(this)
+{}
 
 void MatteMaterial::commitParameters()
 {
+  this->m_sampler = this->getParamObject<Sampler>("color");
   this->m_colorAttribute =
       helium::attributeFromString(this->getParamString("color", "none"));
   this->m_color = this->getParam("color", viskores::Vec3f_32{0.8, 0.8, 0.8});

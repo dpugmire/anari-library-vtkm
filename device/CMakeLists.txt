@@ -27,6 +27,7 @@ add_library(${anari_viskores_target} SHARED
   scene/surface/geometry/Sphere.cpp
   scene/surface/material/Material.cpp
   scene/surface/material/MatteMaterial.cpp
+  scene/surface/material/sampler/Image1DSampler.cpp
   scene/surface/material/sampler/Sampler.cpp
   scene/volume/TransferFunction1D.cpp
   scene/volume/Volume.cpp

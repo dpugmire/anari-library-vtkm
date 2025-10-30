@@ -1,0 +1,54 @@
+#pragma once
+
+#include "Sampler.h"
+
+#include "array/Array1D.h"
+// helium
+#include <helium/utility/ChangeObserverPtr.h>
+// viskores
+#include <viskores/cont/ColorTable.h>
+
+namespace viskores_device {
+
+struct Image1DSampler : public Sampler
+{
+  Image1DSampler(ViskoresDeviceGlobalState *d);
+
+  void commitParameters() override;
+  void finalize() override;
+
+  const Mat4f_32 &inTransform() const
+  {
+    return this->m_inTransform;
+  }
+  const viskores::Vec4f_32 &inOffset() const
+  {
+    return this->m_inOffset;
+  }
+
+  const std::string &inAttribute() const
+  {
+    return this->m_inAttribute;
+  }
+
+  helium::WrapMode wrapMode() const
+  {
+    return this->m_wrapMode;
+  }
+
+  const viskores::cont::ColorTable &colorTable() const
+  {
+    return this->m_colorTable;
+  }
+
+ private:
+  Mat4f_32 m_inTransform;
+  viskores::Vec4f_32 m_inOffset;
+  std::string m_inAttribute;
+  helium::ChangeObserverPtr<Array1D> m_colorArray;
+  helium::WrapMode m_wrapMode;
+
+  viskores::cont::ColorTable m_colorTable;
+};
+
+} // namespace viskores_device
