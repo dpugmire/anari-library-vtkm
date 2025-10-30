@@ -248,7 +248,7 @@ void Frame::renderFrame()
           continue;
         }
         viskores::rendering::Scene scene;
-        scene.AddActor(*surface->geometry()->actor());
+        scene.AddActor(*surface->actor());
         std::unique_ptr<viskores::rendering::Mapper> mapper{ surface->geometry()->mapper()->NewCopy() };
         scene.Render(*mapper, this->Canvas, camera);
       }

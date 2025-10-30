@@ -27,6 +27,8 @@ void Surface::finalize()
     reportMessage(ANARI_SEVERITY_WARNING, "missing 'geometry' on ANARISurface");
     return;
   }
+
+  this->m_actor = this->m_material->createActor(this->m_geometry->getDataSet());
 }
 
 const Geometry *Surface::geometry() const

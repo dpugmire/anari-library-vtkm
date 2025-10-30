@@ -109,12 +109,6 @@ void Triangle::finalize()
   }
   this->m_dataSet.AddPointField("data", viskoresArray);
 
-  this->m_actor =
-      std::make_shared<viskores::rendering::Actor>(this->m_dataSet.GetCellSet(),
-          this->m_dataSet.GetCoordinateSystem(),
-          this->m_dataSet.GetField("data"),
-          this->m_colorTable);
-
   this->AddAttributeInformation();
 }
 
