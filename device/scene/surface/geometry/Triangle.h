@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Geometry.h"
-#include "array/Array1D.h"
 // viskores
 #include <viskores/rendering/Actor.h>
 
@@ -26,8 +25,8 @@ struct Triangle : Geometry
 
  private:
   helium::ChangeObserverPtr<Array1D> m_index;
-  helium::ChangeObserverPtr<Array1D> m_vertexPosition;
-  // TODO: Add other attributes to observe changes.
+  FieldArrayParameters m_vertexAttributes;
+  FieldArrayParameters m_faceVaryingAttributes;
 
   std::shared_ptr<viskores::rendering::MapperRayTracer> m_mapper;
 

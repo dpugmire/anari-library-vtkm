@@ -17,7 +17,8 @@ Sphere::Sphere(ViskoresDeviceGlobalState *s)
 
 void Sphere::commitParameters()
 {
-  // Geometry::commitParameters(); ???
+  this->Geometry::commitParameters();
+  
   m_index = getParamObject<Array1D>("primitive.index");
   m_vertexPosition = getParamObject<Array1D>("vertex.position");
   m_vertexRadius = getParamObject<Array1D>("vertex.radius");
@@ -25,6 +26,8 @@ void Sphere::commitParameters()
 
 void Sphere::finalize()
 {
+  this->Geometry::finalize();
+
   if (!m_vertexPosition) {
     reportMessage(ANARI_SEVERITY_WARNING,
         "missing required parameter 'vertex.position' on sphere geometry");
