@@ -17,35 +17,41 @@ namespace viskores_device {
 Triangle::Triangle(ViskoresDeviceGlobalState *s)
     : Geometry(s), m_index(this), m_vertexColor(this)
 {
-  this->m_vertexAttributes.emplace("position", this);
-  this->m_vertexAttributes.emplace("normal", this);
-  this->m_vertexAttributes.emplace("tangent", this);
-  this->m_vertexAttributes.emplace("color", this);
-  this->m_vertexAttributes.emplace("attribute0", this);
-  this->m_vertexAttributes.emplace("attribute1", this);
-  this->m_vertexAttributes.emplace("attribute2", this);
-  this->m_vertexAttributes.emplace("attribute3", this);
+  this->m_vertexAttributes.setAttributes(this,
+      {"position",
+          "normal",
+          "tangent",
+          "color",
+          "attribute0",
+          "attribute1",
+          "attribute2",
+          "attribute3"});
+  this->m_vertexAttributes.setAnariAssociation("vertex");
+  this->m_vertexAttributes.setViskoresAssociation(
+      viskores::cont::Field::Association::Points);
 
-  this->m_faceVaryingAttributes.emplace("normal", this);
-  this->m_faceVaryingAttributes.emplace("tangent", this);
-  this->m_faceVaryingAttributes.emplace("color", this);
-  this->m_faceVaryingAttributes.emplace("attribute0", this);
-  this->m_faceVaryingAttributes.emplace("attribute1", this);
-  this->m_faceVaryingAttributes.emplace("attribute2", this);
-  this->m_faceVaryingAttributes.emplace("attribute3", this);
+  this->m_faceVaryingAttributes.setAttributes(this,
+      {"normal",
+          "tangent",
+          "color",
+          "attribute0",
+          "attribute1",
+          "attribute2",
+          "attribute3"});
+  this->m_faceVaryingAttributes.setAnariAssociation("faceVarying");
+  this->m_faceVaryingAttributes.setViskoresAssociation(
+      viskores::cont::Field::Association::Cells);
 }
 
 void Triangle::commitParameters()
 {
+  this->Geometry::commitParameters();
+
   // Stashing these in a ChangeObserverPtr means that commit will be
   // called again if the array contents change.
   this->m_index = getParamObject<Array1D>("primitive.index");
-  for (auto &iter : this->m_vertexAttributes) {
-    iter.second = getParamObject<Array1D>("vertex." + iter.first);
-  }
-  for (auto &iter : this->m_faceVaryingAttributes) {
-    iter.second = getParamObject<Array1D>("faceVarying." + iter.first);
-  }
+  this->m_vertexAttributes.commitParameters();
+  this->m_faceVaryingAttributes.commitParameters();
 
   box1 range = {0, 1};
   this->getParam("valueRange", ANARI_FLOAT32_BOX1, &range);
@@ -54,8 +60,10 @@ void Triangle::commitParameters()
 
 void Triangle::finalize()
 {
+  this->Geometry::finalize();
+
   helium::ChangeObserverPtr<Array1D> &positionArray =
-      this->vertexAttribute("position");
+      this->m_vertexAttributes.getParam("position");
   if (!positionArray) {
     reportMessage(ANARI_SEVERITY_WARNING,
         "'triangle' geometry missing 'vertex.position' parameter");
@@ -99,28 +107,16 @@ void Triangle::finalize()
       connectionArray.GetComponentsArray());
   this->m_dataSet.SetCellSet(cellSet);
 
-  for (auto &iter : this->m_vertexAttributes) {
-    if (iter.second) {
-      this->m_dataSet.AddPointField(
-          iter.first, iter.second->dataAsViskoresArray());
-    }
-  }
-  for (auto &iter : this->m_faceVaryingAttributes) {
-    if (iter.second) {
-      this->m_dataSet.AddCellField(
-          iter.first, iter.second->dataAsViskoresArray());
-    }
-  }
+  this->m_vertexAttributes.setFields(this->m_dataSet);
+  this->m_faceVaryingAttributes.setFields(this->m_dataSet);
 
   // We have already checked that the position array exists.
   this->m_dataSet.AddCoordinateSystem("position");
-
-  this->AddAttributeInformation();
 }
 
 bool Triangle::isValid() const
 {
-  return this->vertexAttribute("position");
+  return this->m_vertexAttributes.getParam("position");
 }
 
 } // namespace viskores_device

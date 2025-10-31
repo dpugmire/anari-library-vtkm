@@ -4,11 +4,8 @@
 #pragma once
 
 #include "Geometry.h"
-#include "array/Array1D.h"
 // viskores
 #include <viskores/rendering/Actor.h>
-// std
-#include <map>
 
 namespace viskores_device {
 
@@ -28,18 +25,8 @@ struct Triangle : Geometry
 
  private:
   helium::ChangeObserverPtr<Array1D> m_index;
-  std::map<std::string, helium::ChangeObserverPtr<Array1D>> m_vertexAttributes;
-  std::map<std::string, helium::ChangeObserverPtr<Array1D>>
-      m_faceVaryingAttributes;
-  helium::ChangeObserverPtr<Array1D> &vertexAttribute(const std::string name)
-  {
-    return this->m_vertexAttributes.find(name)->second;
-  }
-  const helium::ChangeObserverPtr<Array1D> &vertexAttribute(
-      const std::string name) const
-  {
-    return this->m_vertexAttributes.find(name)->second;
-  }
+  FieldArrayParameters m_vertexAttributes;
+  FieldArrayParameters m_faceVaryingAttributes;
 
   std::shared_ptr<viskores::rendering::MapperRayTracer> m_mapper;
 
