@@ -57,6 +57,8 @@ Material *Material::createInstance(
 {
   if (subtype == "matte") {
     return new MatteMaterial(s);
+  } else if (subtype == "physicallyBased") {
+    return new MatteMaterial(s, true);
   } else {
     return new UnknownMaterial(s);
   }

@@ -9,7 +9,7 @@ namespace viskores_device {
 
 struct MatteMaterial : public Material
 {
-  MatteMaterial(ViskoresDeviceGlobalState *d);
+  MatteMaterial(ViskoresDeviceGlobalState *d, bool approximatePBR = false);
 
   void commitParameters() override;
   void finalize() override;
@@ -50,6 +50,8 @@ struct MatteMaterial : public Material
   }
 
  private:
+  bool m_approximatePBR{false};
+
   helium::ChangeObserverPtr<Sampler> m_sampler;
   helium::Attribute m_colorAttribute;
   viskores::Vec3f_32 m_color;
